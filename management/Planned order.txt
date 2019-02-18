@@ -1,0 +1,7 @@
+PLAN
+
+Always update time managment as we go
+
+1. C - translator
+2. C - compiler
+3. Test suite

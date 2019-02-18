@@ -16,13 +16,19 @@ extern "C" int fileno(FILE *stream);
 
 /* End the embedded code section. */
 %}
+
+/* Declare shorthand */
+L [a-zA-Z]
+Num [0-9]
+Hex [a-fA-F0-9]
 %%
 
-("//").* || ("/*").*("*/")    {} /* Ignore comments */
+("//").* || ^"/*"[^*]*|[*]*"*/"    {} /* Ignore comments */
 
 "int" 			    { yylval.string = new std::string(yytext); return T_INT; }
 "double"        { yylval.string = new std::string(yytext); return T_DOUBLE; }
 "float"         { yylval.string = new std::string(yytext); return T_FLOAT; }
+"long"          { yylval.string = new std::string(yytext); return T_LONG; }
 "void"          { yylval.string = new std::string(yytext); return T_VOID; }
 "char"          { yylval.string = new std::string(yytext); return T_CHAR; }
 "short"         { yylval.string = new std::string(yytext); return T_SHORT; }
@@ -36,6 +42,14 @@ extern "C" int fileno(FILE *stream);
 "break"			    { yylval.string = new std::string(yytext); return T_BREAK; }
 "continue"		  { yylval.string = new std::string(yytext); return T_CONTINUE; }
 "go to"			    { yylval.string = new std::string(yytext); return T_GO_TO; }
+"auto"          { yylval.string = new std::String(yytext); return T_AUTO; }
+"struct"        { yylval.string = new std::string(yytext); return T_STRUCT; }
+
+[0-9]+([.][0-9]*)? { yylval.number=strtod(yytext, 0); return T_NUMBER; }
+
+[a-z]+[a-z0-9]*        { yylval.string=new std::string(yytext); return T_VARIABLE; }
+
+
 
 /* Operators below: */
 
@@ -100,9 +114,7 @@ extern "C" int fileno(FILE *stream);
 /* Whitespaces are ignored: */
 [ \n\t]
 
-[-]?[0-9]+([.][0-9]*)? { yylval.number=strtod(yytext, 0); return T_NUMBER; }
 
-[a-z]+[a-z0-9]*        { yylval.string=new std::string(yytext); return T_VARIABLE; }
 
 %%
 
