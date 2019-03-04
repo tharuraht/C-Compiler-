@@ -1,2 +1,6 @@
 MilestoneID,             Dependencies, EstimatedEffort, Lead,  Completed, Description
-DefineInitialMilestones,             ,               1,    ?,           , Come up with initial milestones for getting started
+DefineInitialMilestones,             ,2,"am9717, ta2617",           ," Come up with initial milestones for getting started, read and understood specification"
+Create_simple_lexer,,4,am9717,1f639019d6a9f54b9812f3db580b282a9e7fa597,Read the C89 spec and created lexer based on that spec
+Test_simple_lexer,Create_simple_lexer,1,ta2617,,Check the functionality of the lexer by printing output tokens
+Create_simple_parser,Create_simple_lexer,5,am9717,,"Based on lexer, create a parsing file to parse into canonical form"
+Test_simple_parser,Create_simple_parser,1,ta2617,,Pass functions into parser and print out ast tree
