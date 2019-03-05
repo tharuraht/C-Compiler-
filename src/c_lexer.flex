@@ -114,8 +114,6 @@ Hex [a-fA-F0-9]
 /* Whitespaces are ignored: */
 [ \n\t]
 
-
-
 %%
 
 /* Error handler. This will get called if none of the rules match. */
