@@ -44,6 +44,7 @@ Hex [a-fA-F0-9]
 "go to"			    { yylval.string = new std::string(yytext); return T_GO_TO; }
 "auto"          { yylval.string = new std::String(yytext); return T_AUTO; }
 "struct"        { yylval.string = new std::string(yytext); return T_STRUCT; }
+"return"        { yylval.string = new std::string(yytext); return T_RETURN; }
 
 [0-9]+([.][0-9]*)? { yylval.number=strtod(yytext, 0); return T_NUMBER; }
 

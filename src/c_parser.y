@@ -39,11 +39,14 @@
 
 %token T_LBRACKET T_CURLY_LBRACKET T_SQUARE_LBRACKET T_LHEADER T_RBRACKET T_CURLY_RBRACKET T_SQUARE_RBRACKET T_RHEADER
 
-%token T_SEMI_COLON T_COLON T_COMMA
+%token T_SEMICOLON T_COLON T_COMMA
 
-%token T_NUMBER T_VARIABLE
+%token T_NUMBER T_VARIABLE T_RETURN
 
 %type <expr> EXPR TERM FACTOR EXPONENT
+%type <expr> PROGRAM  EX_DECLARATION FUNCTION_DEF TYPE_SPECIFY
+%type <expr> SCOPE SCOPE_BODY
+%type <expr> C_EXPRESSION C_INCREMENT_DECREMENT
 %type <number> T_NUMBER
 %type <string> T_VARIABLE T_LOG T_EXP T_SQRT FUNCTION_NAME
 
@@ -60,6 +63,7 @@
    broken anything while you added it.
 */
 
+/* maths parser
 ROOT : PROG_DECL { g_root = $1; }
 
 PROG_DECL : TERM                 { $$ = $1; }
@@ -88,7 +92,54 @@ FACTOR : T_NUMBER           { $$ = new Number( $1 ); }
 FUNCTION_NAME : T_LOG { $$ = new std::string("log"); }
               | T_EXP { $$ = new std::string("exp"); }
               | T_SQRT { $$ = new std::string("sqrt"); }
+*/
+ROOT : PROGRAM {g_root = $1;}
 
+PROGRAM
+  : EX_DECLARATION  {$$ = $1;}
+  | PROGRAM EX_DECLARATION {$$ = }      //TODO
+  ;
+
+EX_DECLARATION
+  : FUNCTION_DEF  {$$ = $1;}
+  | DECLARATION {$$ = $1;}
+  ;
+
+FUNCTION_DEF
+  : TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET SCOPE {$$ = new FunctionDec($1,$2,NULL,$5);}
+
+
+TYPE_SPECIFY
+  : T_VOID  {$$ = new std::string("void");}
+  | T_INT {$$ = new std::string("int");}
+  | T_DOUBLE {$$ = new std::string("double");}
+  | T_FLOAT {$$ = new std::string("float");}
+  ;
+
+SCOPE : T_CURLY_LBRACKET SCOPE_BODY T_CURLY_RBRACKET  {$$ = $2;} ;
+
+SCOPE_BODY
+  : STATEMENT {$$ = new Body($1, NULL);}
+  | SCOPE_BODY STATEMENT  {$$ = new Body($1, $2);}
+  | DECLARE_VAR {$$ = new Body($1,NULL);}
+  | SCOPE_BODY DECLARE_VAR {$$ = new Body($1,$2);}
+  ;
+
+STATEMENT
+  : T_RETURN C_EXPRESSION T_SEMICOLON {$$ = new ReturnStatement($2);}
+  | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON {$$ = new AssignmentStatement($3);}
+  | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE {$$ = new IfStatement($3,$5,NULL);}
+  | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE T_ELSE SCOPE {$$ = new IfStatement($3,$5,$7);}
+  | T_WHILE T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE  {$$ = new WhileStatment($3,$5);}
+  | T_FOR T_LBRACKET DECLARE_VAR COMPARISONEXPR T_SEMICOLON C_INCREMENT_DECREMENT T_RBRACKET SCOPE {$$ = new ForStatement($3,$4,$6,$8);}
+  ;
+
+/*TODO
+DECLARE_VAR
+COMPARISONEXPR
+C_EXPRESSION
+C_INCREMENT_DECREMENT
+*/
 %%
 
 const Expression *g_root; // Definition of variable (to match declaration earlier)
