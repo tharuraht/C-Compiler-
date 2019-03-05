@@ -44,9 +44,9 @@
 %token T_NUMBER T_VARIABLE T_RETURN
 
 %type <expr> EXPR TERM FACTOR EXPONENT
-%type <expr> PROGRAM  EX_DECLARATION FUNCTION_DEF TYPE_SPECIFY
+%type <expr> PROGRAM  EX_DECLARATION FUNCTION_DEF FUNCTION_CALL TYPE_SPECIFY
 %type <expr> SCOPE SCOPE_BODY
-%type <expr> C_EXPRESSION C_INCREMENT_DECREMENT
+%type <expr> C_EXPRESSION C_INCREMENT_DECREMENT C_ARGS COMPARISONEXPR DECLARE_VAR
 %type <number> T_NUMBER
 %type <string> T_VARIABLE T_LOG T_EXP T_SQRT FUNCTION_NAME
 
@@ -134,11 +134,46 @@ STATEMENT
   | T_FOR T_LBRACKET DECLARE_VAR COMPARISONEXPR T_SEMICOLON C_INCREMENT_DECREMENT T_RBRACKET SCOPE {$$ = new ForStatement($3,$4,$6,$8);}
   ;
 
-/*TODO
 DECLARE_VAR
-COMPARISONEXPR
+  : TYPE_SPECIFY T_VARIABLE T_SEMICOLON {$$ = new VarDeclaration ($1,$2,NULL);}
+  | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON {$$ = new VarDeclaration ($1,$2,$4);}
+
 C_EXPRESSION
+  : BINARY_EXPRESSION_TREE {$$ = $1;}
+  | C_INCREMENT_DECREMENT {$$ = $1;}
+  | FUNCTION_CALL {$$ = $1;}
+
+FUNCTION_CALL
+  : T_VARIABLE T_LBRACKET T_RBRACKET  {$$ = new FunctionCall($1, NULL);}
+  | T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET {$$ = new FunctionCall($1, $3);}
+  
+
+BINARY_EXPRESSION_TREE
+  : BINARY_EXPRESSION_TREE T_PLUS BINARY_EXPRESSION_TREE     { $$ = new AddOperator($1, $3);}
+  | BINARY_EXPRESSION_TREE T_MINUS BINARY_EXPRESSION_TREE    { $$ = new SubOperator($1, $3);}
+  | TERM                 { $$ = $1; }
+  
+TERM : TERM T_TIMES TERM  { $$ = new MulOperator($1, $3);}
+     | TERM T_DIVIDE TERM { $$ = new DivOperator($1, $3);}
+     | TERM T_EXPONENT TERM {$$ = new ExpOperator($1, $3);}
+     | FACTOR               { $$ = $1; }
+
+FACTOR : T_LBRACKET EXPR T_RBRACKET { $$ = $2; }
+       | T_EXP T_LBRACKET EXPR T_RBRACKET   {$$ = new ExpFunction($3);}
+       | T_LOG T_LBRACKET EXPR T_RBRACKET   {$$ = new LogFunction($3);}
+       | T_SQRT T_LBRACKET EXPR T_RBRACKET  {$$ = new SqrtFunction($3);}
+       | FUNCTION_CALL {$$ = $1;}
+       | T_VARIABLE         {$$ = new Variable(*$1);}
+       | T_NUMBER           {$$ = new Number( $1 );}
+
+C_ARGS
+  : C_EXPRESSION {$$ = new Args($1,NULL);}
+  | C_EXPRESSION T_COMMA C_ARGS {$$ = new Args($1,$3);}
+/*TODO
+COMPARISONEXPR
+BINARY_EXPRESSION_TREE
 C_INCREMENT_DECREMENT
+C_ARGS
 */
 %%
 

@@ -3,3 +3,4 @@ Date,Effort,Developers,Milestones
 22.02.19 ,1,"am9717, ta2617","Understood C89 draft spec, allocated initial tasks"
 25.02.19,3,am9717,Worked on a simple lexer
 04.03.19,3,am9717,Worked on a simple parser 
+05.03.19,4,ta2617,Began generating main parse tree
