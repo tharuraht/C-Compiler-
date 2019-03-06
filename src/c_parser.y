@@ -43,14 +43,19 @@
 
 %token T_NUMBER T_VARIABLE T_RETURN
 
-%type <expr> EXPR TERM FACTOR EXPONENT
-%type <expr> PROGRAM  EX_DECLARATION FUNCTION_DEF FUNCTION_CALL TYPE_SPECIFY
-%type <expr> SCOPE SCOPE_BODY
+//%type <expr> EXPR TERM FACTOR EXPONENT
+%type <node> PROGRAM EX_DECLARATION FUNCTION_DEF FUNCTION_CALL TYPE_SPECIFY
+%type <node> SCOPE SCOPE_BODY
+%type <node> STATEMENT T_IF T_ELSE T_WHILE T_FOR T_RETURN
+%type <node> FUNCTION_CALL BINARY BINARY_EXPRESSION_TREE
 %type <expr> C_EXPRESSION C_INCREMENT_DECREMENT C_ARGS COMPARISONEXPR DECLARE_VAR
 %type <number> T_NUMBER
-%type <string> T_VARIABLE T_LOG T_EXP T_SQRT FUNCTION_NAME
+%type <string> T_VARIABLE FUNCTION_NAME
 
-%right "then" T_ELSE //solution for dangling if else problem
+
+//%right "then" T_ELSE solution for dangling if else problem
+%nonassoc "then" //solution for dangling if else problem
+%nonassoc T_ELSE //solution for dangling if else problem
 
 %start ROOT
 
@@ -126,7 +131,7 @@ SCOPE_BODY
   ;
 
 STATEMENT
-  : T_RETURN C_EXPRESSION T_SEMICOLON {$$ = new ReturnStatement($2);}
+: T_RETURN C_EXPRESSION T_SEMICOLON {$$ = new ReturnStatement($2);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON {$$ = new AssignmentStatement($3);}
   | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE {$$ = new IfStatement($3,$5,NULL);}
   | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE T_ELSE SCOPE {$$ = new IfStatement($3,$5,$7);}
