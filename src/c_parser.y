@@ -15,7 +15,8 @@
 // Represents the value associated with any kind of
 // AST node.
 %union{
-  const Expression *expr;
+  const AST_node *NodePtr;
+  const Expression *Expression;
   const constant *const; //added 
   const declaration *dec; //added
   const declarator *decr; //added
@@ -44,7 +45,7 @@
 %token T_NUMBER T_VARIABLE T_RETURN
 
 //%type <expr> EXPR TERM FACTOR EXPONENT
-%type <node> PROGRAM EX_DECLARATION FUNCTION_DEF FUNCTION_CALL TYPE_SPECIFY
+%type <node> PROGRAM EX_DECLARATION FUNCTION_DEF FUNCTION_CALL TYPE_SPECIFY GLOBAL_DECLARATION
 %type <node> SCOPE SCOPE_BODY
 %type <node> STATEMENT T_IF T_ELSE T_WHILE T_FOR T_RETURN
 %type <node> FUNCTION_CALL BINARY BINARY_EXPRESSION_TREE
@@ -102,16 +103,21 @@ ROOT : PROGRAM {g_root = $1;}
 
 PROGRAM
   : EX_DECLARATION  {$$ = $1;}
-  | PROGRAM EX_DECLARATION {$$ = }      //TODO
+  | PROGRAM EX_DECLARATION {$$ = $1;}      //TODO
   ;
 
-EX_DECLARATION
-  : FUNCTION_DEF  {$$ = $1;}
-  | DECLARATION {$$ = $1;}
+EX_DECLARATION :
+    FUNCTION_DEF  {$$ = $1;}
+  | GLOBAL_DECLARATION {$$ = $1;}
   ;
 
-FUNCTION_DEF
-  : TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET SCOPE {$$ = new FunctionDec($1,$2,NULL,$5);}
+GLOBAL_DECLARATION :
+    TYPE_SPECIFY T_VARIABLE T_SEMICOLON {$$ = new GlobalVarDec($1,$2,NULL);}
+  | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON  {$$ = new GlobalVarDec($1,$2,*$4);}
+
+FUNCTION_DEF : 
+    TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET SCOPE {$$ = new FunctionDef($1,$2,NULL,$5);}
+  | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET SCOPE {$$ = new FunctionDef($1,$2,$4,$5);}
 
 
 TYPE_SPECIFY
@@ -204,6 +210,7 @@ COMPARISONEXPR
 BINARY_EXPRESSION_TREE
 C_INCREMENT_DECREMENT
 C_ARGS
+DECLARATION
 */
 %%
 

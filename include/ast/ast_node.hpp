@@ -1,7 +1,5 @@
-#ifndef ast_expression_hpp
-#define ast_expression_hpp
-
-#include "ast_node.hpp"
+#ifndef ast_node_hpp
+#define ast_node_hpp
 
 #include <string>
 #include <iostream>
@@ -9,17 +7,17 @@
 
 #include <memory>
 
-class Expression;
+class AST_node;
 
-typedef const Expression *ExpressionPtr;
+typedef const AST_node *NodePtr;
 
-class Expression : public AST_node
+class AST_node
 {
 public:
-    virtual ~Expression()
+    virtual ~AST_node()
     {}
 
-    //! Tell and expression to print itself to the given stream
+    //! Tell a node to print itself to the given stream
     virtual void print(std::ostream &dst) const =0;
 
     //! Evaluate the tree using the given mapping of variables to numbers
