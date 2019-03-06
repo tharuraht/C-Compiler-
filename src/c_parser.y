@@ -27,7 +27,7 @@
 
 %token T_INT T_DOUBLE T_FLOAT T_VOID T_CHAR T_SHORT T_LONG T_IF T_ELSE T_WHILE T_FOR T_DO T_BREAK T_CONTINUE T_GOTO
 
-%token T_TIMES T_PLUS T_MINUS T_DIVIDE T_MODULUS
+%token T_TIMES T_PLUS T_MINUS T_DIVIDE T_MODULUS  T_INCREMENT T_DECREMENT
 
 %token T_EQUAL T_PLUS_EQUAL T_MINUS_EQUAL T_TIMES_EQUAL T_DIVIDE_EQUAL T_MODULUS_EQUAL
 
@@ -171,9 +171,34 @@ FACTOR : T_LBRACKET EXPR T_RBRACKET { $$ = $2; }
        | T_VARIABLE         {$$ = new Variable(*$1);}
        | T_NUMBER           {$$ = new Number( $1 );}
 
-C_ARGS
-  : C_EXPRESSION {$$ = new Args($1,NULL);}
+C_ARGS :
+    C_EXPRESSION {$$ = new Args($1,NULL);}
   | C_EXPRESSION T_COMMA C_ARGS {$$ = new Args($1,$3);}
+
+
+COMPARISONEXPR : 
+    C_EXPRESSION COMPARISON_OP C_EXPRESSION     {$$ = new ComparisonExpr($1,$2,$3);}
+  | COMPARISONEXPR T_LOGICAL_AND COMPARISONEXPR {$$ = new ComparisonExpr($1,new std::string("&&"));}
+  | COMPARISONEXPR T_LOGICAL_OR COMPARISONEXPR  {$$ = new ComparisonExpr($1,new std::string("||"));}
+  | COMPARISONEXPR                              {$$ = $1;}
+
+
+COMPARISON_OP :   
+    T_IS_EQUAL            {$$ = new std::string("==");}
+  | T_IS_NOT_EQUAL        {$$ = new std::string("!=");}
+  | T_LESS_THAN           {$$ = new std::string("<");}
+  | T_GREATER_THAN        {$$ = new std::string(">");}
+  | T_LESS_EQUAL_THAN     {$$ = new std::string("<=");}
+  | T_GREATER_EQUAL_THAN  {$$ = new std::string(">=");}  
+
+
+C_INCREMENT_DECREMENT : 
+    T_VARIABLE T_INCREMENT  {$$ = new PostIncrement($1);}
+  | T_VARIABLE T_DECREMENT  {$$ = new PostDecrement($1);}
+  | T_INCREMENT T_VARIABLE  {$$ = new PreIncrement($2);}
+  | T_DECREMENT T_VARIABLE  {$$ = new PreDecrement($2);}
+
+
 /*TODO
 COMPARISONEXPR
 BINARY_EXPRESSION_TREE

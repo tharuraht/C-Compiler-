@@ -115,6 +115,10 @@ Hex [a-fA-F0-9]
 /* Whitespaces are ignored: */
 [ \n\t]
 
+/* Increment and decrement */
+[++]            { return T_INCREMENT; }
+[--]            { return T_DECREMENT; }
+
 %%
 
 /* Error handler. This will get called if none of the rules match. */
