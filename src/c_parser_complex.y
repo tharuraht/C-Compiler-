@@ -3,7 +3,7 @@
 
   #include <cassert>
 
-  extern const AST_node *g_root; // A way of getting the AST out
+  extern const Expression *g_root; // A way of getting the AST out
 
   //! This is to fix problems when generating C++
   // We are declaring the functions provided by Flex, so
@@ -15,15 +15,13 @@
 // Represents the value associated with any kind of
 // AST node.
 %union{
-  const AST_node *node;
-  const Expression *expr;
-  /*
+  const AST_node *NodePtr;
+  const Expression *Expression;
   const constant *const; //added 
   const declaration *dec; //added
   const declarator *decr; //added
   const initialiser *init; //added
   const statement *stat; //added
-  */
   double number;
   std::string *string;
 }
@@ -46,15 +44,13 @@
 
 %token T_NUMBER T_VARIABLE T_RETURN
 
-%token T_SIGNED T_GO_TO T_AUTO T_STRUCT 
-
-%type <expr> EXPR TERM FACTOR BINARY_EXPRESSION_TREE
+//%type <expr> EXPR TERM FACTOR EXPONENT
 %type <node> PROGRAM EX_DECLARATION FUNCTION_DEF FUNCTION_CALL TYPE_SPECIFY GLOBAL_DECLARATION
 %type <node> SCOPE SCOPE_BODY
 %type <node> STATEMENT T_IF T_ELSE T_WHILE T_FOR T_RETURN
-%type <node> BINARY 
+%type <node> FUNCTION_CALL BINARY BINARY_EXPRESSION_TREE
 %type <expr> C_EXPRESSION C_INCREMENT_DECREMENT C_ARGS COMPARISONEXPR DECLARE_VAR
-%type <number> T_NUMBER T_INT
+%type <number> T_NUMBER
 %type <string> T_VARIABLE FUNCTION_NAME
 
 
@@ -73,9 +69,38 @@
    broken anything while you added it.
 */
 
-ROOT : BINARY_EXPRESSION_TREE {g_root = $1;}
+/* maths parser
+ROOT : PROG_DECL { g_root = $1; }
 
-/*
+PROG_DECL : TERM                 { $$ = $1; }
+    |EXPR T_PLUS TERM       { $$ = new AddOperator($1, $3); }
+    |EXPR T_MINUS TERM      { $$ = new SubOperator($1, $3); }
+
+TERM : EXPONENT                    { $$ = $1; }
+      |TERM T_TIMES EXPONENT       { $$ = new MulOperator($1, $3); }
+      |TERM T_DIVIDE EXPONENT      { $$ = new DivOperator($1, $3); }
+
+EXPONENT : FACTOR                    { $$ = $1; }
+         |FACTOR T_EXPONENT EXPONENT { $$ = new ExpOperator($1, $3); }
+
+FACTOR : T_NUMBER           { $$ = new Number( $1 ); }
+       | T_LBRACKET EXPR T_RBRACKET { $$ = $2; }
+       | T_VARIABLE { $$ = new Variable( *$1 ); }
+       | FUNCTION_NAME T_LBRACKET EXPR T_RBRACKET 
+         {
+         if (*$1 == "log") { $$ = new LogFunction ($3); }
+         
+         else if (*$1 == "exp") { $$ = new ExpFunction ($3); }
+         
+         else if (*$1 == "sqrt") { $$ = new SqrtFunction ($3); }
+         }
+
+FUNCTION_NAME : T_LOG { $$ = new std::string("log"); }
+              | T_EXP { $$ = new std::string("exp"); }
+              | T_SQRT { $$ = new std::string("sqrt"); }
+*/
+ROOT : PROGRAM {g_root = $1;}
+
 PROGRAM
   : EX_DECLARATION  {$$ = $1;}
   | PROGRAM EX_DECLARATION {$$ = $1;}      //TODO
@@ -133,8 +158,6 @@ FUNCTION_CALL
   : T_VARIABLE T_LBRACKET T_RBRACKET  {$$ = new FunctionCall($1, NULL);}
   | T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET {$$ = new FunctionCall($1, $3);}
   
-//-----------------------------------------------------------------------------
-*/
 
 BINARY_EXPRESSION_TREE
   : BINARY_EXPRESSION_TREE T_PLUS BINARY_EXPRESSION_TREE     { $$ = new AddOperator($1, $3);}
@@ -143,13 +166,17 @@ BINARY_EXPRESSION_TREE
   
 TERM : TERM T_TIMES TERM  { $$ = new MulOperator($1, $3);}
      | TERM T_DIVIDE TERM { $$ = new DivOperator($1, $3);}
+     | TERM T_EXPONENT TERM {$$ = new ExpOperator($1, $3);}
      | FACTOR               { $$ = $1; }
 
-FACTOR : T_VARIABLE         {$$ = new Variable(*$1);}
+FACTOR : T_LBRACKET EXPR T_RBRACKET { $$ = $2; }
+       | T_EXP T_LBRACKET EXPR T_RBRACKET   {$$ = new ExpFunction($3);}
+       | T_LOG T_LBRACKET EXPR T_RBRACKET   {$$ = new LogFunction($3);}
+       | T_SQRT T_LBRACKET EXPR T_RBRACKET  {$$ = new SqrtFunction($3);}
+       | FUNCTION_CALL {$$ = $1;}
+       | T_VARIABLE         {$$ = new Variable(*$1);}
        | T_NUMBER           {$$ = new Number( $1 );}
-       | T_INT              {$$ = new Number($1);}
 
-/*
 C_ARGS :
     C_EXPRESSION {$$ = new Args($1,NULL);}
   | C_EXPRESSION T_COMMA C_ARGS {$$ = new Args($1,$3);}
@@ -176,7 +203,7 @@ C_INCREMENT_DECREMENT :
   | T_VARIABLE T_DECREMENT  {$$ = new PostDecrement($1);}
   | T_INCREMENT T_VARIABLE  {$$ = new PreIncrement($2);}
   | T_DECREMENT T_VARIABLE  {$$ = new PreDecrement($2);}
-*/
+
 
 /*TODO
 COMPARISONEXPR
@@ -187,9 +214,9 @@ DECLARATION
 */
 %%
 
-const AST_node *g_root; // Definition of variable (to match declaration earlier)
+const Expression *g_root; // Definition of variable (to match declaration earlier)
 
-const AST_node *parseAST()
+const Expression *parseAST()
 {
   g_root=0;
   yyparse();

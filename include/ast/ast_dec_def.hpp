@@ -2,6 +2,8 @@
 #define ast_dec_def_hpp
 
 #include <iostream>
+#include <vector>
+#include <string>
 #include "ast.hpp"
 
 extern std::vector<std::string> global_vars;
@@ -52,7 +54,7 @@ class GlobalVarDec: public AST_node {
     ExpressionPtr Expression;
 
     GlobalVarDec (std::string _Type, std::string _Name, ExpressionPtr _Expression) : Type(_Type),Name(_Name),Expression(_Expression) {
-        global_vars.push_back(Name)
+        global_vars.push_back(Name);
         var_count++;
     }
     ~GlobalVarDec () {}
@@ -87,8 +89,8 @@ class LocalVarDec : public AST_node
     std::string Name;
     ExpressionPtr Expression;
 
-    GlobalVarDec(std::string _Type, std::string _Name, ExpressionPtr _Expression) : Type(_Type), Name(_Name), Expression(_Expression) {}
-    ~GlobalVarDec() {}
+    LocalVarDec(std::string _Type, std::string _Name, ExpressionPtr _Expression) : Type(_Type), Name(_Name), Expression(_Expression) {}
+    ~LocalVarDec() {}
 
     virtual void print(std::ostream &dst) const override
     {
