@@ -5,3 +5,4 @@ Date,Effort,Developers,Milestones
 04.03.19,3,am9717,Worked on a simple parser 
 05.03.19,4,ta2617,Began generating main parse tree
 06.03.19,7,"am9717,ta2617","Built more of parse tree, and began writing AST functions"
+09.03.19,3,ta2617,"Reduced and simplified parser tree in order to test and create functional AST"

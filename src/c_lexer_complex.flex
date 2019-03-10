@@ -46,7 +46,7 @@ extern "C" int fileno(FILE *stream);
 
 [a-z]+[a-z0-9]*        { yylval.string=new std::string(yytext); return T_VARIABLE; }
 
-[0-9]+          { yylval.number=strtod(yytext, 0); return T_INT; }
+[0-9]+          { ECHO; yylval.number=strtod(yytext, 0); return T_INT; }
 
 
 

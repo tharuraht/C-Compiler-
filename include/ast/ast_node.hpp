@@ -25,6 +25,10 @@ public:
         const std::map<std::string,double> &bindings
     ) const
     { throw std::runtime_error("Not implemented."); }
+
+    virtual void translate(std::ostream &dst) const {
+        throw std::runtime_error("Translate not implemented.");
+    }
 };
 
 

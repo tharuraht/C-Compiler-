@@ -4,9 +4,7 @@
 #include <string>
 #include <iostream>
 
-class Variable
-    : public Expression
-{
+class Variable: public Expression {
 private:
     std::string id;
 public:
@@ -32,8 +30,7 @@ public:
     }    
 };
 
-class Number
-    : public Expression
+class Number: public Expression
 {
 private:
     double value;
