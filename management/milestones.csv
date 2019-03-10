@@ -4,3 +4,5 @@ Create_simple_lexer,,4,am9717,1f639019d6a9f54b9812f3db580b282a9e7fa597,Read the 
 Test_simple_lexer,Create_simple_lexer,1,ta2617,,Check the functionality of the lexer by printing output tokens
 Create_simple_parser,Create_simple_lexer,5,am9717,,"Based on lexer, create a parsing file to parse into canonical form"
 Test_simple_parser,Create_simple_parser,1,ta2617,,Pass functions into parser and print out ast tree
+Complete_Deliverable_1, , 5,am9717, ,Write test and test drivers for required ten tests. Write a bash script to automate testing.
+Test_Deliverable_1, , 1, am9717, ,Run the automated script and check if own compiler passes written tests.   
