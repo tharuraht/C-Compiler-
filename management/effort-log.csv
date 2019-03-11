@@ -7,3 +7,4 @@ Date,Effort,Developers,Milestones
 06.03.19,7,"am9717,ta2617","Built more of parse tree, and began writing AST functions"
 09.03.19,3,ta2617,"Reduced and simplified parser tree in order to test and create functional AST"
 10.03.19,3, am9717, "Completed ten required tests for deliverable 1, wrote (yet to test) bash script to automate testing"
+11.03.19,3,ta2617,"Broadened parser to allow for simple variable syntax e.g. 'a=5+5;'" 

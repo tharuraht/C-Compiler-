@@ -31,6 +31,7 @@ class FunctionDec: public AST_node {
 
     FunctionDec(std::string _Type, std::string _Identifier, NodePtr _Arguments, NodePtr _Scope) 
     : Type(_Type), Identifier(_Identifier), Arguments(_Arguments), Scope(_Scope) {}
+
     ~FunctionDec() {}
 
     virtual void print(std::ostream &dst) const override {
@@ -82,14 +83,16 @@ class GlobalVarDec: public AST_node {
     }
 };
 
-class LocalVarDec : public AST_node
+class LocalVarDec : public Expression
 {
   public:
     std::string Type;
     std::string Name;
     ExpressionPtr Expression;
 
-    LocalVarDec(std::string _Type, std::string _Name, ExpressionPtr _Expression) : Type(_Type), Name(_Name), Expression(_Expression) {}
+    LocalVarDec(std::string _Type, std::string _Name, ExpressionPtr _Expression)
+     : Type(_Type), Name(_Name), Expression(_Expression) {}
+
     ~LocalVarDec() {}
 
     virtual void print(std::ostream &dst) const override
@@ -109,7 +112,7 @@ class LocalVarDec : public AST_node
         if (Expression != NULL)
         {
             dst << "=";
-            Expression->print(dst);
+            Expression->translate(dst);
         }
         else
         {

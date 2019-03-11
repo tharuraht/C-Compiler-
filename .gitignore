@@ -1,2 +1,6 @@
 src/*.output
 src/*.tab.hpp
+src/*.tab.cpp
+src/*.o
+src/*.yy.cpp
+bin/*

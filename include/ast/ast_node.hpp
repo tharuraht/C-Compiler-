@@ -4,8 +4,13 @@
 #include <string>
 #include <iostream>
 #include <map>
-
+#include <vector>
 #include <memory>
+
+static std::vector<std::string> global_vars;
+static int var_count;
+
+static std::vector<std::string> function_call_queue;
 
 class AST_node;
 
@@ -24,7 +29,7 @@ public:
     virtual double evaluate(
         const std::map<std::string,double> &bindings
     ) const
-    { throw std::runtime_error("Not implemented."); }
+    { throw std::runtime_error("Evaluate not implemented."); }
 
     virtual void translate(std::ostream &dst) const {
         throw std::runtime_error("Translate not implemented.");

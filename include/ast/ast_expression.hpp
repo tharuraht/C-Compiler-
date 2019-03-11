@@ -26,7 +26,7 @@ public:
     virtual double evaluate(
         const std::map<std::string,double> &bindings
     ) const
-    { throw std::runtime_error("Not implemented."); }
+    { throw std::runtime_error("Expr evaluate not implemented."); }
 };
 
 

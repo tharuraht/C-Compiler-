@@ -43,12 +43,11 @@ extern "C" int fileno(FILE *stream);
 "struct"        { yylval.string = new std::string(yytext); return T_STRUCT; }
 "return"        { yylval.string = new std::string(yytext); return T_RETURN; }
 
-[0-9]+([.][0-9]*) { yylval.number=strtod(yytext, 0); return T_NUMBER; }
+[0-9]+([.][0-9]*)? { yylval.number=strtod(yytext, 0); return T_NUMBER; }
 
 [a-z]+[a-z0-9]*        { yylval.string=new std::string(yytext); return T_VARIABLE; }
 
-[0-9]+          { yylval.number=strtod(yytext, 0); return T_INT; }
-
+["][a-z]+[a-z0-9]*["]    { yylval.string=new std::string(yytext); return T_STRING; }
 
 
 

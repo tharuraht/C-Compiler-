@@ -2,18 +2,47 @@
 #define ast_functions_hpp
 
 #include "ast_expression.hpp"
-
 #include <cmath>
 
-class Function
-    : public Expression
+extern std::vector<std::string> function_call_queue;
+
+class FunctionCall : public Expression
 {
+  private:
+    std::string name;
+    ExpressionPtr arg;
+
+
+  public:
+    FunctionCall(std::string _name, ExpressionPtr _arg) : name(_name), arg(_arg) {
+        function_call_queue.push_back(name);
+    }
+    ~FunctionCall() {}
+
+    virtual void print(std::ostream &dst) const override {
+        dst << name << "(";
+        if (arg != NULL) {
+            arg->print(dst);
+        }
+        
+        dst << ")";
+    }
+
+    virtual void translate(std::ostream &dst) const {
+        dst << name << "(";
+        if (arg != NULL) {
+            arg->translate(dst);
+        }
+
+        dst << ")";
+    }
+};
+
+class Function: public Expression {
 private:
     ExpressionPtr arg;
 protected:
-    Function(ExpressionPtr _arg)
-        : arg(_arg)
-    {}
+    Function(ExpressionPtr _arg): arg(_arg) {}
 public:
     virtual const char * getFunction() const =0;
 

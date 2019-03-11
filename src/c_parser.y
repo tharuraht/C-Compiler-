@@ -2,7 +2,7 @@
   #include "ast.hpp"
 
   #include <cassert>
-
+  #include <string>
   extern const AST_node *g_root; // A way of getting the AST out
 
   //! This is to fix problems when generating C++
@@ -15,8 +15,8 @@
 // Represents the value associated with any kind of
 // AST node.
 %union{
-  const AST_node *node;
-  const Expression *expr;
+  const AST_node* node;
+  const Expression* expr;
   /*
   const constant *const; //added 
   const declaration *dec; //added
@@ -44,18 +44,20 @@
 
 %token T_SEMICOLON T_COLON T_COMMA
 
-%token T_NUMBER T_VARIABLE T_RETURN
+%token T_NUMBER T_VARIABLE T_RETURN T_STRING
 
 %token T_SIGNED T_GO_TO T_AUTO T_STRUCT 
 
 %type <expr> EXPR TERM FACTOR BINARY_EXPRESSION_TREE
-%type <node> PROGRAM EX_DECLARATION FUNCTION_DEF FUNCTION_CALL TYPE_SPECIFY GLOBAL_DECLARATION
+%type <expr> C_EXPRESSION C_INCREMENT_DECREMENT C_ARGS COMPARISONEXPR DECLARE_VAR
+
+%type <node> PROGRAM EX_DECLARATION FUNCTION_DEF FUNCTION_CALL GLOBAL_DECLARATION
 %type <node> SCOPE SCOPE_BODY
 %type <node> STATEMENT T_IF T_ELSE T_WHILE T_FOR T_RETURN
 %type <node> BINARY 
-%type <expr> C_EXPRESSION C_INCREMENT_DECREMENT C_ARGS COMPARISONEXPR DECLARE_VAR
-%type <number> T_NUMBER T_INT
-%type <string> T_VARIABLE FUNCTION_NAME
+
+%type <number> T_NUMBER 
+%type <string> T_VARIABLE FUNCTION_NAME T_VOID T_INT T_DOUBLE T_FLOAT TYPE_SPECIFY
 
 
 //%right "then" T_ELSE solution for dangling if else problem
@@ -73,7 +75,7 @@
    broken anything while you added it.
 */
 
-ROOT : BINARY_EXPRESSION_TREE {g_root = $1;}
+ROOT : DECLARE_VAR {g_root = $1;}
 
 /*
 PROGRAM
@@ -95,12 +97,6 @@ FUNCTION_DEF :
   | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET SCOPE {$$ = new FunctionDef($1,$2,$4,$5);}
 
 
-TYPE_SPECIFY
-  : T_VOID  {$$ = new std::string("void");}
-  | T_INT {$$ = new std::string("int");}
-  | T_DOUBLE {$$ = new std::string("double");}
-  | T_FLOAT {$$ = new std::string("float");}
-  ;
 
 SCOPE : T_CURLY_LBRACKET SCOPE_BODY T_CURLY_RBRACKET  {$$ = $2;} ;
 
@@ -120,14 +116,6 @@ STATEMENT
   | T_FOR T_LBRACKET DECLARE_VAR COMPARISONEXPR T_SEMICOLON C_INCREMENT_DECREMENT T_RBRACKET SCOPE {$$ = new ForStatement($3,$4,$6,$8);}
   ;
 
-DECLARE_VAR
-  : TYPE_SPECIFY T_VARIABLE T_SEMICOLON {$$ = new VarDeclaration ($1,$2,NULL);}
-  | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON {$$ = new VarDeclaration ($1,$2,$4);}
-
-C_EXPRESSION
-  : BINARY_EXPRESSION_TREE {$$ = $1;}
-  | C_INCREMENT_DECREMENT {$$ = $1;}
-  | FUNCTION_CALL {$$ = $1;}
 
 FUNCTION_CALL
   : T_VARIABLE T_LBRACKET T_RBRACKET  {$$ = new FunctionCall($1, NULL);}
@@ -135,6 +123,23 @@ FUNCTION_CALL
   
 //-----------------------------------------------------------------------------
 */
+DECLARE_VAR
+  : TYPE_SPECIFY T_VARIABLE T_SEMICOLON {$$ = new LocalVarDec (*$1,*$2,NULL);}
+  | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON {$$ = new LocalVarDec (*$1,*$2,$4);}
+
+TYPE_SPECIFY
+  : T_VOID    {$$ = $1;}
+  | T_INT     {$$ = $1;}
+  | T_DOUBLE  {$$ = $1;}
+  | T_FLOAT   {$$ = $1;}
+  ;
+
+C_EXPRESSION
+  : BINARY_EXPRESSION_TREE {$$ = $1;}
+  /*
+  | C_INCREMENT_DECREMENT {$$ = $1;}
+  | FUNCTION_CALL {$$ = $1;}
+  */
 
 BINARY_EXPRESSION_TREE
   : BINARY_EXPRESSION_TREE T_PLUS BINARY_EXPRESSION_TREE     { $$ = new AddOperator($1, $3);}
@@ -147,7 +152,6 @@ TERM : TERM T_TIMES TERM  { $$ = new MulOperator($1, $3);}
 
 FACTOR : T_VARIABLE         {$$ = new Variable(*$1);}
        | T_NUMBER           {$$ = new Number( $1 );}
-       | T_INT              {$$ = new Number($1);}
 
 /*
 C_ARGS :
@@ -184,6 +188,7 @@ BINARY_EXPRESSION_TREE
 C_INCREMENT_DECREMENT
 C_ARGS
 DECLARATION
+Factor can also have function call
 */
 %%
 
