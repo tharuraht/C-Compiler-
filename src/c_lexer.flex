@@ -15,6 +15,7 @@
 extern "C" int fileno(FILE *stream);
 
 /* End the embedded code section. */
+
 %}
 
 
@@ -124,8 +125,8 @@ void yyerror (char const *s)
   exit(1);
 }
 
-// //main to check what is being lexed
-// int main()
+//main to check what is being lexed
+// int main(void)
 // {
 //     int token;
 //     while ((token = yylex()) != 0)

@@ -24,3 +24,5 @@ clean :
 	rm bin/*
 	rm src/*.tab.cpp
 	rm src/*.yy.cpp
+	rm src/*.output
+	rm src/*.tab.hpp
