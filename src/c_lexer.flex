@@ -15,6 +15,7 @@
 extern "C" int fileno(FILE *stream);
 
 /* End the embedded code section. */
+
 %}
 
 
@@ -123,5 +124,4 @@ void yyerror (char const *s)
   fprintf (stderr, "Flex Error: %s\n", s); /* s is the text that wasn't matched */
   exit(1);
 }
-
 
