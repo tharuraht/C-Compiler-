@@ -124,11 +124,4 @@ void yyerror (char const *s)
   exit(1);
 }
 
-// //main to check what is being lexed
-// int main()
-// {
-//     int token;
-//     while ((token = yylex()) != 0)
-//         printf("Token: %d (%s)\n", token, yytext);
-//     return 0;
-// }
+

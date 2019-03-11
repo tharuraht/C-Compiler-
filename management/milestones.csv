@@ -1,8 +1,9 @@
-MilestoneID,             Dependencies, EstimatedEffort, Lead,  Completed, Description
-DefineInitialMilestones,             ,2,"am9717, ta2617",           ," Come up with initial milestones for getting started, read and understood specification"
+MilestoneID,             Dependencies, EstimatedEffort, Lead,             Completed, Description
+DefineInitialMilestones,             , 2              ,"am9717, ta2617",           ," Come up with initial milestones for getting started, read and understood specification"
 Create_simple_lexer,,4,am9717,1f639019d6a9f54b9812f3db580b282a9e7fa597,Read the C89 spec and created lexer based on that spec
 Test_simple_lexer,Create_simple_lexer,1,ta2617,,Check the functionality of the lexer by printing output tokens
 Create_simple_parser,Create_simple_lexer,5,am9717,,"Based on lexer, create a parsing file to parse into canonical form"
-Test_simple_parser,Create_simple_parser,1,ta2617,,Pass functions into parser and print out ast tree
+Develop_simple_parser,Create_simple_parser,5,ta2617,f3e1f6dd64e3ef570bd285a6f320007b232b6cc2,"Developed parse tree and lexer to be read and print simple mathematical expressions, as in lab 2"
+Test_simple_parser,Create_simple_parser,4,ta2617,,Pass functions into parser and print out ast tree
 Complete_Deliverable_1, , 5,am9717, ,Write test and test drivers for required ten tests. Write a bash script to automate testing.
 Test_Deliverable_1, , 1, am9717, ,Run the automated script and check if own compiler passes written tests.   

@@ -2,9 +2,10 @@
 
 int main()
 {
-    //Lexer debugging
+    //Lexer debugging 
     extern int yy_flex_debug;
-    yy_flex_debug = 0;
+    yy_flex_debug = 0;  //set to 1 to debug
+
     const AST_node *ast=parseAST();
 
     ast->print(std::cout);
