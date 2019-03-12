@@ -1,5 +1,5 @@
-#ifndef ast_assignments_hpp
-#define ast_assignments_hpp
+#ifndef ast_statements_hpp
+#define ast_statements_hpp
 
 #include "ast.hpp"
 
