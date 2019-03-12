@@ -35,20 +35,39 @@ public:
     ~FunctionDec() {}
 
     virtual void print(std::ostream &dst) const override {
-        dst << Type << " " << Identifier << " (";
+        dst << Type << " " << Identifier << "(";
         if (Arguments != NULL) {
             Arguments->print(dst);
         }
-        dst<<") {" <<std::endl;
+        dst<<") " <<std::endl;
         if (Scope != NULL) {
             Scope->print(dst);
             dst<<std::endl;
         }
-        dst<<" }" << std::endl;
+    }
+
+    virtual void translate (std::ostream &dst) const override {
+        dst << "def " << Identifier << "(";
+        if (Arguments != NULL) {
+            Arguments->translate(dst);
+        }
+        dst << "): ";
+        if (Scope != NULL) {
+            Scope->translate(dst);
+            dst << std::endl;
+        }
+
+        //tells python to invoke the function if it is the main function
+        if (Identifier == "main") {
+            dst<< "if __name__ == \"__main__\": "<<std::endl;
+            dst<<"\timport sys"<<std::endl;
+            dst<<"\tret=main()"<<std::endl;
+            dst<<"\tsys.exit(ret)"<<std::endl;
+        }
     }
 };
 
-class GlobalVarDec: public AST_node {
+class GlobalVarDec: public Expression {
     public:
     std::string Type;
     std::string Name;
@@ -120,5 +139,7 @@ class LocalVarDec : public Expression
         }
     }
 };
+
+
 
 #endif

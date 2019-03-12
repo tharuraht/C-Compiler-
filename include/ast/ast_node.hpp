@@ -9,7 +9,7 @@
 
 static std::vector<std::string> global_vars;
 static int var_count;
-
+static int scopelevel;
 static std::vector<std::string> function_call_queue;
 
 class AST_node;
