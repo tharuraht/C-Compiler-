@@ -10,7 +10,7 @@ extern std::vector<std::string> global_vars;
 extern int var_count;
 
 class FunctionDef: public AST_node {
-    public:
+public:
     std::string Type;
     std::string Identifier;
 
@@ -23,7 +23,7 @@ class FunctionDef: public AST_node {
 };
 
 class FunctionDec: public AST_node {
-    public:
+public:
     std::string Type;
     std::string Identifier;
     NodePtr Arguments;
@@ -111,12 +111,12 @@ class LocalVarDec : public Expression
         dst << Name;
         if (Expression != NULL)
         {
-            dst << "=";
+            dst << " = ";
             Expression->translate(dst);
         }
         else
         {
-            dst << "=0";
+            dst << "= 0";
         }
     }
 };

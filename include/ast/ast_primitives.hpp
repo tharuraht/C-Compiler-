@@ -20,6 +20,11 @@ public:
         dst<<id;
     }
 
+    virtual void translate(std::ostream &dst) const {
+        dst<<id;
+    }
+
+
     virtual double evaluate(
         const std::map<std::string,double> &bindings
     ) const override
@@ -46,6 +51,11 @@ public:
     {
         dst<<value;
     }
+
+    virtual void translate(std::ostream &dst) const {
+        dst<<value;
+    }
+
 
     virtual double evaluate(
         const std::map<std::string,double> &bindings

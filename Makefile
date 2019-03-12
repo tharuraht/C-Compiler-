@@ -2,7 +2,7 @@ CPPFLAGS += -std=c++11 -W -Wall -g -Wno-unused-parameter
 CPPFLAGS += -I include
 LFLAGS = -d
 
-all : bin/print_canonical bin/eval_expr
+all : bin/print_canonical bin/eval_expr bin/translate_python
 
 src/c_parser.tab.cpp src/c_parser.tab.hpp : src/c_parser.y
 	bison -v -d src/c_parser.y -o src/c_parser.tab.cpp
@@ -17,6 +17,11 @@ bin/print_canonical : src/print_canonical.o src/c_parser.tab.o src/c_lexer.yy.o 
 bin/eval_expr : src/eval_expr.o src/c_parser.tab.o src/c_lexer.yy.o src/c_parser.tab.o
 	mkdir -p bin
 	g++ $(CPPFLAGS) -o bin/eval_expr $^
+
+
+bin/translate_python : src/translate_python.o src/c_parser.tab.o src/c_lexer.yy.o src/c_parser.tab.o
+	mkdir -p bin
+	g++ $(CPPFLAGS) -o bin/translate_python $^
 
 
 clean :

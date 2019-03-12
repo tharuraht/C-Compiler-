@@ -35,30 +35,42 @@ public:
         right->print(dst);
         dst<<" )";
     }
-};
 
-class AddOperator
-    : public Operator
-{
-protected:
-    virtual const char *getOpcode() const override
-    { return "+"; }
-public:
-    AddOperator(ExpressionPtr _left, ExpressionPtr _right)
-        : Operator(_left, _right)
-    {}
-    
-    virtual double evaluate(
-        const std::map<std::string,double> &bindings
-    ) const override 
-    {
-        // TODO-C : Run bin/eval_expr with something like 5+a, where a=10, to make sure you understand how this works
-        double vl=left->evaluate(bindings);
-        double vr=right->evaluate(bindings);
-        return vl+vr;
-
-        //throw std::runtime_error("AddOperator::evaluate is not implemented.");
+    virtual void translate(std::ostream &dst) const {
+        left ->translate(dst);
+        dst << " ";
+        dst << getOpcode();
+        dst << " ";
+        right->translate(dst);
     }
+
+    };
+
+    class AddOperator
+        : public Operator
+    {
+      protected:
+        virtual const char *getOpcode() const override
+        {
+            return "+";
+        }
+
+      public:
+        AddOperator(ExpressionPtr _left, ExpressionPtr _right)
+            : Operator(_left, _right)
+        {
+        }
+
+        virtual double evaluate(
+            const std::map<std::string, double> &bindings) const override
+        {
+            // TODO-C : Run bin/eval_expr with something like 5+a, where a=10, to make sure you understand how this works
+            double vl = left->evaluate(bindings);
+            double vr = right->evaluate(bindings);
+            return vl + vr;
+
+            //throw std::runtime_error("AddOperator::evaluate is not implemented.");
+        }
 };
 
 class SubOperator
