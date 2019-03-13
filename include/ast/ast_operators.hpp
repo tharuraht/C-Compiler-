@@ -145,14 +145,37 @@ public:
     }
 };
 
-class ExpOperator
+// class ExpOperator
+//     : public Operator
+// {
+// protected:
+//     virtual const char *getOpcode() const override
+//     { return "^"; }
+// public:
+//     ExpOperator(ExpressionPtr _left, ExpressionPtr _right)
+//         : Operator(_left, _right)
+//     {}
+
+//     virtual double evaluate(
+//         const std::map<std::string,double> &bindings
+//     ) const override
+//     {
+//         //throw std::runtime_error("ExpOperator::evaluate is not implemented.");
+
+//         double vl=left->evaluate(bindings);
+//         double vr=right->evaluate(bindings);
+//         return pow(vl, vr);
+//     }
+// };
+
+class LessThanOperator
     : public Operator
 {
 protected:
     virtual const char *getOpcode() const override
-    { return "^"; }
+    { return "<"; }
 public:
-    ExpOperator(ExpressionPtr _left, ExpressionPtr _right)
+    LessThanOperator(ExpressionPtr _left, ExpressionPtr _right)
         : Operator(_left, _right)
     {}
 
@@ -160,13 +183,52 @@ public:
         const std::map<std::string,double> &bindings
     ) const override
     {
-        //throw std::runtime_error("ExpOperator::evaluate is not implemented.");
-
         double vl=left->evaluate(bindings);
         double vr=right->evaluate(bindings);
-        return pow(vl, vr);
+        return (vl<vr);
     }
 };
 
+class GreaterThanOperator
+    : public Operator
+{
+protected:
+    virtual const char *getOpcode() const override
+    { return ">"; }
+public:
+    GreaterThanOperator(ExpressionPtr _left, ExpressionPtr _right)
+        : Operator(_left, _right)
+    {}
+
+    virtual double evaluate(
+        const std::map<std::string,double> &bindings
+    ) const override
+    {
+        double vl=left->evaluate(bindings);
+        double vr=right->evaluate(bindings);
+        return (vl>vr);
+    }
+};
+
+class IsEqualOperator
+    : public Operator
+{
+protected:
+    virtual const char *getOpcode() const override
+    { return "=="; }
+public:
+    IsEqualOperator(ExpressionPtr _left, ExpressionPtr _right)
+        : Operator(_left, _right)
+    {}
+
+    virtual double evaluate(
+        const std::map<std::string,double> &bindings
+    ) const override
+    {
+        double vl=left->evaluate(bindings);
+        double vr=right->evaluate(bindings);
+        return (vl==vr);
+    }
+};
 
 #endif

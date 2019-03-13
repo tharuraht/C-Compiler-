@@ -49,13 +49,15 @@
 %token T_SIGNED T_GO_TO T_AUTO T_STRUCT 
 
 
-%type <expr> EXPR TERM FACTOR BINARY_EXPRESSION_TREE STATEMENT
-%type <expr> C_EXPRESSION C_INCREMENT_DECREMENT C_ARGS COMPARISONEXPR DECLARE_VAR FUNCTION_CALL PASSED_PARAMS
+%type <expr>  TERM FACTOR BINARY_EXPRESSION_TREE STATEMENT
+%type <expr> C_EXPRESSION COMPARISONEXPR C_ARGS  DECLARE_VAR FUNCTION_CALL PASSED_PARAMS
+
+//C_INCREMENT_DECREMENT, , EXPR, SCOPE_BODY
 
 %type <node> PROGRAM EX_DECLARATION FUNCTION_DEC_DEF  GLOBAL_DECLARATION
-%type <node> SCOPE SCOPE_BODY SCOPE_STATEMENTS IFELSE_SCOPE PARAMETER
+%type <node> SCOPE  SCOPE_STATEMENTS IFELSE_SCOPE PARAMETER
 %type <node>  T_IF T_ELSE T_WHILE T_FOR T_RETURN
-%type <node> BINARY 
+//%type <node> BINARY 
 
 %type <number> T_NUMBER 
 %type <string> T_VARIABLE FUNCTION_NAME T_VOID T_INT T_DOUBLE T_FLOAT TYPE_SPECIFY
@@ -185,6 +187,7 @@ TYPE_SPECIFY
   | T_FLOAT   {$$ = $1;}
 
 
+
 C_EXPRESSION
   : BINARY_EXPRESSION_TREE {$$ = $1;}
   /*
@@ -195,10 +198,13 @@ C_EXPRESSION
 BINARY_EXPRESSION_TREE
   : TERM T_PLUS BINARY_EXPRESSION_TREE     { $$ = new AddOperator($1, $3);}
   | TERM T_MINUS BINARY_EXPRESSION_TREE    { $$ = new SubOperator($1, $3);}
-  | TERM                 { $$ = $1; }
+  | TERM                    { $$ = $1; }
   
 TERM : FACTOR T_TIMES TERM  { $$ = new MulOperator($1, $3);}
      | FACTOR T_DIVIDE TERM { $$ = new DivOperator($1, $3);}
+     | FACTOR T_LESS_THAN TERM { $$ = new LessThanOperator($1, $3);}
+     | FACTOR T_GREATER_THAN TERM { $$ = new GreaterThanOperator($1, $3);}
+     | FACTOR T_IS_EQUAL TERM { $$ = new IsEqualOperator($1, $3);}
      | FACTOR               { $$ = $1; }
 
 FACTOR : T_VARIABLE         {$$ = new Variable(*$1);}
@@ -206,11 +212,8 @@ FACTOR : T_VARIABLE         {$$ = new Variable(*$1);}
        | T_MINUS T_NUMBER   {$$ = new Number(-$2);}
        | FUNCTION_CALL      {$$ = $1;}
 
+
 /*
-
-  
-
-
 COMPARISONEXPR : 
     C_EXPRESSION COMPARISON_OP C_EXPRESSION     {$$ = new ComparisonExpr($1,$2,$3);}
   | COMPARISONEXPR T_LOGICAL_AND COMPARISONEXPR {$$ = new ComparisonExpr($1,new std::string("&&"));}
