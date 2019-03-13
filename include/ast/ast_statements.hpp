@@ -86,16 +86,10 @@ public:
     }
 
     virtual void translate(std::ostream &dst) const override {
-
-        for (int i =0; i < scopelevel; i++){
-            dst<< "\t";
-        }
         dst<< "if(";
         Condition->translate(dst);
-        dst<<"):" << std::endl;
-        scopelevel++;
+        dst<<"):";
         Body->translate(dst);
-        scopelevel--;
     }
 };
 

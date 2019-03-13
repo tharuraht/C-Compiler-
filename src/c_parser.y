@@ -151,6 +151,7 @@ SCOPE_STATEMENTS :
 STATEMENT :
     T_RETURN C_EXPRESSION T_SEMICOLON {$$ = new ReturnStatement($2);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON{$$ = new AssignmentStatement(*$1,$3);}
+  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET SCOPE {$$ = new IfStatement($3,$5);}
   | DECLARE_VAR {$$ = $1;}
 
 DECLARE_VAR
