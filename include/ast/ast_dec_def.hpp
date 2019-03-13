@@ -39,9 +39,9 @@ class FunctionDef: public AST_node {
 public:
     std::string Type;
     std::string Identifier;
-    NodePtr Arguments;
+    ExpressionPtr Arguments;
 
-    FunctionDef (std::string _Type, std::string _Identifier, NodePtr _Arguments) : Type(_Type), Identifier(_Identifier), Arguments(_Arguments) {}
+    FunctionDef (std::string _Type, std::string _Identifier, ExpressionPtr _Arguments) : Type(_Type), Identifier(_Identifier), Arguments(_Arguments) {}
     ~FunctionDef () {}
 
     virtual void print(std::ostream &dst) const override {

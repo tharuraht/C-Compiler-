@@ -49,16 +49,16 @@ public:
 
     virtual void print (std::ostream &dst) const override {
         SingleParameter->print(dst);
-        dst<<",";
         if (OtherParameters != NULL) {
+            dst << ",";
             OtherParameters->print(dst);
         }
     }
 
     virtual void translate (std::ostream &dst) const override {
         SingleParameter->translate(dst);
-        dst << ",";
         if (OtherParameters != NULL) {
+            dst << ",";
             OtherParameters->translate(dst);
         }
     }
@@ -80,6 +80,33 @@ public:
 
     virtual void translate (std::ostream &dst) const override {
         dst<< Identifier;
+    }
+};
+
+class PassedParams : public Expression {
+private:
+    ExpressionPtr CurrentParam;
+    ExpressionPtr OtherParams;
+
+public:
+    ~PassedParams() {}
+
+    PassedParams (ExpressionPtr _CurrentParam, ExpressionPtr _OtherParams) : CurrentParam(_CurrentParam), OtherParams(_OtherParams) {}
+
+    virtual void print (std::ostream &dst) const override {
+        CurrentParam->print(dst);
+        if (OtherParams != NULL) {
+            dst << ",";
+            OtherParams->print(dst);
+        }
+    }
+
+    virtual void translate (std::ostream &dst) const override {
+        CurrentParam->translate(dst);
+        if (OtherParams != NULL) {
+            dst << ",";
+            OtherParams->translate(dst);
+        }
     }
 };
 

@@ -49,12 +49,12 @@
 %token T_SIGNED T_GO_TO T_AUTO T_STRUCT 
 
 
-%type <expr> EXPR TERM FACTOR BINARY_EXPRESSION_TREE
-%type <expr> C_EXPRESSION C_INCREMENT_DECREMENT C_ARGS COMPARISONEXPR DECLARE_VAR
+%type <expr> EXPR TERM FACTOR BINARY_EXPRESSION_TREE STATEMENT
+%type <expr> C_EXPRESSION C_INCREMENT_DECREMENT C_ARGS COMPARISONEXPR DECLARE_VAR FUNCTION_CALL PASSED_PARAMS
 
-%type <node> PROGRAM EX_DECLARATION FUNCTION_DEC_DEF FUNCTION_CALL GLOBAL_DECLARATION
+%type <node> PROGRAM EX_DECLARATION FUNCTION_DEC_DEF  GLOBAL_DECLARATION
 %type <node> SCOPE SCOPE_BODY SCOPE_STATEMENTS IFELSE_SCOPE PARAMETER
-%type <node> STATEMENT T_IF T_ELSE T_WHILE T_FOR T_RETURN
+%type <node>  T_IF T_ELSE T_WHILE T_FOR T_RETURN
 %type <node> BINARY 
 
 %type <number> T_NUMBER 
@@ -112,7 +112,7 @@ STATEMENT
 
 FUNCTION_CALL
   : T_VARIABLE T_LBRACKET T_RBRACKET  {$$ = new FunctionCall($1, NULL);}
-  | T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET {$$ = new FunctionCall($1, $3);}
+  | T_VARIABLE T_LBRACKET CALLEDF_ARGS T_RBRACKET {$$ = new FunctionCall($1, $3);}
   
 //-----------------------------------------------------------------------------
 */
@@ -132,10 +132,9 @@ GLOBAL_DECLARATION :
 FUNCTION_DEC_DEF : 
     TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET SCOPE         {$$ = new FunctionDec(*$1,*$2,NULL,$5);}
   | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET SCOPE  {$$ = new FunctionDec(*$1,*$2,$4,$6);}
-/*
   | TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET T_SEMICOLON        {$$ = new FunctionDef(*$1,*$2, NULL);}
-  | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET T_SEMICOLON {$$ = new FunctionDef(*$1,*$2,*$4);}
-*/
+  | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET T_SEMICOLON {$$ = new FunctionDef(*$1,*$2,$4);}
+
 
 C_ARGS :
     PARAMETER T_COMMA C_ARGS {$$ = new Args($1,$3);}
@@ -146,7 +145,7 @@ PARAMETER : T_INT T_VARIABLE {$$= new Parameter(*$1,*$2);}
 SCOPE : T_CURLY_LBRACKET SCOPE_STATEMENTS T_CURLY_RBRACKET  {$$ = new ScopeBody($2);} ;
 
 SCOPE_STATEMENTS :
-    STATEMENT SCOPE_STATEMENTS  { $$ = new ScopeStatements($1,$2);}
+    STATEMENT SCOPE_STATEMENTS  { std::cout<<"scopes"<< std::endl; $$ = new ScopeStatements($1,$2);}
   | STATEMENT                   { $$ = new ScopeStatements($1,NULL);}
 /*
   : STATEMENT                {$$ = new ScopeBody($1, NULL);}
@@ -156,12 +155,23 @@ SCOPE_STATEMENTS :
 */
 
 STATEMENT :
-    T_RETURN C_EXPRESSION T_SEMICOLON                         {$$ = new ReturnStatement($2);}
+    T_RETURN STATEMENT                                        {$$ = new ReturnStatement($2);}
+  | FUNCTION_CALL T_SEMICOLON                                 {$$ = $1;}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON               {$$ = new AssignmentStatement(*$1,$3);}
+  | T_VARIABLE T_EQUAL FUNCTION_CALL T_SEMICOLON            {$$ = new AssignmentStatement(*$1,$3);}
   | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET IFELSE_SCOPE      {$$ = new IfElseStatement($3,$5, NULL);}
   | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET IFELSE_SCOPE T_ELSE IFELSE_SCOPE {$$ = new IfElseStatement($3, $5, $7);}
   | T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET SCOPE          {$$ = new WhileStatement($3,$5);}
-  | DECLARE_VAR                                               {$$ = $1;}
+  | DECLARE_VAR T_SEMICOLON                                             {$$ = $1;}
+  | C_EXPRESSION T_SEMICOLON                                           {$$ = $1;}
+
+FUNCTION_CALL
+  : T_VARIABLE T_LBRACKET PASSED_PARAMS T_RBRACKET {std::cout<<"params"<< std::endl;$$ = new FunctionCall(*$1, $3);}
+  | T_VARIABLE T_LBRACKET T_RBRACKET  {$$ = new FunctionCall(*$1, NULL);}
+
+PASSED_PARAMS
+  : FACTOR T_COMMA PASSED_PARAMS {$$ = new PassedParams($1, $3);}
+  | FACTOR                       {$$ = new PassedParams($1,NULL);}
 
 IFELSE_SCOPE :
     STATEMENT {$$ = $1;}
@@ -197,6 +207,7 @@ TERM : FACTOR T_TIMES TERM  { $$ = new MulOperator($1, $3);}
 FACTOR : T_VARIABLE         {$$ = new Variable(*$1);}
        | T_NUMBER           {$$ = new Number( $1 );}
        | T_MINUS T_NUMBER   {$$ = new Number(-$2);}
+       | FUNCTION_CALL      {std::cout<<"function called"<<std::endl; $$ = $1;}
 
 /*
 
