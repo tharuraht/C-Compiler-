@@ -53,7 +53,7 @@
 %type <expr> C_EXPRESSION C_INCREMENT_DECREMENT C_ARGS COMPARISONEXPR DECLARE_VAR
 
 %type <node> PROGRAM EX_DECLARATION FUNCTION_DEC_DEF FUNCTION_CALL GLOBAL_DECLARATION
-%type <node> SCOPE SCOPE_BODY SCOPE_STATEMENTS
+%type <node> SCOPE SCOPE_BODY SCOPE_STATEMENTS IFELSE_SCOPE PARAMETER
 %type <node> STATEMENT T_IF T_ELSE T_WHILE T_FOR T_RETURN
 %type <node> BINARY 
 
@@ -102,11 +102,12 @@ FUNCTION_DEC :
 STATEMENT
 : T_RETURN C_EXPRESSION T_SEMICOLON {$$ = new ReturnStatement($2);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON{$$ = new AssignmentStatement($1,$3);}
-  | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE {$$ = new IfStatement($3,$5,NULL);}
-  | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE T_ELSE SCOPE {$$ = new IfStatement($3,$5,$7);}
+  | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET IFELSE_SCOPE {$$ = new IfStatement($3,$5,NULL);}
+  | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET IFELSE_SCOPE T_ELSE IFELSE_SCOPE {$$ = new IfStatement($3,$5,$7);}
   | T_WHILE T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE  {$$ = new WhileStatment($3,$5);}
   | T_FOR T_LBRACKET DECLARE_VAR COMPARISONEXPR T_SEMICOLON C_INCREMENT_DECREMENT T_RBRACKET SCOPE {$$ = new ForStatement($3,$4,$6,$8);}
-  ;
+  
+
 
 
 FUNCTION_CALL
@@ -117,54 +118,65 @@ FUNCTION_CALL
 */
 PROGRAM
   : EX_DECLARATION PROGRAM {$$ = new Program($1,$2);}
-  | EX_DECLARATION {$$ = new Program($1, NULL);}      //TODO
+  | EX_DECLARATION         {$$ = new Program($1, NULL);}    
 
 EX_DECLARATION :
-    FUNCTION_DEC_DEF  {$$ = $1;}
+    FUNCTION_DEC_DEF   {$$ = $1;}
   | GLOBAL_DECLARATION {$$ = $1;}
 
 
 GLOBAL_DECLARATION :
-    TYPE_SPECIFY T_VARIABLE T_SEMICOLON {$$ = new GlobalVarDec(*$1,*$2,NULL);}
-  | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON  {$$ = new GlobalVarDec(*$1,*$2,$4);}
+    TYPE_SPECIFY T_VARIABLE T_SEMICOLON                         {$$ = new GlobalVarDec(*$1,*$2,NULL);}
+  | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON    {$$ = new GlobalVarDec(*$1,*$2,$4);}
 
 FUNCTION_DEC_DEF : 
-    TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET SCOPE { $$ = new FunctionDec(*$1,*$2,NULL,$5);}
+    TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET SCOPE         {$$ = new FunctionDec(*$1,*$2,NULL,$5);}
+  | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET SCOPE  {$$ = new FunctionDec(*$1,*$2,$4,$6);}
 /*
-  | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET SCOPE {$$ = new FunctionDec(*$1,*$2,*$4,$5);}
-  | TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET T_SEMICOLON {$$ = new FunctionDef(*$1,*$2, NULL);}
+  | TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET T_SEMICOLON        {$$ = new FunctionDef(*$1,*$2, NULL);}
   | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET T_SEMICOLON {$$ = new FunctionDef(*$1,*$2,*$4);}
 */
+
+C_ARGS :
+    PARAMETER T_COMMA C_ARGS {$$ = new Args($1,$3);}
+  | PARAMETER                {$$ = new Args($1,NULL); }
+
+PARAMETER : T_INT T_VARIABLE {$$= new Parameter(*$1,*$2);}
 
 SCOPE : T_CURLY_LBRACKET SCOPE_STATEMENTS T_CURLY_RBRACKET  {$$ = new ScopeBody($2);} ;
 
 SCOPE_STATEMENTS :
-    STATEMENT SCOPE_STATEMENTS { $$ = new ScopeStatements($1,$2);}
-  | STATEMENT { $$ = new ScopeStatements($1,NULL);}
+    STATEMENT SCOPE_STATEMENTS  { $$ = new ScopeStatements($1,$2);}
+  | STATEMENT                   { $$ = new ScopeStatements($1,NULL);}
 /*
-  : STATEMENT {$$ = new ScopeBody($1, NULL);}
-  | STATEMENT SCOPE_BODY  {$$ = new ScopeBody($1, $2);}
-  | DECLARE_VAR {$$ = new ScopeBody($1,NULL);}
-  | DECLARE_VAR SCOPE_BODY {$$ = new ScopeBody($1,$2);}
+  : STATEMENT                {$$ = new ScopeBody($1, NULL);}
+  | STATEMENT SCOPE_BODY     {$$ = new ScopeBody($1, $2);}
+  | DECLARE_VAR              {$$ = new ScopeBody($1,NULL);}
+  | DECLARE_VAR SCOPE_BODY   {$$ = new ScopeBody($1,$2);}
 */
 
 STATEMENT :
-    T_RETURN C_EXPRESSION T_SEMICOLON {$$ = new ReturnStatement($2);}
-  | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON{$$ = new AssignmentStatement(*$1,$3);}
-  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET SCOPE {$$ = new IfStatement($3,$5);}
-  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET SCOPE T_ELSE T_CURLY_LBRACKET STATEMENT T_CURLY_RBRACKET {$$ = new IfElseStatement($3,$5, $8);}
-  | DECLARE_VAR {$$ = $1;}
+    T_RETURN C_EXPRESSION T_SEMICOLON                         {$$ = new ReturnStatement($2);}
+  | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON               {$$ = new AssignmentStatement(*$1,$3);}
+  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET IFELSE_SCOPE      {$$ = new IfElseStatement($3,$5, NULL);}
+  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET IFELSE_SCOPE T_ELSE IFELSE_SCOPE {$$ = new IfElseStatement($3, $5, $7);}
+  | T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET SCOPE          {$$ = new WhileStatement($3,$5);}
+  | DECLARE_VAR                                               {$$ = $1;}
+
+IFELSE_SCOPE :
+    STATEMENT {$$ = $1;}
+  | SCOPE {$$=$1;}
 
 DECLARE_VAR
-  : TYPE_SPECIFY T_VARIABLE T_SEMICOLON {$$ = new LocalVarDec (*$1,*$2,NULL);}
-  | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON {$$ = new LocalVarDec (*$1,*$2,$4);}
+  : TYPE_SPECIFY T_VARIABLE T_SEMICOLON                       {$$ = new LocalVarDec (*$1,*$2,NULL);}
+  | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON  {$$ = new LocalVarDec (*$1,*$2,$4);}
 
 TYPE_SPECIFY
   : T_VOID    {$$ = $1;}
   | T_INT     {$$ = $1;}
   | T_DOUBLE  {$$ = $1;}
   | T_FLOAT   {$$ = $1;}
-  ;
+
 
 C_EXPRESSION
   : BINARY_EXPRESSION_TREE {$$ = $1;}
@@ -187,11 +199,7 @@ FACTOR : T_VARIABLE         {$$ = new Variable(*$1);}
        | T_MINUS T_NUMBER   {$$ = new Number(-$2);}
 
 /*
-C_ARGS :
-    PARAMETER T_COMMA C_ARGS {$$ = new Args($1,$3);}
-  | PARAMETER {$$ = $1; }
 
-PARAMETER : T_INT T_VARIABLE {$$= new Parameter($1,$2);}
   
 
 

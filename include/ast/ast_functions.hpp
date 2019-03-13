@@ -38,7 +38,7 @@ class FunctionCall : public Expression
     }
 };
 
-class Args: public AST_node {
+class Args: public Expression {
 private:
     NodePtr SingleParameter;
     NodePtr OtherParameters;
@@ -50,17 +50,21 @@ public:
     virtual void print (std::ostream &dst) const override {
         SingleParameter->print(dst);
         dst<<",";
-        OtherParameters->print(dst);
+        if (OtherParameters != NULL) {
+            OtherParameters->print(dst);
+        }
     }
 
     virtual void translate (std::ostream &dst) const override {
         SingleParameter->translate(dst);
         dst << ",";
-        OtherParameters->translate(dst);
+        if (OtherParameters != NULL) {
+            OtherParameters->translate(dst);
+        }
     }
 };
 
-class Parameter: public AST_node {
+class Parameter: public Expression {
 private:
     std::string Type;
     std::string Identifier;

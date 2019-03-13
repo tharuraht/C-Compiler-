@@ -65,34 +65,6 @@ public:
     }
 };
 
-class IfStatement : public Expression {
-private:
-    ExpressionPtr Condition;
-    NodePtr Body;
-public:
-    ~IfStatement () {}
-
-    IfStatement (ExpressionPtr _Condition, NodePtr _Body) : Condition(_Condition), Body(_Body) {}
-
-    virtual void print (std::ostream &dst) const override {
-        // for (int i = 0; i < scopelevel; i++) {
-        //     dst << "\t";
-        // }
-        dst << "if (";
-        Condition->print(dst);
-        dst<<") ";
-        Body->print(dst);
-
-    }
-
-    virtual void translate(std::ostream &dst) const override {
-        dst<< "if(";
-        Condition->translate(dst);
-        dst<<"):";
-        Body->translate(dst);
-    }
-};
-
 class IfElseStatement : public Expression {
 private:
     ExpressionPtr Condition;
@@ -105,16 +77,17 @@ public:
     IfElseStatement (ExpressionPtr _Condition, NodePtr _IBody, NodePtr _EBody) : Condition(_Condition), IBody(_IBody), EBody(_EBody) {}
 
     virtual void print (std::ostream &dst) const override {
-        for (int i = 0; i < scopelevel; i++) {
-            dst << "\t";
-        }
         dst << "if (";
         Condition->print(dst);
         dst<<") ";
         IBody->print(dst);
-        dst<<"else";
-        EBody->print(dst);
-
+        if (EBody != NULL) {
+            dst<<std::endl;
+            for (int i = 0; i < scopelevel; i++) {dst<<"\t";}
+            dst<<"else";
+            EBody->print(dst);
+        }
+        
     }
 
     virtual void translate(std::ostream &dst) const override {
@@ -122,17 +95,39 @@ public:
         Condition->translate(dst);
         dst<<"):";
         IBody->translate(dst);
-        //dst<<"\n";
-        scopelevel--;
 
-        for(int i = 0; i < scopelevel; i++){dst<<"\t";}
-        dst<<"else:";
-        //scopelevel++;
-        //for(int i = 0; i < scopelevel; i++){dst<<"\t";}
-        //std::cout<<scopelevel;
+        if(EBody != NULL){
+            dst<<std::endl;
+            for(int i = 0; i < scopelevel; i++){dst<<"\t";}
+            dst<<"else:";
+            EBody->translate(dst);
+        }
+    }
+};
 
-        EBody->translate(dst);
-    }   
+class WhileStatement: public Expression {
+private:
+    ExpressionPtr Condition;
+    NodePtr Body;
+
+public:
+    ~WhileStatement() {}
+
+    WhileStatement (ExpressionPtr _Condition, NodePtr _Body) : Condition(_Condition) , Body(_Body) {}
+
+    virtual void print (std::ostream &dst) const override {
+        dst << "while(";
+        Condition->print(dst);
+        dst <<") ";
+        Body->print(dst);
+    }
+
+    virtual void translate (std::ostream &dst) const override {
+        dst<< "while(";
+        Condition->translate(dst);
+        dst<<"): ";
+        Body->translate(dst);
+    }
 };
 
 class ScopeBody : public Expression {
@@ -165,6 +160,7 @@ public:
         }
     }
 };
+
 
 class ScopeStatements: public AST_node {
 private:
