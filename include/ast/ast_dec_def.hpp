@@ -9,17 +9,48 @@
 extern std::vector<std::string> global_vars;
 extern int var_count;
 
+class Program: public AST_node {
+private:
+    NodePtr ExDec;
+    NodePtr Rest_of_program;
+
+public:
+    ~Program() {}
+
+    Program (NodePtr _ExDec, NodePtr _Rest_of_program) : ExDec(_ExDec), Rest_of_program(_Rest_of_program) {}
+
+    virtual void print (std::ostream &dst) const override {
+        ExDec->print(dst);
+        if (Rest_of_program != NULL) {
+            Rest_of_program->print(dst);
+        }
+    }
+
+    virtual void translate (std::ostream &dst) const override {
+        ExDec->translate(dst);
+        if (Rest_of_program != NULL) {
+            Rest_of_program->translate(dst);
+        }
+    }
+};
+
 class FunctionDef: public AST_node {
 public:
     std::string Type;
     std::string Identifier;
+    NodePtr Arguments;
 
-    FunctionDef (std::string _Type, std::string _Identifier) : Type(_Type), Identifier(_Identifier) {}
+    FunctionDef (std::string _Type, std::string _Identifier, NodePtr _Arguments) : Type(_Type), Identifier(_Identifier), Arguments(_Arguments) {}
     ~FunctionDef () {}
 
     virtual void print(std::ostream &dst) const override {
-        dst <<Type<<" "<<Identifier<<" ();"<<std::endl;
+        dst <<Type<<" "<<Identifier<<"(";
+        if (Arguments != NULL) {
+            Arguments->print(dst);
+        }
+        dst<<");"<<std::endl;
     }
+
 };
 
 class FunctionDec: public AST_node {

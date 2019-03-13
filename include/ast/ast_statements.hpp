@@ -99,7 +99,7 @@ public:
 
     virtual void print(std::ostream &dst) const override {
         dst << "{ " << std::endl;
-        std::cout<<"scope level: "<<scopelevel<<std::endl;
+        // std::cout<<"scope level: "<<scopelevel<<std::endl;
         scopelevel++;
         for (int i = 0; i < scopelevel; i++) {
             dst << "\t";
