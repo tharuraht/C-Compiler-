@@ -59,28 +59,43 @@ public:
     }
 };
 
-class IfStatement : public Expression {
+class IfElseStatement : public Expression {
 private:
     ExpressionPtr Condition;
-    NodePtr Body;
-public:
-    ~IfStatement () {}
+    NodePtr IBody;
+    NodePtr EBody;
 
-    IfStatement (ExpressionPtr _Condition, NodePtr _Body) : Condition(_Condition), Body(_Body) {}
+public:
+    ~IfElseStatement () {}
+
+    IfElseStatement (ExpressionPtr _Condition, NodePtr _IBody, NodePtr _EBody) : Condition(_Condition), IBody(_IBody), EBody(_EBody) {}
 
     virtual void print (std::ostream &dst) const override {
         dst << "if (";
         Condition->print(dst);
         dst<<") ";
-        Body->print(dst);
-
+        IBody->print(dst);
+        if (EBody != NULL) {
+            dst<<std::endl;
+            for (int i = 0; i < scopelevel; i++) {dst<<"\t";}
+            dst<<"else";
+            EBody->print(dst);
+        }
+        
     }
 
     virtual void translate(std::ostream &dst) const override {
         dst<< "if(";
         Condition->translate(dst);
         dst<<"):";
-        Body->translate(dst);
+        IBody->translate(dst);
+
+        if(EBody != NULL){
+            dst<<std::endl;
+            for(int i = 0; i < scopelevel; i++){dst<<"\t";}
+            dst<<"else:";
+            EBody->translate(dst);
+        }
     }
 };
 
