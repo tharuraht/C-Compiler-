@@ -8,6 +8,7 @@
 
 extern std::vector<std::string> global_vars;
 extern int var_count;
+extern int scopelevel;
 
 class Program: public AST_node {
 private:
@@ -73,7 +74,6 @@ public:
         dst<<") " <<std::endl;
         if (Scope != NULL) {
             Scope->print(dst);
-            dst<<std::endl;
         }
     }
 
@@ -83,13 +83,20 @@ public:
             Arguments->translate(dst);
         }
         dst << "): ";
+        for (int i=0; i< global_vars.size();i++) {
+            dst<<std::endl;
+            for (int i = 0; i < scopelevel; i++) {
+                dst << "\t";
+            }
+            dst<<"\tglobal "<<global_vars[i];
+        }
         if (Scope != NULL) {
             Scope->translate(dst);
-            dst << std::endl;
         }
 
         //tells python to invoke the function if it is the main function
         if (Identifier == "main") {
+            dst<<std::endl;
             dst<< "if __name__ == \"__main__\": "<<std::endl;
             dst<<"\timport sys"<<std::endl;
             dst<<"\tret=main()"<<std::endl;
@@ -117,7 +124,7 @@ class GlobalVarDec: public Expression {
             dst << " = ";
             Expression->print(dst);
         }
-        dst<<";";
+        dst<<";"<<std::endl;
     }
 
     virtual void translate(std::ostream &dst) const override {
@@ -125,11 +132,12 @@ class GlobalVarDec: public Expression {
         if (Expression != NULL)
         {
             dst<<"=";
-            Expression->print(dst);
+            Expression->translate(dst);
         }
         else {
             dst<<"=0";
         }
+        dst<<std::endl;
     }
 };
 
@@ -141,7 +149,8 @@ class LocalVarDec : public Expression
     ExpressionPtr Expression;
 
     LocalVarDec(std::string _Type, std::string _Name, ExpressionPtr _Expression)
-     : Type(_Type), Name(_Name), Expression(_Expression) {}
+        : Type(_Type), Name(_Name), Expression(_Expression) 
+        { var_count++; }
 
     ~LocalVarDec() {}
 
@@ -166,7 +175,7 @@ class LocalVarDec : public Expression
         }
         else
         {
-            dst << "= 0";
+            dst << "=0";
         }
     }
 };
