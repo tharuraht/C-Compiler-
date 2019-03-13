@@ -27,13 +27,13 @@ public:
 
     virtual void print(std::ostream &dst) const override
     {
-        dst<<"( ";
+        
         left->print(dst);
-        dst<<" ";
+        
         dst<<getOpcode();
-        dst<<" ";
+        
         right->print(dst);
-        dst<<" )";
+       
     }
 
     virtual void translate(std::ostream &dst) const {

@@ -38,9 +38,6 @@ public:
     ReturnStatement (ExpressionPtr _AdditionalExpressions): AdditionalExpressions(_AdditionalExpressions) {}
 
     virtual void print(std::ostream &dst) const override {
-        for (int i = 0; i < scopelevel; i++) {
-            dst << "\t";
-        }
         dst<<"return";
         if (AdditionalExpressions != NULL) {
             dst<<" ";
@@ -53,9 +50,6 @@ public:
     }
 
     virtual void translate(std::ostream &dst) const override {
-        for (int i = 0; i < scopelevel; i++) {
-            dst << "\t";
-        }
         dst << "return";
         if (AdditionalExpressions != NULL) {
             dst << " ";
