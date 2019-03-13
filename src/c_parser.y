@@ -110,9 +110,7 @@ STATEMENT
 
 
 
-FUNCTION_CALL
-  : T_VARIABLE T_LBRACKET T_RBRACKET  {$$ = new FunctionCall($1, NULL);}
-  | T_VARIABLE T_LBRACKET CALLEDF_ARGS T_RBRACKET {$$ = new FunctionCall($1, $3);}
+
   
 //-----------------------------------------------------------------------------
 */
@@ -132,9 +130,10 @@ GLOBAL_DECLARATION :
 FUNCTION_DEC_DEF : 
     TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET SCOPE         {$$ = new FunctionDec(*$1,*$2,NULL,$5);}
   | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET SCOPE  {$$ = new FunctionDec(*$1,*$2,$4,$6);}
+/*
   | TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET T_SEMICOLON        {$$ = new FunctionDef(*$1,*$2, NULL);}
-  | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET T_SEMICOLON {$$ = new FunctionDef(*$1,*$2,$4);}
-
+  | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET T_SEMICOLON {$$ = new FunctionDef(*$1,*$2,*$4);}
+*/
 
 C_ARGS :
     PARAMETER T_COMMA C_ARGS {$$ = new Args($1,$3);}
@@ -155,27 +154,25 @@ SCOPE_STATEMENTS :
 */
 
 STATEMENT :
-    T_RETURN STATEMENT                                        {$$ = new ReturnStatement($2);}
-  | FUNCTION_CALL T_SEMICOLON                                 {$$ = $1;}
+    T_RETURN C_EXPRESSION T_SEMICOLON                         {$$ = new ReturnStatement($2);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON               {$$ = new AssignmentStatement(*$1,$3);}
-  | T_VARIABLE T_EQUAL FUNCTION_CALL T_SEMICOLON            {$$ = new AssignmentStatement(*$1,$3);}
-  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET IFELSE_SCOPE      {$$ = new IfElseStatement($3,$5, NULL);}
+  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET IFELSE_SCOPE      {$$ = new IfElseStatement($3,$5,NULL);}
   | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET IFELSE_SCOPE T_ELSE IFELSE_SCOPE {$$ = new IfElseStatement($3, $5, $7);}
   | T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET SCOPE          {$$ = new WhileStatement($3,$5);}
-  | DECLARE_VAR T_SEMICOLON                                             {$$ = $1;}
-  | C_EXPRESSION T_SEMICOLON                                           {$$ = $1;}
+  | DECLARE_VAR                                               {$$ = $1;}
 
-FUNCTION_CALL
-  : T_VARIABLE T_LBRACKET PASSED_PARAMS T_RBRACKET {$$ = new FunctionCall(*$1, $3);}
-  | T_VARIABLE T_LBRACKET T_RBRACKET  {$$ = new FunctionCall(*$1, NULL);}
+IFELSE_SCOPE :
+    STATEMENT {$$ = $1;}
+  | SCOPE {$$=$1;}
+
+  FUNCTION_CALL
+  : T_VARIABLE T_LBRACKET PASSED_PARAMS T_RBRACKET  {$$ = new FunctionCall(*$1, $3);}
+  | T_VARIABLE T_LBRACKET T_RBRACKET {$$ = new FunctionCall(*$1, NULL);}
 
 PASSED_PARAMS
   : FACTOR T_COMMA PASSED_PARAMS {$$ = new PassedParams($1, $3);}
   | FACTOR                       {$$ = new PassedParams($1,NULL);}
 
-IFELSE_SCOPE :
-    STATEMENT {$$ = $1;}
-  | SCOPE {$$=$1;}
 
 DECLARE_VAR
   : TYPE_SPECIFY T_VARIABLE T_SEMICOLON                       {$$ = new LocalVarDec (*$1,*$2,NULL);}
