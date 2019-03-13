@@ -75,9 +75,9 @@ public:
     IfStatement (ExpressionPtr _Condition, NodePtr _Body) : Condition(_Condition), Body(_Body) {}
 
     virtual void print (std::ostream &dst) const override {
-        for (int i = 0; i < scopelevel; i++) {
-            dst << "\t";
-        }
+        // for (int i = 0; i < scopelevel; i++) {
+        //     dst << "\t";
+        // }
         dst << "if (";
         Condition->print(dst);
         dst<<") ";
@@ -91,6 +91,48 @@ public:
         dst<<"):";
         Body->translate(dst);
     }
+};
+
+class IfElseStatement : public Expression {
+private:
+    ExpressionPtr Condition;
+    NodePtr IBody;
+    NodePtr EBody;
+
+public:
+    ~IfElseStatement () {}
+
+    IfElseStatement (ExpressionPtr _Condition, NodePtr _IBody, NodePtr _EBody) : Condition(_Condition), IBody(_IBody), EBody(_EBody) {}
+
+    virtual void print (std::ostream &dst) const override {
+        for (int i = 0; i < scopelevel; i++) {
+            dst << "\t";
+        }
+        dst << "if (";
+        Condition->print(dst);
+        dst<<") ";
+        IBody->print(dst);
+        dst<<"else";
+        EBody->print(dst);
+
+    }
+
+    virtual void translate(std::ostream &dst) const override {
+        dst<< "if(";
+        Condition->translate(dst);
+        dst<<"):";
+        IBody->translate(dst);
+        //dst<<"\n";
+        scopelevel--;
+
+        for(int i = 0; i < scopelevel; i++){dst<<"\t";}
+        dst<<"else:";
+        //scopelevel++;
+        //for(int i = 0; i < scopelevel; i++){dst<<"\t";}
+        //std::cout<<scopelevel;
+
+        EBody->translate(dst);
+    }   
 };
 
 class ScopeBody : public Expression {
