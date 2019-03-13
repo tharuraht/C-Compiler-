@@ -145,7 +145,7 @@ PARAMETER : T_INT T_VARIABLE {$$= new Parameter(*$1,*$2);}
 SCOPE : T_CURLY_LBRACKET SCOPE_STATEMENTS T_CURLY_RBRACKET  {$$ = new ScopeBody($2);} ;
 
 SCOPE_STATEMENTS :
-    STATEMENT SCOPE_STATEMENTS  { std::cout<<"scopes"<< std::endl; $$ = new ScopeStatements($1,$2);}
+    STATEMENT SCOPE_STATEMENTS  { $$ = new ScopeStatements($1,$2);}
   | STATEMENT                   { $$ = new ScopeStatements($1,NULL);}
 /*
   : STATEMENT                {$$ = new ScopeBody($1, NULL);}
@@ -166,7 +166,7 @@ STATEMENT :
   | C_EXPRESSION T_SEMICOLON                                           {$$ = $1;}
 
 FUNCTION_CALL
-  : T_VARIABLE T_LBRACKET PASSED_PARAMS T_RBRACKET {std::cout<<"params"<< std::endl;$$ = new FunctionCall(*$1, $3);}
+  : T_VARIABLE T_LBRACKET PASSED_PARAMS T_RBRACKET {$$ = new FunctionCall(*$1, $3);}
   | T_VARIABLE T_LBRACKET T_RBRACKET  {$$ = new FunctionCall(*$1, NULL);}
 
 PASSED_PARAMS
@@ -207,7 +207,7 @@ TERM : FACTOR T_TIMES TERM  { $$ = new MulOperator($1, $3);}
 FACTOR : T_VARIABLE         {$$ = new Variable(*$1);}
        | T_NUMBER           {$$ = new Number( $1 );}
        | T_MINUS T_NUMBER   {$$ = new Number(-$2);}
-       | FUNCTION_CALL      {std::cout<<"function called"<<std::endl; $$ = $1;}
+       | FUNCTION_CALL      {$$ = $1;}
 
 /*
 
