@@ -8,3 +8,5 @@ Date,Effort,Developers,Milestones
 09.03.19,3,ta2617,"Reduced and simplified parser tree in order to test and create functional AST"
 10.03.19,3, am9717, "Completed ten required tests for deliverable 1, wrote (yet to test) bash script to automate testing"
 11.03.19,3,ta2617,"Broadened parser to allow for simple variable syntax e.g. 'a=5+5;'" 
+12.03.19,3,ta2617,"Implemented function definition, main specific translation"
+13.03.19,5,ta2617,"Fixed bugs with multiple statements, resolved some shift-reduce conflicts, implemented global vars"

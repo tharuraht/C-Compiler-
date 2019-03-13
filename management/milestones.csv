@@ -8,3 +8,4 @@ Test_simple_parser,Create_simple_parser,4,ta2617,,Pass functions into parser and
 Complete_Deliverable_1, , 5,am9717, ,Write test and test drivers for required ten tests. Write a bash script to automate testing.
 Test_Deliverable_1, , 1, am9717, ,Run the automated script and check if own compiler passes written tests.
 Create_var_declaration,Test_simple_parser,2,ta2617,,"Broadened parser to allow for simple variable syntax e.g. 'a=5+5;'" 
+Implement_function_def,Create_var_declaration,3,ta2617,,"Implemented function definition, main specific translation"

@@ -32,7 +32,7 @@
 
 %token T_TIMES T_PLUS T_MINUS T_DIVIDE T_MODULUS  T_INCREMENT T_DECREMENT
 
-%token T_EQUAL T_PLUS_EQUAL T_MINUS_EQUAL T_TIMES_EQUAL T_DIVIDE_EQUAL T_MODULUS_EQUAL
+%nonassoc T_EQUAL T_PLUS_EQUAL T_MINUS_EQUAL T_TIMES_EQUAL T_DIVIDE_EQUAL T_MODULUS_EQUAL
 
 %token T_IS_EQUAL T_IS_NOT_EQUAL T_LESS_THAN T_LESS_EQUAL_THAN T_GREATER_THAN T_GREATER_EQUAL_THAN
 
@@ -40,26 +40,27 @@
 
 %token T_BITWISE_AND T_BITWISE_OR T_BITWISE_XOR T_BITWISE_COMPLEMENT T_LSHIFT T_RSHIFT
 
-%token T_LBRACKET T_CURLY_LBRACKET T_SQUARE_LBRACKET T_LHEADER T_RBRACKET T_CURLY_RBRACKET T_SQUARE_RBRACKET T_RHEADER
+%nonassoc T_LBRACKET T_CURLY_LBRACKET T_SQUARE_LBRACKET T_LHEADER T_RBRACKET T_CURLY_RBRACKET T_SQUARE_RBRACKET T_RHEADER
 
-%token T_SEMICOLON T_COLON T_COMMA
+%right T_SEMICOLON T_COLON T_COMMA
 
-%token T_NUMBER T_VARIABLE T_RETURN T_STRING
+%right T_NUMBER T_VARIABLE T_RETURN T_STRING
 
 %token T_SIGNED T_GO_TO T_AUTO T_STRUCT 
+
 
 %type <expr> EXPR TERM FACTOR BINARY_EXPRESSION_TREE
 %type <expr> C_EXPRESSION C_INCREMENT_DECREMENT C_ARGS COMPARISONEXPR DECLARE_VAR
 
 %type <node> PROGRAM EX_DECLARATION FUNCTION_DEC_DEF FUNCTION_CALL GLOBAL_DECLARATION
-%type <node> SCOPE SCOPE_BODY
+%type <node> SCOPE SCOPE_BODY SCOPE_STATEMENTS
 %type <node> STATEMENT T_IF T_ELSE T_WHILE T_FOR T_RETURN
 %type <node> BINARY 
 
 %type <number> T_NUMBER 
 %type <string> T_VARIABLE FUNCTION_NAME T_VOID T_INT T_DOUBLE T_FLOAT TYPE_SPECIFY
 
-
+%right PREC1
 //%right "then" T_ELSE solution for dangling if else problem
 %nonassoc "then" //solution for dangling if else problem
 %nonassoc T_ELSE //solution for dangling if else problem
@@ -100,7 +101,7 @@ FUNCTION_DEC :
 
 STATEMENT
 : T_RETURN C_EXPRESSION T_SEMICOLON {$$ = new ReturnStatement($2);}
-  | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON {$$ = new AssignmentStatement($1,$3);}
+  | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON{$$ = new AssignmentStatement($1,$3);}
   | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE {$$ = new IfStatement($3,$5,NULL);}
   | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE T_ELSE SCOPE {$$ = new IfStatement($3,$5,$7);}
   | T_WHILE T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE  {$$ = new WhileStatment($3,$5);}
@@ -120,9 +121,12 @@ PROGRAM
 
 EX_DECLARATION :
     FUNCTION_DEC_DEF  {$$ = $1;}
-  /*
   | GLOBAL_DECLARATION {$$ = $1;}
-  */
+
+
+GLOBAL_DECLARATION :
+    TYPE_SPECIFY T_VARIABLE T_SEMICOLON {$$ = new GlobalVarDec(*$1,*$2,NULL);}
+  | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON  {$$ = new GlobalVarDec(*$1,*$2,$4);}
 
 FUNCTION_DEC_DEF : 
     TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET SCOPE { $$ = new FunctionDec(*$1,*$2,NULL,$5);}
@@ -132,15 +136,22 @@ FUNCTION_DEC_DEF :
   | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET T_SEMICOLON {$$ = new FunctionDef(*$1,*$2,*$4);}
 */
 
-SCOPE : T_CURLY_LBRACKET SCOPE_BODY T_CURLY_RBRACKET  {$$ = $2;} ;
+SCOPE : T_CURLY_LBRACKET SCOPE_STATEMENTS T_CURLY_RBRACKET  {$$ = new ScopeBody($2);} ;
 
-SCOPE_BODY : DECLARE_VAR {$$ = new ScopeBody($1,NULL);}
+SCOPE_STATEMENTS :
+    STATEMENT SCOPE_STATEMENTS { $$ = new ScopeStatements($1,$2);}
+  | STATEMENT { $$ = new ScopeStatements($1,NULL);}
 /*
   : STATEMENT {$$ = new ScopeBody($1, NULL);}
   | STATEMENT SCOPE_BODY  {$$ = new ScopeBody($1, $2);}
   | DECLARE_VAR {$$ = new ScopeBody($1,NULL);}
   | DECLARE_VAR SCOPE_BODY {$$ = new ScopeBody($1,$2);}
 */
+
+STATEMENT :
+    T_RETURN C_EXPRESSION T_SEMICOLON {$$ = new ReturnStatement($2);}
+  | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON{$$ = new AssignmentStatement(*$1,$3);}
+  | DECLARE_VAR {$$ = $1;}
 
 DECLARE_VAR
   : TYPE_SPECIFY T_VARIABLE T_SEMICOLON {$$ = new LocalVarDec (*$1,*$2,NULL);}
@@ -161,21 +172,25 @@ C_EXPRESSION
   */
 
 BINARY_EXPRESSION_TREE
-  : BINARY_EXPRESSION_TREE T_PLUS BINARY_EXPRESSION_TREE     { $$ = new AddOperator($1, $3);}
-  | BINARY_EXPRESSION_TREE T_MINUS BINARY_EXPRESSION_TREE    { $$ = new SubOperator($1, $3);}
+  : TERM T_PLUS BINARY_EXPRESSION_TREE     { $$ = new AddOperator($1, $3);}
+  | TERM T_MINUS BINARY_EXPRESSION_TREE    { $$ = new SubOperator($1, $3);}
   | TERM                 { $$ = $1; }
   
-TERM : TERM T_TIMES TERM  { $$ = new MulOperator($1, $3);}
-     | TERM T_DIVIDE TERM { $$ = new DivOperator($1, $3);}
+TERM : FACTOR T_TIMES TERM  { $$ = new MulOperator($1, $3);}
+     | FACTOR T_DIVIDE TERM { $$ = new DivOperator($1, $3);}
      | FACTOR               { $$ = $1; }
 
 FACTOR : T_VARIABLE         {$$ = new Variable(*$1);}
        | T_NUMBER           {$$ = new Number( $1 );}
+       | T_MINUS T_NUMBER   {$$ = new Number(-$2);}
 
 /*
 C_ARGS :
-    C_EXPRESSION {$$ = new Args($1,NULL);}
-  | C_EXPRESSION T_COMMA C_ARGS {$$ = new Args($1,$3);}
+    PARAMETER T_COMMA C_ARGS {$$ = new Args($1,$3);}
+  | PARAMETER {$$ = $1; }
+
+PARAMETER : T_INT T_VARIABLE {$$= new Parameter($1,$2);}
+  
 
 
 COMPARISONEXPR : 

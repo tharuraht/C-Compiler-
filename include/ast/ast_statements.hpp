@@ -25,8 +25,7 @@ public:
     virtual void translate(std::ostream &dst) const override
     {
         dst << VarName << " = ";
-        Expression->translate(dst);
-                
+        Expression->translate(dst);         
     }
 };
 
@@ -102,49 +101,65 @@ public:
 
 class ScopeBody : public Expression {
 private:
-    ExpressionPtr Singular_statement;
-    ExpressionPtr Rest_of_statements;
+    NodePtr Body;
 public:
     ~ScopeBody () {}
 
-    ScopeBody (ExpressionPtr _Singular_statement, ExpressionPtr _Rest_of_statements)
-     : Singular_statement(_Singular_statement), Rest_of_statements(_Rest_of_statements) {}
+    ScopeBody (NodePtr _Body) : Body(_Body) {}
 
     virtual void print(std::ostream &dst) const override {
         dst << "{ " << std::endl;
         // std::cout<<"scope level: "<<scopelevel<<std::endl;
         scopelevel++;
-        for (int i = 0; i < scopelevel; i++) {
-            dst << "\t";
-        }
-        Singular_statement->print(dst);
-        if (Rest_of_statements != NULL) {
-            dst<<std::endl;
-            Rest_of_statements->print(dst);
-        }
+        Body->print(dst);
         scopelevel--;
         for (int i = 0; i < scopelevel; i++) {
             dst << "\t";
         }
-        dst << "\n}";
+        dst << "}";
     }
 
     virtual void translate(std::ostream &dst) const override {
         dst << std::endl;
         scopelevel++;
-        for (int i = 0; i < scopelevel; i++) {
-            dst << "\t";
-        }
-        Singular_statement->translate(dst);
-        if (Rest_of_statements != NULL) {
-            dst << std::endl;
-            Rest_of_statements->translate(dst);
-        }
+        Body->translate(dst);
         scopelevel--;
         for (int i = 0; i < scopelevel; i++) {
             dst << "\t";
         }
-        dst << std::endl;
+    }
+};
+
+class ScopeStatements: public AST_node {
+private:
+    NodePtr Singular_statement;
+    NodePtr Rest_of_statements;
+public:
+    ~ScopeStatements () {}
+
+    ScopeStatements (NodePtr _Singular_statement, NodePtr _Rest_of_statements)
+     : Singular_statement(_Singular_statement), Rest_of_statements(_Rest_of_statements) {}
+
+    virtual void print(std::ostream &dst) const override {
+        for (int i = 0; i < scopelevel; i++) {
+            dst << "\t";
+        }
+        Singular_statement->print(dst);
+        dst<<std::endl;
+        if (Rest_of_statements != NULL) {
+            Rest_of_statements->print(dst);
+        }
+    }
+
+    virtual void translate(std::ostream &dst) const override {
+        for (int i = 0; i < scopelevel; i++) {
+            dst << "\t";
+        }
+        Singular_statement->translate(dst);
+        dst<<std::endl;
+        if (Rest_of_statements != NULL) {
+            Rest_of_statements->translate(dst);
+        }
     }
 };
 

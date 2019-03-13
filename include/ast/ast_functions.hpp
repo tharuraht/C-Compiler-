@@ -38,6 +38,47 @@ class FunctionCall : public Expression
     }
 };
 
+class Args: public AST_node {
+private:
+    NodePtr SingleParameter;
+    NodePtr OtherParameters;
+public:
+    ~Args() {}
+
+    Args(NodePtr _SingleParameter, NodePtr _OtherParameters) : SingleParameter(_SingleParameter), OtherParameters(_OtherParameters) {}
+
+    virtual void print (std::ostream &dst) const override {
+        SingleParameter->print(dst);
+        dst<<",";
+        OtherParameters->print(dst);
+    }
+
+    virtual void translate (std::ostream &dst) const override {
+        SingleParameter->translate(dst);
+        dst << ",";
+        OtherParameters->translate(dst);
+    }
+};
+
+class Parameter: public AST_node {
+private:
+    std::string Type;
+    std::string Identifier;
+
+public:
+    ~Parameter () {}
+
+    Parameter(std::string _Type, std::string _Identifier) : Type(_Type), Identifier(_Identifier) {}
+
+    virtual void print (std::ostream &dst) const override {
+        dst << Type <<" "<< Identifier;
+    }
+
+    virtual void translate (std::ostream &dst) const override {
+        dst<< Identifier;
+    }
+};
+
 class Function: public Expression {
 private:
     ExpressionPtr arg;
