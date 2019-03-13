@@ -85,6 +85,19 @@ public:
         Body->print(dst);
 
     }
+
+    virtual void translate(std::ostream &dst) const override {
+
+        for (int i =0; i < scopelevel; i++){
+            dst<< "\t";
+        }
+        dst<< "if(";
+        Condition->translate(dst);
+        dst<<"):" << std::endl;
+        scopelevel++;
+        Body->translate(dst);
+        scopelevel--;
+    }
 };
 
 class ScopeBody : public Expression {
