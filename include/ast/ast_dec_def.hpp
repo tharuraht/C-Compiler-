@@ -58,10 +58,10 @@ class FunctionDec: public AST_node {
 public:
     std::string Type;
     std::string Identifier;
-    NodePtr Arguments;
+    ExpressionPtr Arguments;
     NodePtr Scope;
 
-    FunctionDec(std::string _Type, std::string _Identifier, NodePtr _Arguments, NodePtr _Scope) 
+    FunctionDec(std::string _Type, std::string _Identifier, ExpressionPtr _Arguments, NodePtr _Scope) 
     : Type(_Type), Identifier(_Identifier), Arguments(_Arguments), Scope(_Scope) {}
 
     ~FunctionDec() {}

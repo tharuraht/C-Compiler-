@@ -75,9 +75,6 @@ public:
     IfStatement (ExpressionPtr _Condition, NodePtr _Body) : Condition(_Condition), Body(_Body) {}
 
     virtual void print (std::ostream &dst) const override {
-        for (int i = 0; i < scopelevel; i++) {
-            dst << "\t";
-        }
         dst << "if (";
         Condition->print(dst);
         dst<<") ";
@@ -89,6 +86,31 @@ public:
         dst<< "if(";
         Condition->translate(dst);
         dst<<"):";
+        Body->translate(dst);
+    }
+};
+
+class WhileStatement: public Expression {
+private:
+    ExpressionPtr Condition;
+    NodePtr Body;
+
+public:
+    ~WhileStatement() {}
+
+    WhileStatement (ExpressionPtr _Condition, NodePtr _Body) : Condition(_Condition) , Body(_Body) {}
+
+    virtual void print (std::ostream &dst) const override {
+        dst << "while(";
+        Condition->print(dst);
+        dst <<") ";
+        Body->print(dst);
+    }
+
+    virtual void translate (std::ostream &dst) const override {
+        dst<< "while(";
+        Condition->translate(dst);
+        dst<<"): ";
         Body->translate(dst);
     }
 };
@@ -123,6 +145,7 @@ public:
         }
     }
 };
+
 
 class ScopeStatements: public AST_node {
 private:
