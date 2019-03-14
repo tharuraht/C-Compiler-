@@ -50,7 +50,7 @@
 
 
 %type <expr>  TERM FACTOR BINARY_EXPRESSION_TREE STATEMENT
-%type <expr> C_EXPRESSION COMPARISONEXPR C_ARGS  DECLARE_VAR FUNCTION_CALL PASSED_PARAMS
+%type <expr> C_EXPRESSION COMPARISON_OP COMPARISONEXPR C_ARGS  DECLARE_VAR FUNCTION_CALL PASSED_PARAMS
 
 //C_INCREMENT_DECREMENT, , EXPR, SCOPE_BODY
 
@@ -202,9 +202,14 @@ BINARY_EXPRESSION_TREE
   
 TERM : FACTOR T_TIMES TERM  { $$ = new MulOperator($1, $3);}
      | FACTOR T_DIVIDE TERM { $$ = new DivOperator($1, $3);}
-     | FACTOR T_LESS_THAN TERM { $$ = new LessThanOperator($1, $3);}
-     | FACTOR T_GREATER_THAN TERM { $$ = new GreaterThanOperator($1, $3);}
-     | FACTOR T_IS_EQUAL TERM { $$ = new IsEqualOperator($1, $3);}
+     | COMPARISON_OP  { $$ = $1;}
+
+COMPARISON_OP : FACTOR T_LESS_THAN COMPARISON_OP { $$ = new LessThanOperator($1, $3);}
+     | FACTOR T_LESS_EQUAL_THAN COMPARISON_OP { $$ = new LessThanEqualOperator($1, $3);}
+     | FACTOR T_GREATER_THAN COMPARISON_OP { $$ = new GreaterThanOperator($1, $3);}
+     | FACTOR T_GREATER_EQUAL_THAN COMPARISON_OP { $$ = new GreaterThanOperator($1, $3);}
+     | FACTOR T_IS_EQUAL COMPARISON_OP { $$ = new IsEqualOperator($1, $3);}
+     | FACTOR T_IS_NOT_EQUAL COMPARISON_OP { $$ = new IsNotEqualOperator($1, $3);}
      | FACTOR               { $$ = $1; }
 
 FACTOR : T_VARIABLE         {$$ = new Variable(*$1);}

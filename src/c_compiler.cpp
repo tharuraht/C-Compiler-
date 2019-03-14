@@ -20,5 +20,8 @@ int main(int argc, char *argv[])
 	  ast->translate(std::cout);
     std::cout<<std::endl;
 	}
+
+	fclose(stdin);
+	fclose(stdout);
 return 0;
 }
