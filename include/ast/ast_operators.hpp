@@ -189,6 +189,28 @@ public:
     }
 };
 
+class LessThanEqualOperator
+    : public Operator
+{
+protected:
+    virtual const char *getOpcode() const override
+    { return "<="; }
+public:
+    LessThanEqualOperator(ExpressionPtr _left, ExpressionPtr _right)
+        : Operator(_left, _right)
+    {}
+
+    virtual double evaluate(
+        const std::map<std::string,double> &bindings
+    ) const override
+    {
+        double vl=left->evaluate(bindings);
+        double vr=right->evaluate(bindings);
+        return (vl<=vr);
+    }
+};
+
+
 class GreaterThanOperator
     : public Operator
 {
@@ -228,6 +250,27 @@ public:
         double vl=left->evaluate(bindings);
         double vr=right->evaluate(bindings);
         return (vl==vr);
+    }
+};
+
+class IsNotEqualOperator
+    : public Operator
+{
+protected:
+    virtual const char *getOpcode() const override
+    { return "!="; }
+public:
+    IsNotEqualOperator(ExpressionPtr _left, ExpressionPtr _right)
+        : Operator(_left, _right)
+    {}
+
+    virtual double evaluate(
+        const std::map<std::string,double> &bindings
+    ) const override
+    {
+        double vl=left->evaluate(bindings);
+        double vr=right->evaluate(bindings);
+        return (vl!=vr);
     }
 };
 
