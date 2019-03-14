@@ -232,6 +232,27 @@ public:
     }
 };
 
+class GreaterThanEqualOperator
+    : public Operator
+{
+protected:
+    virtual const char *getOpcode() const override
+    { return ">="; }
+public:
+    GreaterThanEqualOperator(ExpressionPtr _left, ExpressionPtr _right)
+        : Operator(_left, _right)
+    {}
+
+    virtual double evaluate(
+        const std::map<std::string,double> &bindings
+    ) const override
+    {
+        double vl=left->evaluate(bindings);
+        double vr=right->evaluate(bindings);
+        return (vl>=vr);
+    }
+};
+
 class IsEqualOperator
     : public Operator
 {
@@ -271,6 +292,48 @@ public:
         double vl=left->evaluate(bindings);
         double vr=right->evaluate(bindings);
         return (vl!=vr);
+    }
+};
+
+class LogicalAndOperator
+    : public Operator
+{
+protected:
+    virtual const char *getOpcode() const override
+    { return "&&"; }
+public:
+    LogicalAndOperator(ExpressionPtr _left, ExpressionPtr _right)
+        : Operator(_left, _right)
+    {}
+
+    virtual double evaluate(
+        const std::map<std::string,double> &bindings
+    ) const override
+    {
+        double vl=left->evaluate(bindings);
+        double vr=right->evaluate(bindings);
+        return (vl&&vr);
+    }
+};
+
+class LogicalOrOperator
+    : public Operator
+{
+protected:
+    virtual const char *getOpcode() const override
+    { return "||"; }
+public:
+    LogicalOrOperator(ExpressionPtr _left, ExpressionPtr _right)
+        : Operator(_left, _right)
+    {}
+
+    virtual double evaluate(
+        const std::map<std::string,double> &bindings
+    ) const override
+    {
+        double vl=left->evaluate(bindings);
+        double vr=right->evaluate(bindings);
+        return (vl||vr);
     }
 };
 
