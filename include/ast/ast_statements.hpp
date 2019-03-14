@@ -155,6 +155,38 @@ public:
     }
 };
 
+class NoBraces : public Expression
+{
+  private:
+    NodePtr Body;
+
+  public:
+    ~NoBraces() {}
+
+    NoBraces(NodePtr _Body) : Body(_Body) {}
+
+    virtual void print(std::ostream &dst) const override
+    {
+        // std::cout<<"scope level: "<<scopelevel<<std::endl;
+        scopelevel++;
+        for (int i = 0; i < scopelevel; i++)  { dst << "\t"; }
+        Body->print(dst);
+        scopelevel--;
+                for (int i = 0; i < scopelevel; i++)  { dst << "\t"; }
+
+    }
+
+    virtual void translate(std::ostream &dst) const override
+    {
+        dst << std::endl;
+        scopelevel++;
+        for (int i = 0; i < scopelevel; i++)  { dst << "\t"; }
+        Body->translate(dst);
+        scopelevel--;
+        for (int i = 0; i < scopelevel; i++)  { dst << "\t"; }
+
+    }
+};
 
 class ScopeStatements: public AST_node {
 private:

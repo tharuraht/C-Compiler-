@@ -55,7 +55,7 @@
 //C_INCREMENT_DECREMENT, , EXPR, SCOPE_BODY
 
 %type <node> PROGRAM EX_DECLARATION FUNCTION_DEC_DEF  GLOBAL_DECLARATION
-%type <node> SCOPE  SCOPE_STATEMENTS IFELSE_SCOPE PARAMETER
+%type <node> SCOPE  SCOPE_STATEMENTS STAT_SCOPE PARAMETER
 %type <node>  T_IF T_ELSE T_WHILE T_FOR T_RETURN
 //%type <node> BINARY 
 
@@ -158,13 +158,13 @@ SCOPE_STATEMENTS :
 STATEMENT :
     T_RETURN C_EXPRESSION T_SEMICOLON                         {$$ = new ReturnStatement($2);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON               {$$ = new AssignmentStatement(*$1,$3);}
-  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET IFELSE_SCOPE      {$$ = new IfElseStatement($3,$5,NULL);}
-  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET IFELSE_SCOPE T_ELSE IFELSE_SCOPE {$$ = new IfElseStatement($3, $5, $7);}
-  | T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET SCOPE          {$$ = new WhileStatement($3,$5);}
+  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE      {$$ = new IfElseStatement($3,$5,NULL);}
+  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE {$$ = new IfElseStatement($3, $5, $7);}
+  | T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE          {$$ = new WhileStatement($3,$5);}
   | DECLARE_VAR                                               {$$ = $1;}
 
-IFELSE_SCOPE :
-    STATEMENT {$$ = $1;}
+STAT_SCOPE :
+    STATEMENT {$$ = new NoBraces($1);}
   | SCOPE {$$=$1;}
 
   FUNCTION_CALL

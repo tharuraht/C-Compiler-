@@ -4,3 +4,5 @@ src/*.tab.cpp
 src/*.o
 src/*.yy.cpp
 bin/*
+
+tmp/*
