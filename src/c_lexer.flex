@@ -21,7 +21,9 @@ extern "C" int fileno(FILE *stream);
 
 %%
 
-("//").* || ^"/*"[^*]*|[*]*"*/"    {} /* Ignore comments */
+"//".* {}  /*Ignore single line comments, credits: https://stackoverflow.com/questions/25395251/detecting-and-skipping-line-comments-with-flex */
+
+[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/] {}  /*Ignore multi-line comments, credits: https://stackoverflow.com/questions/25395251/detecting-and-skipping-line-comments-with-flex */
 
 "int" 			    { yylval.string = new std::string(yytext); return T_INT; }
 "double"        { yylval.string = new std::string(yytext); return T_DOUBLE; }
