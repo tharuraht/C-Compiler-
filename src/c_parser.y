@@ -172,8 +172,8 @@ STAT_SCOPE :
   | T_VARIABLE T_LBRACKET T_RBRACKET {$$ = new FunctionCall(*$1, NULL);}
 
 PASSED_PARAMS
-  : FACTOR T_COMMA PASSED_PARAMS {$$ = new PassedParams($1, $3);}
-  | FACTOR                       {$$ = new PassedParams($1,NULL);}
+  : BINARY_EXPRESSION_TREE T_COMMA PASSED_PARAMS {$$ = new PassedParams($1, $3);}
+  | BINARY_EXPRESSION_TREE                       {$$ = new PassedParams($1,NULL);}
 
 
 DECLARE_VAR
