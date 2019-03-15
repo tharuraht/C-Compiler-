@@ -62,7 +62,6 @@
 %type <number> T_NUMBER 
 %type <string> T_VARIABLE FUNCTION_NAME T_VOID T_INT T_DOUBLE T_FLOAT TYPE_SPECIFY
 
-%right PREC1
 //%right "then" T_ELSE solution for dangling if else problem
 %nonassoc "then" //solution for dangling if else problem
 %nonassoc T_ELSE //solution for dangling if else problem

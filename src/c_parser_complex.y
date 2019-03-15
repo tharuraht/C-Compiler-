@@ -55,8 +55,8 @@
 
 
 //%right "then" T_ELSE solution for dangling if else problem
-%nonassoc "then" //solution for dangling if else problem
 %nonassoc T_ELSE //solution for dangling if else problem
+%nonassoc NOELSE //solution for dangling if else problem
 
 %start ROOT
 
@@ -139,7 +139,7 @@ SCOPE_BODY
 STATEMENT
 : T_RETURN C_EXPRESSION T_SEMICOLON {$$ = new ReturnStatement($2);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON {$$ = new AssignmentStatement($3);}
-  | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE {$$ = new IfStatement($3,$5,NULL);}
+  | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE %prec NOELSE {$$ = new IfStatement($3,$5,NULL);}
   | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE T_ELSE SCOPE {$$ = new IfStatement($3,$5,$7);}
   | T_WHILE T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE  {$$ = new WhileStatment($3,$5);}
   | T_FOR T_LBRACKET DECLARE_VAR COMPARISONEXPR T_SEMICOLON C_INCREMENT_DECREMENT T_RBRACKET SCOPE {$$ = new ForStatement($3,$4,$6,$8);}
