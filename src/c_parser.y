@@ -30,7 +30,7 @@
 
 %token T_INT T_DOUBLE T_FLOAT T_VOID T_CHAR T_SHORT T_LONG T_IF T_ELSE T_WHILE T_FOR T_DO T_BREAK T_CONTINUE T_GOTO
 
-%token T_TIMES T_PLUS T_MINUS T_DIVIDE T_MODULUS  T_INCREMENT T_DECREMENT
+%token   T_MODULUS  T_INCREMENT T_DECREMENT
 
 %nonassoc T_EQUAL T_PLUS_EQUAL T_MINUS_EQUAL T_TIMES_EQUAL T_DIVIDE_EQUAL T_MODULUS_EQUAL
 
@@ -41,6 +41,10 @@
 %token T_BITWISE_AND T_BITWISE_OR T_BITWISE_XOR T_BITWISE_COMPLEMENT T_LSHIFT T_RSHIFT
 
 %nonassoc T_LBRACKET T_CURLY_LBRACKET T_SQUARE_LBRACKET T_LHEADER T_RBRACKET T_CURLY_RBRACKET T_SQUARE_RBRACKET T_RHEADER
+
+%left T_MINUS T_DIVIDE
+
+%right T_PLUS T_TIMES
 
 %right T_SEMICOLON T_COLON T_COMMA
 
@@ -160,7 +164,8 @@ STATEMENT :
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE      {$$ = new IfElseStatement($3,$5,NULL);}
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE {$$ = new IfElseStatement($3, $5, $7);}
   | T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE          {$$ = new WhileStatement($3,$5);}
-  | DECLARE_VAR                                               {$$ = $1;}
+  | DECLARE_VAR  T_SEMICOLON                                               {$$ = $1;}
+  | C_EXPRESSION T_SEMICOLON                                             {$$ = $1;}
 
 STAT_SCOPE :
     STATEMENT {$$ = new NoBraces($1);}
@@ -176,8 +181,8 @@ PASSED_PARAMS
 
 
 DECLARE_VAR
-  : TYPE_SPECIFY T_VARIABLE T_SEMICOLON                       {$$ = new LocalVarDec (*$1,*$2,NULL);}
-  | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON  {$$ = new LocalVarDec (*$1,*$2,$4);}
+  : TYPE_SPECIFY T_VARIABLE                        {$$ = new LocalVarDec (*$1,*$2,NULL);}
+  | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION   {$$ = new LocalVarDec (*$1,*$2,$4);}
 
 TYPE_SPECIFY
   : T_VOID    {$$ = $1;}
