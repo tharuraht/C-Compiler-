@@ -14,3 +14,4 @@ Date,Effort,Developers,Milestones
 13.03.19,5,am9717, "Added translator functionality for: ifelse statements and operators. Implemented c_compiler.cpp for translator testbench testing" 
 14.04.19,3,ta2617, "Fixed bugs with translator, added some tests for translator"
 14.03.19,4,am9717,"Added more comparator and logical operator translator functionality, improved commment support and added more translator tests"
+15.03.19,1,ta2617,"Fixed binary operators || and && in parse tree"

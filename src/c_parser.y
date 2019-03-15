@@ -158,9 +158,9 @@ SCOPE_STATEMENTS :
 STATEMENT :
     T_RETURN C_EXPRESSION T_SEMICOLON                         {$$ = new ReturnStatement($2);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON               {$$ = new AssignmentStatement(*$1,$3);}
-  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE      {$$ = new IfElseStatement($3,$5,NULL);}
-  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE {$$ = new IfElseStatement($3, $5, $7);}
-  | T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE          {$$ = new WhileStatement($3,$5);}
+  | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE      {$$ = new IfElseStatement($3,$5,NULL);}
+  | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE {$$ = new IfElseStatement($3, $5, $7);}
+  | T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE          {$$ = new WhileStatement($3,$5);}
   | DECLARE_VAR                                               {$$ = $1;}
 
 STAT_SCOPE :
@@ -202,19 +202,19 @@ BINARY_EXPRESSION_TREE
   
 TERM : FACTOR T_TIMES TERM  { $$ = new MulOperator($1, $3);}
      | FACTOR T_DIVIDE TERM { $$ = new DivOperator($1, $3);}
-     | COMPARISON_OP  { $$ = $1;}
+     | FACTOR  { $$ = $1;}
 
-COMPARISON_OP : FACTOR T_LESS_THAN COMPARISON_OP { $$ = new LessThanOperator($1, $3);}
-     | FACTOR T_LESS_EQUAL_THAN COMPARISON_OP { $$ = new LessThanEqualOperator($1, $3);}
-     | FACTOR T_GREATER_THAN COMPARISON_OP { $$ = new GreaterThanOperator($1, $3);}
-     | FACTOR T_GREATER_EQUAL_THAN COMPARISON_OP { $$ = new GreaterThanEqualOperator($1, $3);}
-     | FACTOR T_IS_EQUAL COMPARISON_OP { $$ = new IsEqualOperator($1, $3);}
-     | FACTOR T_IS_NOT_EQUAL COMPARISON_OP { $$ = new IsNotEqualOperator($1, $3);}
-     | LOGICAL_OP { $$ = $1;}
+COMPARISON_OP : BINARY_EXPRESSION_TREE T_LESS_THAN COMPARISON_OP { $$ = new LessThanOperator($1, $3);}
+     | BINARY_EXPRESSION_TREE T_LESS_EQUAL_THAN COMPARISON_OP { $$ = new LessThanEqualOperator($1, $3);}
+     | BINARY_EXPRESSION_TREE T_GREATER_THAN COMPARISON_OP { $$ = new GreaterThanOperator($1, $3);}
+     | BINARY_EXPRESSION_TREE T_GREATER_EQUAL_THAN COMPARISON_OP { $$ = new GreaterThanEqualOperator($1, $3);}
+     | BINARY_EXPRESSION_TREE T_IS_EQUAL COMPARISON_OP { $$ = new IsEqualOperator($1, $3);}
+     | BINARY_EXPRESSION_TREE T_IS_NOT_EQUAL COMPARISON_OP { $$ = new IsNotEqualOperator($1, $3);}
+     | BINARY_EXPRESSION_TREE { $$ = $1;}
 
-LOGICAL_OP : FACTOR T_LOGICAL_AND LOGICAL_OP { $$ = new LogicalAndOperator($1, $3);}
-     | FACTOR T_LOGICAL_OR LOGICAL_OP { $$ = new LogicalOrOperator($1, $3);}
-     | FACTOR               { $$ = $1; }
+LOGICAL_OP : COMPARISON_OP T_LOGICAL_AND LOGICAL_OP { $$ = new LogicalAndOperator($1, $3);}
+     | COMPARISON_OP T_LOGICAL_OR LOGICAL_OP { $$ = new LogicalOrOperator($1, $3);}
+     | COMPARISON_OP               { $$ = $1; }
 
 FACTOR : T_VARIABLE         {$$ = new Variable(*$1);}
        | T_NUMBER           {$$ = new Number( $1 );}
