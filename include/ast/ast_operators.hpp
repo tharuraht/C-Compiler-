@@ -314,6 +314,12 @@ public:
         double vr=right->evaluate(bindings);
         return (vl&&vr);
     }
+
+    virtual void translate (std::ostream &dst) const override {
+        left->translate(dst);
+        dst << " and ";
+        right->translate(dst);
+    }
 };
 
 class LogicalOrOperator
@@ -327,13 +333,17 @@ public:
         : Operator(_left, _right)
     {}
 
-    virtual double evaluate(
-        const std::map<std::string,double> &bindings
-    ) const override
+    virtual double evaluate(const std::map<std::string,double> &bindings) const override
     {
         double vl=left->evaluate(bindings);
         double vr=right->evaluate(bindings);
         return (vl||vr);
+    }
+
+    virtual void translate (std::ostream &dst) const override {
+        left->translate(dst);
+        dst << " or ";
+        right->translate(dst);
     }
 };
 

@@ -10,3 +10,4 @@ Test_Deliverable_1, , 1, am9717, ,Run the automated script and check if own comp
 Create_var_declaration,Test_simple_parser,2,ta2617,,"Broadened parser to allow for simple variable syntax e.g. 'a=5+5;'" 
 Implement_function_def,Create_var_declaration,3,ta2617,,"Implemented function definition, main specific translation"
 Implement_operators,Test_simple_parser,2,am9717,, Based on formative test 9, implement operators such as <, > and ==.
+Test_python_translator,Implement_function_def,ta2617,,"Added and tests some tests for conversion between c and python"

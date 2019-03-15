@@ -48,9 +48,7 @@ extern "C" int fileno(FILE *stream);
 
 [0-9]+          { ECHO; yylval.number=strtod(yytext, 0); return T_INT; }
 
-
-
-
+      
 [*]             { return T_TIMES; }
 [+]             { return T_PLUS; }
 [-]             { return T_MINUS; }
@@ -112,7 +110,7 @@ extern "C" int fileno(FILE *stream);
 [+][+]            { return T_INCREMENT; }
 [-][-]            { return T_DECREMENT; }
 
-[ \n\t]         {;}
+[ \n\t]            {;}
 .                 { fprintf(stderr, "Invalid token\n"); exit(1); }
 
 %%

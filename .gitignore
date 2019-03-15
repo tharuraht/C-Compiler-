@@ -6,3 +6,5 @@ src/*.yy.cpp
 bin/*
 
 tmp/*
+
+.vscode/

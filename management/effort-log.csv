@@ -12,3 +12,4 @@ Date,Effort,Developers,Milestones
 12.03.19,3,ta2617,"Implemented function definition, main specific translation"
 13.03.19,5,ta2617,"Fixed bugs with multiple statements, resolved some shift-reduce conflicts, implemented global vars"
 13.03.19,5,am9717, "Added translator functionality for: ifelse statements and operators. Implemented c_compiler.cpp for translator testbench testing" 
+14.04.19,3,ta2617, "Fixed bugs with translator, added some tests for translator"

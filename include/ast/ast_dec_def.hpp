@@ -83,7 +83,7 @@ public:
             Arguments->translate(dst);
         }
         dst << "): ";
-        for (int i=0; i< global_vars.size();i++) {
+        for (unsigned int i=0; i< global_vars.size();i++) {
             dst<<std::endl;
             for (int i = 0; i < scopelevel; i++) {
                 dst << "\t";
