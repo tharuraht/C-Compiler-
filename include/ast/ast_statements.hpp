@@ -123,6 +123,52 @@ public:
     }
 };
 
+class DoWhileStatement: public Expression {
+private:
+    ExpressionPtr Condition;
+    NodePtr Body;
+
+public:
+    ~DoWhileStatement() {}
+
+    DoWhileStatement (ExpressionPtr _Condition, NodePtr _Body) : Condition(_Condition) , Body(_Body) {}
+
+    virtual void print (std::ostream &dst) const override {
+        dst << "do" <<std::endl;
+        dst<<"\t";
+        Body->print(dst);
+        dst<<"while(";
+        Condition->print(dst);
+        dst <<");"<<std::endl;
+        
+    }
+};
+
+class ForStatement: public Expression {
+private:
+    NodePtr Init;
+    ExpressionPtr Condition;
+    NodePtr Increment;
+    NodePtr Body;
+
+public:
+    ~ForStatement() {}
+
+    ForStatement (NodePtr _Init, ExpressionPtr _Condition, NodePtr _Increment, NodePtr _Body) : Init(_Init), Condition(_Condition) , Increment(_Increment), Body(_Body) {}
+
+    virtual void print (std::ostream &dst) const override {
+        dst << "for(";
+        Init->print(dst);
+        Condition->print(dst);
+        dst<<";";
+        Increment->print(dst);
+        dst<<")"<<std::endl;
+        dst<<"\t";
+        Body->print(dst);        
+    }
+};
+
+
 class ScopeBody : public Expression {
 private:
     NodePtr Body;

@@ -187,5 +187,92 @@ class LocalVarDec : public Expression
 };
 
 
+class PostIncrement: public AST_node {
+
+private:
+std::string variable;
+
+public:
+    ~PostIncrement() {}
+
+    PostIncrement (std::string _variable) : variable(_variable) {}
+
+    virtual void print (std::ostream &dst) const override {
+        dst<<variable<<"++";
+    }
+
+    // virtual void translate (std::ostream &dst) const override {
+    //     ExDec->translate(dst);
+    //     if (Rest_of_program != NULL) {
+    //         Rest_of_program->translate(dst);
+    //     }
+    // }
+};
+
+class PreIncrement: public AST_node {
+
+private:
+std::string variable;
+
+public:
+    ~PreIncrement() {}
+
+    PreIncrement (std::string _variable) : variable(_variable) {}
+
+    virtual void print (std::ostream &dst) const override {
+        dst<<"++"<<variable;
+    }
+
+    // virtual void translate (std::ostream &dst) const override {
+    //     ExDec->translate(dst);
+    //     if (Rest_of_program != NULL) {
+    //         Rest_of_program->translate(dst);
+    //     }
+    // }
+};
+
+class PostDecrement: public AST_node {
+
+private:
+std::string variable;
+
+public:
+    ~PostDecrement() {}
+
+    PostDecrement (std::string _variable) : variable(_variable) {}
+
+    virtual void print (std::ostream &dst) const override {
+        dst<<variable<<"--";
+    }
+
+    // virtual void translate (std::ostream &dst) const override {
+    //     ExDec->translate(dst);
+    //     if (Rest_of_program != NULL) {
+    //         Rest_of_program->translate(dst);
+    //     }
+    // }
+};
+
+class PreDecrement: public AST_node {
+
+private:
+std::string variable;
+
+public:
+    ~PreDecrement() {}
+
+    PreDecrement (std::string _variable) : variable(_variable) {}
+
+    virtual void print (std::ostream &dst) const override {
+        dst<<"--"<<variable;
+    }
+
+    // virtual void translate (std::ostream &dst) const override {
+    //     ExDec->translate(dst);
+    //     if (Rest_of_program != NULL) {
+    //         Rest_of_program->translate(dst);
+    //     }
+    // }
+};
 
 #endif
