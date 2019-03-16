@@ -60,7 +60,7 @@
 
 %type <node> PROGRAM EX_DECLARATION FUNCTION_DEC_DEF  GLOBAL_DECLARATION
 %type <node> SCOPE  SCOPE_STATEMENTS STAT_SCOPE PARAMETER
-%type <node>  T_IF T_ELSE T_WHILE T_FOR T_RETURN
+%type <node>  T_IF T_ELSE T_WHILE T_FOR T_RETURN C_INCREMENT_DECREMENT
 //%type <node> BINARY 
 
 %type <number> T_NUMBER 
@@ -167,6 +167,8 @@ STATEMENT :
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE      {$$ = new IfElseStatement($3,$5,NULL);}
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE {$$ = new IfElseStatement($3, $5, $7);}
   | T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE          {$$ = new WhileStatement($3,$5);}
+  | T_DO STAT_SCOPE T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET T_SEMICOLON {$$ = new DoWhileStatement($5, $2);}
+  | T_FOR T_LBRACKET STATEMENT LOGICAL_OP T_SEMICOLON C_INCREMENT_DECREMENT T_RBRACKET STAT_SCOPE {$$ = new ForStatement($3, $4, $6, $8);}
   | DECLARE_VAR  T_SEMICOLON                                               {$$ = $1;}
   | C_EXPRESSION T_SEMICOLON                                             {$$ = $1;}
 
@@ -194,14 +196,9 @@ TYPE_SPECIFY
   | T_FLOAT   {$$ = $1;}
 
 
-
 C_EXPRESSION
   : BINARY_EXPRESSION_TREE {$$ = $1;}
   | FUNCTION_CALL {$$ = $1;}
-  /*
-  | C_INCREMENT_DECREMENT {$$ = $1;}
-  | FUNCTION_CALL {$$ = $1;}
-  */
 
 BINARY_EXPRESSION_TREE
   : TERM T_PLUS C_EXPRESSION     { $$ = new AddOperator($1, $3);}
@@ -212,6 +209,12 @@ TERM : FACTOR T_TIMES TERM  { $$ = new MulOperator($1, $3);}
      | FACTOR T_DIVIDE TERM { $$ = new DivOperator($1, $3);}
      | FACTOR T_MODULUS TERM { $$ = new ModOperator($1, $3);}
      | FACTOR  { $$ = $1;}
+
+C_INCREMENT_DECREMENT : 
+    T_VARIABLE T_INCREMENT  {$$ = new PostIncrement(*$1);}
+  | T_VARIABLE T_DECREMENT  {$$ = new PostDecrement(*$1);}
+  | T_INCREMENT T_VARIABLE  {$$ = new PreIncrement(*$2);}
+  | T_DECREMENT T_VARIABLE  {$$ = new PreDecrement(*$2);}
 
 COMPARISON_OP : BINARY_EXPRESSION_TREE T_LESS_THAN COMPARISON_OP { $$ = new LessThanOperator($1, $3);}
      | BINARY_EXPRESSION_TREE T_LESS_EQUAL_THAN COMPARISON_OP { $$ = new LessThanEqualOperator($1, $3);}
@@ -248,12 +251,6 @@ COMPARISON_OP :
   | T_LESS_EQUAL_THAN     {$$ = new std::string("<=");}
   | T_GREATER_EQUAL_THAN  {$$ = new std::string(">=");}  
 
-
-C_INCREMENT_DECREMENT : 
-    T_VARIABLE T_INCREMENT  {$$ = new PostIncrement($1);}
-  | T_VARIABLE T_DECREMENT  {$$ = new PostDecrement($1);}
-  | T_INCREMENT T_VARIABLE  {$$ = new PreIncrement($2);}
-  | T_DECREMENT T_VARIABLE  {$$ = new PreDecrement($2);}
 */
 
 /*TODO
