@@ -221,4 +221,24 @@ public:
     }
 };
 
+class BracketedExpr : public Expression {
+private:
+    ExpressionPtr Expression;
+public:
+    ~BracketedExpr() {}
+    BracketedExpr(ExpressionPtr _Expression) : Expression(_Expression) {}
+
+    virtual void print (std::ostream &dst) const override {
+        dst<<"(";
+        Expression->print(dst);
+        dst<<")";
+    }
+
+    virtual void translate (std::ostream &dst) const override {
+        dst<<"(";
+        Expression->translate(dst);
+        dst<<")";
+    }
+};
+
 #endif

@@ -200,8 +200,8 @@ C_EXPRESSION
   */
 
 BINARY_EXPRESSION_TREE
-  : TERM T_PLUS BINARY_EXPRESSION_TREE     { $$ = new AddOperator($1, $3);}
-  | TERM T_MINUS BINARY_EXPRESSION_TREE    { $$ = new SubOperator($1, $3);}
+  : TERM T_PLUS C_EXPRESSION     { $$ = new AddOperator($1, $3);}
+  | TERM T_MINUS C_EXPRESSION    { $$ = new SubOperator($1, $3);}
   | TERM                    { $$ = $1; }
   
 TERM : FACTOR T_TIMES TERM  { $$ = new MulOperator($1, $3);}
@@ -224,6 +224,7 @@ FACTOR : T_VARIABLE         {$$ = new Variable(*$1);}
        | T_NUMBER           {$$ = new Number( $1 );}
        | T_MINUS T_NUMBER   {$$ = new Number(-$2);}
        | FUNCTION_CALL      {$$ = $1;}
+       | T_LBRACKET C_EXPRESSION T_RBRACKET {$$ = new BracketedExpr($2);}
 
 
 /*
