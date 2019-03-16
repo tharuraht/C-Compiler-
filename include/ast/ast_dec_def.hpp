@@ -93,6 +93,12 @@ public:
         if (Scope != NULL) {
             Scope->translate(dst);
         }
+        else if(Scope == NULL){
+            dst<<std::endl;
+            dst<<"\t";
+            dst<<"pass";
+            dst<<std::endl;
+        }
 
         //tells python to invoke the function if it is the main function
         if (Identifier == "main") {
