@@ -161,6 +161,7 @@ SCOPE_STATEMENTS :
 STATEMENT :
     T_RETURN C_EXPRESSION T_SEMICOLON                         {$$ = new ReturnStatement($2);}
   | T_RETURN LOGICAL_OP T_SEMICOLON                         {$$ = new ReturnStatement($2);}
+  | T_RETURN FUNCTION_CALL T_SEMICOLON                      {$$ = new ReturnStatement($2);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON               {$$ = new AssignmentStatement(*$1,$3);}
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE      {$$ = new IfElseStatement($3,$5,NULL);}
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE {$$ = new IfElseStatement($3, $5, $7);}
