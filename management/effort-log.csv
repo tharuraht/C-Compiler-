@@ -16,4 +16,5 @@ Date,Effort,Developers,Milestones
 14.03.19,4,am9717,"Added more comparator and logical operator translator functionality, improved commment support and added more translator tests"
 15.03.19,5,ta2617,"Fixed binary operators || and && in parse tree, added more tests such as nested if, fixed expressions in function calls"
 15.03.19,1,ta2617,"Allowed for non-assigned expressions, added associatiity to ops"
+15.03.19,6,am9717,"Improved translator function for operators, built more parse tree to support returning function calls and debugged errors in translator"
 16.03.19,1,ta2617,"Implemented bracketed expressions for translate"

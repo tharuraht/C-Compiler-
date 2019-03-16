@@ -53,8 +53,7 @@ public:
         dst << "return";
         if (AdditionalExpressions != NULL) {
             dst << " ";
-            AdditionalExpressions->print(dst);
-            
+            AdditionalExpressions->translate(dst);
         }
     }
 };

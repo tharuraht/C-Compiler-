@@ -160,6 +160,7 @@ SCOPE_STATEMENTS :
 
 STATEMENT :
     T_RETURN C_EXPRESSION T_SEMICOLON                         {$$ = new ReturnStatement($2);}
+  | T_RETURN LOGICAL_OP T_SEMICOLON                         {$$ = new ReturnStatement($2);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON               {$$ = new AssignmentStatement(*$1,$3);}
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE      {$$ = new IfElseStatement($3,$5,NULL);}
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE {$$ = new IfElseStatement($3, $5, $7);}
@@ -194,6 +195,7 @@ TYPE_SPECIFY
 
 C_EXPRESSION
   : BINARY_EXPRESSION_TREE {$$ = $1;}
+  | FUNCTION_CALL {$$ = $1;}
   /*
   | C_INCREMENT_DECREMENT {$$ = $1;}
   | FUNCTION_CALL {$$ = $1;}
@@ -206,6 +208,7 @@ BINARY_EXPRESSION_TREE
   
 TERM : FACTOR T_TIMES TERM  { $$ = new MulOperator($1, $3);}
      | FACTOR T_DIVIDE TERM { $$ = new DivOperator($1, $3);}
+     | FACTOR T_MODULUS TERM { $$ = new ModOperator($1, $3);}
      | FACTOR  { $$ = $1;}
 
 COMPARISON_OP : BINARY_EXPRESSION_TREE T_LESS_THAN COMPARISON_OP { $$ = new LessThanOperator($1, $3);}
