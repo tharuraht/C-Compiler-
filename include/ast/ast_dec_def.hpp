@@ -145,6 +145,26 @@ class GlobalVarDec: public Expression {
         }
         dst<<std::endl;
     }
+
+    virtual void compile (std::ostream &dst, Context &contxt) const override {
+        //only generate assembly if the variable is assigned
+        if (Expression != NULL) {
+            dst<<"\t"<<".globl"<<"\t"<<Name<<std::endl;
+            dst<<"\t"<<".data"<<"\t"<<std::endl;
+            dst<<"\t"<<".align"<<"\t"<<"2"<<std::endl;
+            
+            dst<<Name<<":"<<std::endl;
+            //store expression
+            dst<<"\t"<<".word"<<"\t"<<std::endl;
+            Expression->compile(dst, contxt);
+            dst<<std::endl;
+
+            dst<<"\t"<<".text"<<std::endl;
+            dst<<"\t"<<".align"<<"\t"<<"2"<<std::endl;
+        }
+
+        contxt.NewGlobalVar (Name);
+    }
 };
 
 class LocalVarDec : public Expression

@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include <memory>
+#include "ast_context.hpp"
 
 static std::vector<std::string> global_vars;
 static int var_count;
@@ -33,6 +34,10 @@ public:
 
     virtual void translate(std::ostream &dst) const {
         throw std::runtime_error("Translate not implemented.");
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt) const {
+        throw std::runtime_error("Compilation not implemented.");
     }
 };
 

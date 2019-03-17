@@ -50,7 +50,7 @@ class Context {
     std::vector<int> FindFreeRegs (unsigned int first, unsigned int last) {
         std::vector<int> FreeRegs;
         
-        for (int i = first; i <= last; i++) {
+        for (unsigned int i = first; i <= last; i++) {
             if (regavailable[i]) {
                 FreeRegs.push_back(i);
             }
