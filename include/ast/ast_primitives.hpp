@@ -32,7 +32,22 @@ public:
         // TODO-B : Run bin/eval_expr with a variable binding to make sure you understand how this works.
         // If the binding does not exist, this will throw an error
         return bindings.at(id);
-    }    
+    } 
+
+    virtual void compile(std::ostream &dst, Context &contxt) const override
+    {
+        int var_offset = contxt.LookupVariable(id, scopelevel);
+
+        if(var_offset){  //if (var_offset == 0)
+            
+            dst<<"\t"<<"lui"<<"\t"<<"$2, "<<"%hi("<<id<<")"<<std::endl;
+            dst<<"\t"<<"lw"<<"\t"<<"$2, "<<"%lo("<<id<<")($2)"<<std::endl;
+        }
+        else{
+            //load whole word into register two
+            dst<<"\t"<<"lw"<<"\t"<<"$2, "<<var_offset<<"($fp)"<<std::endl;
+        }
+    }   
 };
 
 class Number: public Expression
@@ -66,7 +81,7 @@ public:
     }
 
     virtual void compile(std::ostream &dst, Context &contxt) const override {
-		dst <<"\t"<< "li" << "\t" << "$2, " << value;
+		dst <<"\t"<< "li" << "\t" << "$2, " << value<<std::endl;
 	}
 };
 

@@ -81,7 +81,7 @@
    broken anything while you added it.
 */
 
-ROOT : GLOBAL_DECLARATION {g_root = $1;}
+ROOT : FUNCTION_DEC_DEF {g_root = $1;}
 
 /*
 PROGRAM

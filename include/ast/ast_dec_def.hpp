@@ -109,6 +109,53 @@ public:
             dst<<"\tsys.exit(ret)"<<std::endl;
         }
     }
+
+    virtual void compile (std::ostream &dst, Context &contxt) const override 
+    {
+
+        //dst<<"#MIPS function:"<<std::endl;
+        //creating ABI directives
+        dst<<"\t"<<".align"<<"\t"<<"2"<<std::endl;
+        dst<<"\t"<<".globl"<<"\t"<<Identifier<<std::endl;
+        dst<<std::endl;
+        dst<<"\t"<<".ent"<<"\t"<<Identifier<<std::endl;
+        dst<<"\t"<<".type"<<"\t"<<Identifier<<", @function"<<std::endl;
+
+        dst<<Identifier<<":"<<std::endl;
+        //space allocated in stack
+        dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,-"<<(var_count*4)+8<<std::endl; //restoring sp
+
+        dst<<"\t"<<"sw"<<"\t"<<"$fp,"<<(var_count*4)+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
+        dst<<"\t"<<"move"<<"\t"<<"$fp, $sp"<<std::endl;
+
+        if(Arguments != NULL){
+            Arguments->compile(dst, contxt);
+        }
+
+        contxt.FreeParamRegs();
+
+        if(Scope != NULL){
+            Scope->compile(dst, contxt);
+        }
+        else if(Identifier == "main" && Scope == NULL){
+            dst<<"\t"<<"move"<<"\t"<<"$2, $0"<<std::endl; //empty main should return zero in $2
+        }
+        else{
+            dst<<"\t"<<"nop"<<"\t"<<std::endl; //if a function is declared as empty
+        }
+        
+        dst<<"\t"<<"move"<<"\t"<<"$sp, $fp"<<std::endl; //deallocating stack
+        
+        dst<<"\t"<<"lw"<<"\t"<<"$fp,"<<(var_count*4)+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
+        dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,"<<(var_count*4)+8<<std::endl; //restoring sp
+        dst<<"\t"<<"j"<<"\t"<<"$31"<<std::endl;
+        dst<<"\t"<<"nop"<<std::endl;
+        dst<<std::endl;
+
+        dst<<"\t"<<".end"<<"\t" <<Identifier<<std::endl;
+
+        contxt.FreeParamRegs();
+    }
 };
 
 class GlobalVarDec: public Expression {
@@ -152,6 +199,8 @@ class GlobalVarDec: public Expression {
             dst<<"\t"<<".globl"<<"\t"<<Name<<std::endl;
             dst<<"\t"<<".data"<<"\t"<<std::endl;
             dst<<"\t"<<".align"<<"\t"<<"2"<<std::endl;
+            //dst<<"\t"<<".type"<<"\t"<<Name<<", @object"<<std::endl;
+            //dst<<"\t"<<".size"<<"\t"<<Name<<", 4"<<std::endl;
             
             dst<<Name<<":"<<std::endl;
             //store expression

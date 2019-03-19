@@ -4,6 +4,11 @@ src/*.tab.cpp
 src/*.o
 src/*.yy.cpp
 bin/*
+c_translator/formative/*
+
+Vagrantfile
+
+ubuntu-xenial-16.04-cloudimg-console.log
 
 tmp/*
 
