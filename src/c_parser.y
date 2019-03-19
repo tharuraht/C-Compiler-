@@ -54,7 +54,7 @@
 
 
 %type <expr>  TERM FACTOR BINARY_EXPRESSION_TREE STATEMENT
-%type <expr> C_EXPRESSION COMPARISON_OP LOGICAL_OP COMPARISONEXPR C_ARGS DECLARE_VAR FUNCTION_CALL PASSED_PARAMS ADDITIONAL_DECS
+%type <expr> C_EXPRESSION COMPARISON_OP LOGICAL_OP COMPARISONEXPR C_ARGS DECLARE_VAR FUNCTION_CALL PASSED_PARAMS G_ADDITIONAL_DECS L_ADDITIONAL_DECS
 
 //C_INCREMENT_DECREMENT, , EXPR, SCOPE_BODY
 
@@ -83,42 +83,6 @@
 
 ROOT : PROGRAM {g_root = $1;}
 
-/*
-PROGRAM
-  : EX_DECLARATION  {$$ = $1;}
-  | PROGRAM EX_DECLARATION {$$ = $1;}      //TODO
-  ;
-
-EX_DECLARATION :
-    FUNCTION_DEF  {$$ = $1;}
-  | FUNCTION_DEC  {$$ = $1;}
-  | GLOBAL_DECLARATION {$$ = $1;}
-  ;
-
-GLOBAL_DECLARATION :
-    TYPE_SPECIFY T_VARIABLE T_SEMICOLON {$$ = new GlobalVarDec($1,$2,NULL);}
-  | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON  {$$ = new GlobalVarDec($1,$2,*$4);}
-
-FUNCTION_DEC : 
-    TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET SCOPE {$$ = new FunctionDec($1,$2,NULL,$5);}
-  | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET SCOPE {$$ = new FunctionDec($1,$2,$4,$5);}
-
-
-STATEMENT
-: T_RETURN C_EXPRESSION T_SEMICOLON {$$ = new ReturnStatement($2);}
-  | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON{$$ = new AssignmentStatement($1,$3);}
-  | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET IFELSE_SCOPE {$$ = new IfStatement($3,$5,NULL);}
-  | T_IF T_LBRACKET COMPARISONEXPR T_RBRACKET IFELSE_SCOPE T_ELSE IFELSE_SCOPE {$$ = new IfStatement($3,$5,$7);}
-  | T_WHILE T_LBRACKET COMPARISONEXPR T_RBRACKET SCOPE  {$$ = new WhileStatment($3,$5);}
-  | T_FOR T_LBRACKET DECLARE_VAR COMPARISONEXPR T_SEMICOLON C_INCREMENT_DECREMENT T_RBRACKET SCOPE {$$ = new ForStatement($3,$4,$6,$8);}
-  
-
-
-
-
-  
-//-----------------------------------------------------------------------------
-*/
 PROGRAM
   : EX_DECLARATION PROGRAM {$$ = new Program($1,$2);}
   | EX_DECLARATION         {$$ = new Program($1, NULL);}    
@@ -131,14 +95,15 @@ EX_DECLARATION :
 GLOBAL_DECLARATION :
     TYPE_SPECIFY T_VARIABLE T_SEMICOLON                         {$$ = new GlobalVarDec(*$1,*$2,NULL);}
   | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON    {$$ = new GlobalVarDec(*$1,*$2,$4);}
-  | TYPE_SPECIFY T_VARIABLE T_COMMA ADDITIONAL_DECS T_SEMICOLON {$$ = new MultipleDecs (*$1,*$2,$4,NULL);}
-  | TYPE_SPECIFY T_VARIABLE T_COMMA ADDITIONAL_DECS T_EQUAL C_EXPRESSION T_SEMICOLON {$$ = new MultipleDecs (*$1,*$2,$4,$6);}
+  | TYPE_SPECIFY T_VARIABLE T_COMMA G_ADDITIONAL_DECS T_SEMICOLON {$$ = new MultipleDecs (*$1,*$2,$4, true);}
 
 
 
-ADDITIONAL_DECS :
-    T_VARIABLE T_COMMA ADDITIONAL_DECS {$$ = new AdditionalDecs (*$1,$3);}
-  | T_VARIABLE {$$ = new AdditionalDecs (*$1, NULL);}
+G_ADDITIONAL_DECS :
+    T_VARIABLE T_EQUAL C_EXPRESSION T_COMMA G_ADDITIONAL_DECS       {$$ = new AdditionalDecs (*$1,$3,$5, true);}
+  | T_VARIABLE T_COMMA G_ADDITIONAL_DECS                            {$$ = new AdditionalDecs (*$1,NULL,$3, true);}
+  | T_VARIABLE T_EQUAL C_EXPRESSION                                 {$$ = new AdditionalDecs(*$1,$3,NULL,true);}
+  | T_VARIABLE                                                      {$$ = new AdditionalDecs (*$1,NULL, NULL, true);}
 
 FUNCTION_DEC_DEF : 
     TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET SCOPE         {$$ = new FunctionDec(*$1,*$2,NULL,$5);}
@@ -195,6 +160,14 @@ PASSED_PARAMS
 DECLARE_VAR
   : TYPE_SPECIFY T_VARIABLE                        {$$ = new LocalVarDec (*$1,*$2,NULL);}
   | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION   {$$ = new LocalVarDec (*$1,*$2,$4);}
+  | TYPE_SPECIFY T_VARIABLE T_COMMA L_ADDITIONAL_DECS  {$$ = new MultipleDecs (*$1,*$2,$4,false);}
+
+
+L_ADDITIONAL_DECS :
+    T_VARIABLE T_EQUAL C_EXPRESSION T_COMMA L_ADDITIONAL_DECS       {$$ = new AdditionalDecs (*$1,$3,$5, false);}
+  | T_VARIABLE T_COMMA L_ADDITIONAL_DECS                            {$$ = new AdditionalDecs (*$1,NULL,$3, false);}
+  | T_VARIABLE T_EQUAL C_EXPRESSION                                 {$$ = new AdditionalDecs(*$1,$3,NULL,false);}
+  | T_VARIABLE                                                      {$$ = new AdditionalDecs (*$1,NULL, NULL, false);}
 
 TYPE_SPECIFY
   : T_VOID    {$$ = $1;}

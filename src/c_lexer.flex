@@ -122,7 +122,7 @@ extern "C" int fileno(FILE *stream);
 /* Error handler. This will get called if none of the rules match. */
 void yyerror (char const *s)
 {
-  fprintf (stderr, "Flex Error: %s\n", s); /* s is the text that wasn't matched */
+  fprintf (stderr, "Parse Error: %s\n", s); /* s is the text that wasn't matched */
   exit(1);
 }
 

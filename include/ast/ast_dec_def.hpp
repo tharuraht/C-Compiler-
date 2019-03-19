@@ -10,7 +10,10 @@ extern std::vector<std::string> global_vars;
 extern int var_count;
 extern int scopelevel;
 
-static std::vector<std::string> Names;
+static std::vector<std::string> GlobalNames;
+static std::vector<ExpressionPtr> GlobalNameExpr;
+static std::vector<std::string> LocalNames;
+static std::vector<ExpressionPtr> LocalNameExpr;
 
 class Program : public AST_node
 {
@@ -88,17 +91,15 @@ public:
         dst << "): ";
         for (unsigned int i=0; i< global_vars.size();i++) {
             dst<<std::endl;
-            for (int i = 0; i < scopelevel; i++) {
-                dst << "\t";
-            }
+            for (int i = 0; i < scopelevel; i++) {dst << "\t";}
             dst<<"\tglobal "<<global_vars[i];
         }
-        for (unsigned int i=0; i< Names.size();i++) {
+        for (unsigned int i=0; i< GlobalNames.size();i++) {
             dst<<std::endl;
             for (int i = 0; i < scopelevel; i++) {
                 dst << "\t";
             }
-            dst<<"\tglobal "<<Names[i];
+            dst << "\tglobal " << GlobalNames[i];
         }
         if (Scope != NULL) {
             Scope->translate(dst);
@@ -271,45 +272,82 @@ class MultipleDecs : public Expression {
 private:
   std::string Type;
   ExpressionPtr AdditionalNames;
-  ExpressionPtr Expression;
+  bool isGlobal;
 
 protected:
     
 
 public:
     ~MultipleDecs() {}
-    MultipleDecs (std::string _Type, std::string _Name, ExpressionPtr _AdditionalNames, ExpressionPtr _Expression) 
-    : Type(_Type), AdditionalNames(_AdditionalNames), Expression(_Expression){
-        Names.push_back(_Name);
+    MultipleDecs (std::string _Type, std::string _Name, ExpressionPtr _AdditionalNames, bool _isGlobal) 
+    : Type(_Type), AdditionalNames(_AdditionalNames), isGlobal(_isGlobal) {
+        if (isGlobal)
+        GlobalNames.push_back(_Name);
+        else
+        LocalNames.push_back(_Name);
     }
     MultipleDecs () {} //for inheritance
 
     virtual void print(std::ostream &dst) const override {
         AdditionalNames->print(dst);
         //after recursive call
-        for (unsigned int i=0;i<Names.size();i++) {
-            dst<< Type <<" "<< Names[i];
-            if (Expression != NULL) {
-                dst<<" = ";
-                Expression->print(dst);
+        if (isGlobal) {
+            for (unsigned int i = 0; i < GlobalNames.size(); i++) {
+                dst << Type << " " << GlobalNames[i];
+                if (GlobalNameExpr[i] != NULL) {
+                    dst << " = ";
+                    GlobalNameExpr[i]->print(dst);
+                }
+                dst << ";" << std::endl;
+                for (int i = 0; i < scopelevel; i++) {dst << "\t";}
             }
-            dst<<";"<<std::endl;
         }
+        else {
+            for (unsigned int i = 0; i < LocalNames.size(); i++) {
+                dst << Type << " " << LocalNames[i];
+                if (LocalNameExpr[i] != NULL) {
+                    dst << " = ";
+                    LocalNameExpr[i]->print(dst);
+                }
+                dst << ";" << std::endl;
+                for (int i = 0; i < scopelevel; i++) {dst << "\t";}
+
+            }
+        }
+        
     }
 
     virtual void translate (std::ostream &dst) const override {
         AdditionalNames->translate(dst);
         //after recursive call
-        for (unsigned int i=0;i<Names.size();i++) {
-            dst<< Names[i];
-            if (Expression != NULL) {
-                dst<<" = ";
-                Expression->translate(dst);
+        if (isGlobal) {
+            for (unsigned int i=0;i<GlobalNames.size();i++) {
+                dst << GlobalNames[i];
+                if (GlobalNameExpr[i] != NULL) {
+                    dst<<" = ";
+                    GlobalNameExpr[i]->translate(dst);
+                }
+                else {
+                    dst<<" =0";
+                }
+                dst<<std::endl;
+                for (int i = 0; i < scopelevel; i++) {dst << "\t";}
             }
-            else {
-                dst<<" =0";
-            }
-            dst<<std::endl;
+        }
+        else {
+           for (unsigned int i=0;i<LocalNames.size();i++) {
+                dst<< LocalNames[i];
+                if (LocalNameExpr[i] != NULL)
+                {
+                    dst<<" = ";
+                    LocalNameExpr[i]->translate(dst);
+                }
+                else {
+                    dst<<" =0";
+                }
+                dst<<std::endl;
+                for (int i = 0; i < scopelevel; i++) {dst << "\t";}
+            } 
         }
     }
 };
@@ -317,12 +355,24 @@ public:
 class AdditionalDecs: public MultipleDecs {
 private:
     std::string CurrentVar;
+    ExpressionPtr CurrentExpression;
     ExpressionPtr NextVar;
+    bool isGlobal;
 public:
     ~AdditionalDecs () {}
 
-    AdditionalDecs(std::string _CurrentVar, ExpressionPtr _NextVar) : CurrentVar(_CurrentVar), NextVar(_NextVar) {
-        Names.push_back(_CurrentVar);
+    AdditionalDecs(std::string _CurrentVar, ExpressionPtr _CurrentExpression, ExpressionPtr _NextVar, bool _isGlobal) 
+    : CurrentVar(_CurrentVar), CurrentExpression(_CurrentExpression), NextVar(_NextVar), isGlobal(_isGlobal) {
+        if (isGlobal) {
+            GlobalNames.push_back(CurrentVar);
+            GlobalNameExpr.push_back(CurrentExpression);
+        }
+            
+        else {
+            LocalNames.push_back(CurrentVar);
+            LocalNameExpr.push_back(CurrentExpression);
+        }
+
     }
 
     virtual void print (std::ostream &dst) const override {
