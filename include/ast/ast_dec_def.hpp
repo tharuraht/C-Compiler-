@@ -10,8 +10,11 @@ extern std::vector<std::string> global_vars;
 extern int var_count;
 extern int scopelevel;
 
-class Program: public AST_node {
-private:
+static std::vector<std::string> Names;
+
+class Program : public AST_node
+{
+  private:
     NodePtr ExDec;
     NodePtr Rest_of_program;
 
@@ -202,6 +205,77 @@ class LocalVarDec : public Expression
         else
         {
             dst << "=0";
+        }
+    }
+};
+
+class MultipleDecs : public Expression {
+private:
+  std::string Type;
+  ExpressionPtr AdditionalNames;
+  ExpressionPtr Expression;
+
+protected:
+    
+
+public:
+    ~MultipleDecs() {}
+    MultipleDecs (std::string _Type, std::string _Name, ExpressionPtr _AdditionalNames, ExpressionPtr _Expression) 
+    : Type(_Type), AdditionalNames(_AdditionalNames), Expression(_Expression){
+        Names.push_back(_Name);
+    }
+    MultipleDecs () {} //for inheritance
+
+    virtual void print(std::ostream &dst) const override {
+        AdditionalNames->print(dst);
+        //after recursive call
+        for (unsigned int i=0;i<Names.size();i++) {
+            dst<< Type <<" "<< Names[i];
+            if (Expression != NULL) {
+                dst<<" = ";
+                Expression->print(dst);
+            }
+            dst<<";"<<std::endl;
+        }
+    }
+
+    virtual void translate (std::ostream &dst) const override {
+        AdditionalNames->translate(dst);
+        //after recursive call
+        for (unsigned int i=0;i<Names.size();i++) {
+            dst<< Type <<" "<< Names[i];
+            if (Expression != NULL) {
+                dst<<" = ";
+                Expression->translate(dst);
+            }
+            else {
+                dst<<" =0";
+            }
+            dst<<std::endl;
+        }
+    }
+};
+
+class AdditionalDecs: public MultipleDecs {
+private:
+    std::string CurrentVar;
+    ExpressionPtr NextVar;
+public:
+    ~AdditionalDecs () {}
+
+    AdditionalDecs(std::string _CurrentVar, ExpressionPtr _NextVar) : CurrentVar(_CurrentVar), NextVar(_NextVar) {
+        Names.push_back(_CurrentVar);
+    }
+
+    virtual void print (std::ostream &dst) const override {
+        if(NextVar != NULL) {
+            NextVar->print(dst);
+        }
+    }
+    
+    virtual void translate (std::ostream &dst) const override {
+        if (NextVar != NULL) {
+            NextVar->translate(dst);
         }
     }
 };
