@@ -39,6 +39,14 @@ public:
             Rest_of_program->translate(dst);
         }
     }
+
+    virtual void compile (std::ostream &dst, Context &contxt) const override {
+        ExDec->compile(dst,contxt);
+        if (Rest_of_program != NULL) {
+            Rest_of_program->compile(dst, contxt);
+        }
+    }
+
 };
 
 class FunctionDef: public AST_node {
@@ -136,8 +144,9 @@ public:
 
         dst<<Identifier<<":"<<std::endl;
         //space allocated in stack
+        dst<<"#allocating stack"<<std::endl;
         dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,-"<<(var_count*4)+8<<std::endl; //restoring sp
-         dst<<"\t"<<"sw"<<"\t"<<"$31,"<<(var_count*4)+8<<"($sp)"<<std::endl;
+        dst<<"\t"<<"sw"<<"\t"<<"$31,"<<(var_count*4)+8<<"($sp)"<<std::endl;
         dst<<"\t"<<"sw"<<"\t"<<"$fp,"<<(var_count*4)+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
         dst<<"\t"<<"move"<<"\t"<<"$fp, $sp"<<std::endl;
 
@@ -157,8 +166,9 @@ public:
             dst<<"\t"<<"nop"<<"\t"<<std::endl; //if a function is declared as empty
         }
         
+        dst<<"#deallocating stack"<<std::endl;
         dst<<"\t"<<"move"<<"\t"<<"$sp, $fp"<<std::endl; //deallocating stack
-        
+        dst<<"\t"<<"lw"<<"\t"<<"$31,"<<(var_count*4)+8<<"($sp)"<<std::endl;
         dst<<"\t"<<"lw"<<"\t"<<"$fp,"<<(var_count*4)+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
         dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,"<<(var_count*4)+8<<std::endl; //restoring sp
         dst<<"\t"<<"j"<<"\t"<<"$31"<<std::endl;
@@ -266,6 +276,23 @@ class LocalVarDec : public Expression
             dst << "=0";
         }
     }
+
+    virtual void compile(std::ostream &dst, Context &contxt) const override
+    {
+        dst << "#local variable"<<std::endl;
+        if (Expression != NULL)
+        {
+            Expression->compile(dst, contxt);
+        }
+        else
+        {
+            dst <<"\t"<<"li"<<"\t"<<"$2, 0"<<std::endl;
+        }
+
+
+        dst<<"\t"<<"sw"<<"\t"<<"$2, "<<"8($fp)"<<std::endl;
+    }
+
 };
 
 class MultipleDecs : public Expression {
@@ -279,8 +306,8 @@ protected:
 
 public:
     ~MultipleDecs() {}
-    MultipleDecs (std::string _Type, std::string _Name, ExpressionPtr _AdditionalNames, bool _isGlobal) 
-    : Type(_Type), AdditionalNames(_AdditionalNames), isGlobal(_isGlobal) {
+    MultipleDecs (std::string _Type, std::string _Name, ExpressionPtr _AdditionalNames,  bool _isGlobal) 
+    : Type(_Type), AdditionalNames(_AdditionalNames),  isGlobal(_isGlobal) {
         if (isGlobal)
         GlobalNames.push_back(_Name);
         else
@@ -328,7 +355,7 @@ public:
                     GlobalNameExpr[i]->translate(dst);
                 }
                 else {
-                    dst<<" =0";
+                    dst<<" = 0";
                 }
                 dst<<std::endl;
                 for (int i = 0; i < scopelevel; i++) {dst << "\t";}
@@ -343,7 +370,7 @@ public:
                     LocalNameExpr[i]->translate(dst);
                 }
                 else {
-                    dst<<" =0";
+                    dst<<" = 0";
                 }
                 dst<<std::endl;
                 for (int i = 0; i < scopelevel; i++) {dst << "\t";}
