@@ -214,6 +214,16 @@ public:
             dst << "\t";
         }
     }
+
+    virtual void compile(std::ostream &dst, Context &contxt) const override {
+        //dst << std::endl;
+        scopelevel++;
+        Body->compile(dst, contxt);
+        scopelevel--;
+        for (int i = 0; i < scopelevel; i++) {
+            dst << "\t";
+        }
+    }
 };
 
 class NoBraces : public Expression
@@ -280,6 +290,18 @@ public:
             Rest_of_statements->translate(dst);
         }
     }
+
+    virtual void compile(std::ostream &dst, Context &contxt) const override {
+        // for (int i = 0; i < scopelevel; i++) {
+        //     dst << "\t";
+        // }
+        Singular_statement->compile(dst, contxt);
+        if (Rest_of_statements != NULL) {
+            Rest_of_statements->compile(dst, contxt);
+        }
+    }
+
+
 };
 
 class BracketedExpr : public Expression {
