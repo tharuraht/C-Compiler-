@@ -93,6 +93,13 @@ public:
             }
             dst<<"\tglobal "<<global_vars[i];
         }
+        for (unsigned int i=0; i< Names.size();i++) {
+            dst<<std::endl;
+            for (int i = 0; i < scopelevel; i++) {
+                dst << "\t";
+            }
+            dst<<"\tglobal "<<Names[i];
+        }
         if (Scope != NULL) {
             Scope->translate(dst);
         }
@@ -292,7 +299,7 @@ public:
         AdditionalNames->translate(dst);
         //after recursive call
         for (unsigned int i=0;i<Names.size();i++) {
-            dst<< Type <<" "<< Names[i];
+            dst<< Names[i];
             if (Expression != NULL) {
                 dst<<" = ";
                 Expression->translate(dst);
