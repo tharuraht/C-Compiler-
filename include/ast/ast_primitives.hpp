@@ -72,13 +72,13 @@ public:
     }
 
 
-    virtual double evaluate(
-        const std::map<std::string,double> &bindings
-    ) const override
-    {
-        // TODO-A : Run bin/eval_expr with a numeric expression to make sure you understand how this works.
-        return value;
-    }
+    // virtual double evaluate(
+    //     const std::map<std::string,double> &bindings
+    // ) const override
+    // {
+    //     // TODO-A : Run bin/eval_expr with a numeric expression to make sure you understand how this works.
+    //     return value;
+    // }
 
     virtual void compile(std::ostream &dst, Context &contxt) const override {
 		dst <<"\t"<< "li" << "\t" << "$2, " << value<<std::endl;
