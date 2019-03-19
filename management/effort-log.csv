@@ -20,4 +20,5 @@ Date,Effort,Developers,Milestones
 16.03.19,4,ta2617,"Implemented bracketed expressions for translate, created context class for compiler"
 16.03.19,8,am9717, "Reduced shift/conflict errors in parse tree, implemented do-while and for loops, increments/decrements and empty function calls for translator"
 17.03.19,5,"am9717,ta2617","Discussed codegen structure based on lab 3 and started codegen for global variables"
-17.03.19,2,ta2617,"Implemented type definition and assignment of multiple variables"
+18.03.19,2,ta2617,"Implemented type definition and assignment of multiple variables"
+19.04.19,2,ta2617,"Fixed implementation of multiple decs, was understood wrong before"
