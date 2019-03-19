@@ -56,6 +56,22 @@ public:
             AdditionalExpressions->translate(dst);
         }
     }
+
+    virtual void compile(std::ostream &dst, Context &contxt) const override {
+        
+        if (AdditionalExpressions != NULL) {
+            AdditionalExpressions->compile(dst, contxt);
+        }
+        else{
+            dst<<"\t"<<"move"<<"\t"<<"$sp, $fp"<<std::endl; //deallocating stack
+            dst<<"\t"<<"lw"<<"\t"<<"$31,"<<(var_count*4)+8<<"($sp)"<<std::endl;
+            dst<<"\t"<<"lw"<<"\t"<<"$fp,"<<(var_count*4)+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
+            dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,"<<(var_count*4)+8<<std::endl; //restoring sp
+            dst<<"\t"<<"j"<<"\t"<<"$31"<<std::endl;
+            dst<<"\t"<<"nop"<<std::endl;
+            dst<<std::endl;
+        }
+    }
 };
 
 class IfElseStatement : public Expression {

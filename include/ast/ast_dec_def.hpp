@@ -125,6 +125,8 @@ public:
 
         //dst<<"#MIPS function:"<<std::endl;
         //creating ABI directives
+        dst<<"\t"<<".text"<<std::endl;
+        dst<<std::endl;
         dst<<"\t"<<".align"<<"\t"<<"2"<<std::endl;
         dst<<"\t"<<".globl"<<"\t"<<Identifier<<std::endl;
         dst<<std::endl;
@@ -134,7 +136,7 @@ public:
         dst<<Identifier<<":"<<std::endl;
         //space allocated in stack
         dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,-"<<(var_count*4)+8<<std::endl; //restoring sp
-
+         dst<<"\t"<<"sw"<<"\t"<<"$31,"<<(var_count*4)+8<<"($sp)"<<std::endl;
         dst<<"\t"<<"sw"<<"\t"<<"$fp,"<<(var_count*4)+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
         dst<<"\t"<<"move"<<"\t"<<"$fp, $sp"<<std::endl;
 
