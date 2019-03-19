@@ -19,4 +19,5 @@ Date,Effort,Developers,Milestones
 15.03.19,6,am9717,"Improved translator function for operators, built more parse tree to support returning function calls and debugged errors in translator"
 16.03.19,4,ta2617,"Implemented bracketed expressions for translate, created context class for compiler"
 16.03.19,8,am9717, "Reduced shift/conflict errors in parse tree, implemented do-while and for loops, increments/decrements and empty function calls for translator"
-17.03.19,5,am9717,"Discussed codegen structure based on lab 3 and started codegen for global variables"
+17.03.19,5,"am9717,ta2617","Discussed codegen structure based on lab 3 and started codegen for global variables"
+17.03.19,2,ta2617,"Implemented type definition and assignment of multiple variables"

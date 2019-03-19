@@ -54,7 +54,7 @@
 
 
 %type <expr>  TERM FACTOR BINARY_EXPRESSION_TREE STATEMENT
-%type <expr> C_EXPRESSION COMPARISON_OP LOGICAL_OP COMPARISONEXPR C_ARGS DECLARE_VAR FUNCTION_CALL PASSED_PARAMS
+%type <expr> C_EXPRESSION COMPARISON_OP LOGICAL_OP COMPARISONEXPR C_ARGS DECLARE_VAR FUNCTION_CALL PASSED_PARAMS ADDITIONAL_DECS
 
 //C_INCREMENT_DECREMENT, , EXPR, SCOPE_BODY
 
@@ -81,7 +81,7 @@
    broken anything while you added it.
 */
 
-ROOT : FUNCTION_DEC_DEF {g_root = $1;}
+ROOT : PROGRAM {g_root = $1;}
 
 /*
 PROGRAM
@@ -131,6 +131,14 @@ EX_DECLARATION :
 GLOBAL_DECLARATION :
     TYPE_SPECIFY T_VARIABLE T_SEMICOLON                         {$$ = new GlobalVarDec(*$1,*$2,NULL);}
   | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON    {$$ = new GlobalVarDec(*$1,*$2,$4);}
+  | TYPE_SPECIFY T_VARIABLE T_COMMA ADDITIONAL_DECS T_SEMICOLON {$$ = new MultipleDecs (*$1,*$2,$4,NULL);}
+  | TYPE_SPECIFY T_VARIABLE T_COMMA ADDITIONAL_DECS T_EQUAL C_EXPRESSION T_SEMICOLON {$$ = new MultipleDecs (*$1,*$2,$4,$6);}
+
+
+
+ADDITIONAL_DECS :
+    T_VARIABLE T_COMMA ADDITIONAL_DECS {$$ = new AdditionalDecs (*$1,$3);}
+  | T_VARIABLE {$$ = new AdditionalDecs (*$1, NULL);}
 
 FUNCTION_DEC_DEF : 
     TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET SCOPE         {$$ = new FunctionDec(*$1,*$2,NULL,$5);}
@@ -162,7 +170,6 @@ SCOPE_STATEMENTS :
 STATEMENT :
     T_RETURN C_EXPRESSION T_SEMICOLON                         {$$ = new ReturnStatement($2);}
   | T_RETURN LOGICAL_OP T_SEMICOLON                         {$$ = new ReturnStatement($2);}
-  | T_RETURN FUNCTION_CALL T_SEMICOLON                      {$$ = new ReturnStatement($2);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON               {$$ = new AssignmentStatement(*$1,$3);}
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE      {$$ = new IfElseStatement($3,$5,NULL);}
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE {$$ = new IfElseStatement($3, $5, $7);}
@@ -198,7 +205,7 @@ TYPE_SPECIFY
 
 C_EXPRESSION
   : BINARY_EXPRESSION_TREE {$$ = $1;}
-  | FUNCTION_CALL {$$ = $1;}
+
 
 BINARY_EXPRESSION_TREE
   : TERM T_PLUS C_EXPRESSION     { $$ = new AddOperator($1, $3);}
