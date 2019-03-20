@@ -33,6 +33,10 @@ public:
         const std::map<std::string,double> &bindings
     ) const
     { throw std::runtime_error("Expr evaluate not implemented."); }
+
+    virtual int evaluate () const {
+        throw std::runtime_error("Not implemented");
+    }
 };
 
 

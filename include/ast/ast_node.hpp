@@ -14,6 +14,7 @@ static int scopelevel;
 static std::vector<std::string> function_call_queue;
 static int parameter_count = 16;
 static int function_call_num;
+static bool varGlobal;
 
 
 class AST_node;

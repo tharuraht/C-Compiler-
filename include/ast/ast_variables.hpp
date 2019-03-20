@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-
+extern bool varGlobal;
 
 class GlobalVarDec : public Expression
 {
@@ -60,8 +60,10 @@ class GlobalVarDec : public Expression
 
             dst << Name << ":" << std::endl;
             //store expression
-            dst << "\t"<< ".word"<< "\t" << std::endl;
+            dst << "\t"<< ".word"<< "\t";
+            varGlobal = true;
             Expression->compile(dst, contxt, destReg);
+            varGlobal = false;
             dst << std::endl;
 
             dst << "\t"<< ".text" << std::endl;

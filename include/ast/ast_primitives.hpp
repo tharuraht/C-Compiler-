@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+extern bool varGlobal;
 
 class Variable: public Expression {
 private:
@@ -37,16 +38,15 @@ public:
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
         int var_offset = contxt.LookupVariable(id, scopelevel);
-        std::cout<<"VAR OFFSET: "<<var_offset<<std::endl;
+        // std::cout<<"VAR OFFSET: "<<var_offset<<std::endl;
 
         if(var_offset != 0){  //if (var_offset == 0)
-            
-            dst<<"\t"<<"lui"<<"\t"<<"$"<<destReg<<", "<<"%hi("<<id<<")"<<"\t#Loading in variable from memory"<<std::endl;
-            dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<"%lo("<<id<<")($2)"<<std::endl;
+            //looks for local variables in the scopes
+            dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
         }
         else{
-            //load whole word into register two
-            dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
+            dst<<"\t"<<"lui"<<"\t"<<"$"<<destReg<<", "<<"%hi("<<id<<")"<<"\t#Loading in variable from memory"<<std::endl;
+            dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<"%lo("<<id<<")($2)"<<std::endl;
         }
     }   
 };
@@ -80,10 +80,18 @@ public:
     //     // TODO-A : Run bin/eval_expr with a numeric expression to make sure you understand how this works.
     //     return value;
     // }
+    virtual int evaluate () const override {
+        return value;
+    }
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
-        dst <<"\t"<< "li" << "\t" << "$"<<destReg<<", " << value<<std::endl;
+        if (varGlobal) {
+            dst<<value<<"\t#Global variable"<<std::endl;
+        }
+        else if (!varGlobal) {
+            dst <<"\t"<< "li" << "\t" << "$"<<destReg<<", " << value<<std::endl;
+        }
 	}
 };
 

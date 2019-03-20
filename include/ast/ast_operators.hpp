@@ -74,12 +74,19 @@ public:
     
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
-        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
-        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
-        left->compile(dst, contxt, destReg);
-        right->compile(dst, contxt, freeregs[0]);
-        dst << "\t"<< "addu"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" << freeregs[0] <<"\t#Add operator"<< std::endl;
-        contxt.set_unused(freeregs[0]);
+        if (varGlobal) {
+            int vl = left->evaluate();
+            int vr = right->evaluate();
+            dst<<vl + vr;
+        }
+        else {
+            std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
+            contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+            left->compile(dst, contxt, destReg);
+            right->compile(dst, contxt, freeregs[0]);
+            dst << "\t"<< "addu"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" << freeregs[0] <<"\t#Add operator"<< std::endl;
+            contxt.set_unused(freeregs[0]);
+        }
     }
 
 };
@@ -95,28 +102,35 @@ public:
         : Operator(_left, _right)
     {}
     
-    virtual double evaluate(
-        const std::map<std::string,double> &bindings
-    ) const override 
-    {
-        // TODO-D : Implement this, based on AddOperator::evaluate
+    // virtual double evaluate(
+    //     const std::map<std::string,double> &bindings
+    // ) const override 
+    // {
+    //     // TODO-D : Implement this, based on AddOperator::evaluate
 
-        double vl=left->evaluate(bindings);
-        double vr=right->evaluate(bindings);
-        return vl-vr;
+    //     double vl=left->evaluate(bindings);
+    //     double vr=right->evaluate(bindings);
+    //     return vl-vr;
 
-        //throw std::runtime_error("SubOperator::evaluate is not implemented.");
-    }
+    //     //throw std::runtime_error("SubOperator::evaluate is not implemented.");
+    // }
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
-        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
-        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
-        
-        left->compile(dst, contxt, destReg);
-        right->compile(dst, contxt, freeregs[0]);
-        dst << "\t"<< "sub"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" << freeregs[0] <<"\t#Sub Operator"<< std::endl;
-        contxt.set_unused(freeregs[0]);
+        if (varGlobal) {
+            int vl = left->evaluate();
+            int vr = right->evaluate();
+            dst<<vl - vr;
+        }
+        else {
+            std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
+            contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+            
+            left->compile(dst, contxt, destReg);
+            right->compile(dst, contxt, freeregs[0]);
+            dst << "\t"<< "sub"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" << freeregs[0] <<"\t#Sub Operator"<< std::endl;
+            contxt.set_unused(freeregs[0]);
+        }
     }
 };
 
@@ -145,14 +159,21 @@ public:
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
-        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
-        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
-        
-        left->compile(dst, contxt, destReg);
-        right->compile(dst, contxt, freeregs[0]);
-        dst << "\t"<<"mult"<<"\t"<< "$" << destReg << ", $" << freeregs[0] <<"\t#Multiply Operator"<< std::endl;
-        dst << "\t"<<"mflo"<<"\t"<<"$"<<destReg<<"\t#Store result of multiply"<<std::endl;
-        contxt.set_unused(freeregs[0]);
+        if (varGlobal) {
+            int vl = left->evaluate();
+            int vr = right->evaluate();
+            dst<<vl * vr;
+        }
+        else {
+            std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
+            contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+            
+            left->compile(dst, contxt, destReg);
+            right->compile(dst, contxt, freeregs[0]);
+            dst << "\t"<<"mult"<<"\t"<< "$" << destReg << ", $" << freeregs[0] <<"\t#Multiply Operator"<< std::endl;
+            dst << "\t"<<"mflo"<<"\t"<<"$"<<destReg<<"\t#Store result of multiply"<<std::endl;
+            contxt.set_unused(freeregs[0]);
+        }
     }
 };
 
