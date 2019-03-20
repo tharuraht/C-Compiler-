@@ -20,6 +20,11 @@ int main(int argc, char *argv[])
 	  ast->translate(std::cout);
     std::cout<<std::endl;
 	}
+	else if (test=="-S") {
+		Context *contxt = new Context();
+		ast->compile(std::cout, *contxt, 2);
+		std::cout<<std::endl;
+	}
 
 	fclose(stdin);
 	fclose(stdout);

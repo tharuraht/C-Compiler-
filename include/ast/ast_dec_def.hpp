@@ -143,7 +143,7 @@ public:
         }
         //dst<<"#MIPS function:"<<std::endl;
         //creating ABI directives
-        dst<<"----------FUNCTION "<<Identifier<<"----------"<<std::endl;
+        dst<<"#----------FUNCTION "<<Identifier<<"----------"<<std::endl;
         dst<<"\t"<<".text"<<std::endl;
         dst<<std::endl;
         dst<<"\t"<<".align"<<"\t"<<"2"<<std::endl;
