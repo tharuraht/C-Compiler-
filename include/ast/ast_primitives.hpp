@@ -32,20 +32,21 @@ public:
         // TODO-B : Run bin/eval_expr with a variable binding to make sure you understand how this works.
         // If the binding does not exist, this will throw an error
         return bindings.at(id);
-    } 
+    }
 
-    virtual void compile(std::ostream &dst, Context &contxt) const override
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
         int var_offset = contxt.LookupVariable(id, scopelevel);
+        std::cout<<"VAR OFFSET: "<<var_offset<<std::endl;
 
-        if(var_offset){  //if (var_offset == 0)
+        if(var_offset != 0){  //if (var_offset == 0)
             
-            dst<<"\t"<<"lui"<<"\t"<<"$2, "<<"%hi("<<id<<")"<<std::endl;
-            dst<<"\t"<<"lw"<<"\t"<<"$2, "<<"%lo("<<id<<")($2)"<<std::endl;
+            dst<<"\t"<<"lui"<<"\t"<<"$"<<destReg<<", "<<"%hi("<<id<<")"<<"\t#Loading in variable from memory"<<std::endl;
+            dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<"%lo("<<id<<")($2)"<<std::endl;
         }
         else{
             //load whole word into register two
-            dst<<"\t"<<"lw"<<"\t"<<"$2, "<<var_offset<<"($fp)"<<std::endl;
+            dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
         }
     }   
 };
@@ -80,8 +81,9 @@ public:
     //     return value;
     // }
 
-    virtual void compile(std::ostream &dst, Context &contxt) const override {
-		dst <<"\t"<< "li" << "\t" << "$2, " << value<<std::endl;
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
+    {
+        dst <<"\t"<< "li" << "\t" << "$"<<destReg<<", " << value<<std::endl;
 	}
 };
 

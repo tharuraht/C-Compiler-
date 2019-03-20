@@ -48,14 +48,13 @@ class Context {
     }
 
     std::vector<int> FindFreeRegs (unsigned int first, unsigned int last) {
+        //finds and returns register numbers that are free for the defined range
         std::vector<int> FreeRegs;
-        
         for (unsigned int i = first; i <= last; i++) {
             if (regavailable[i]) {
                 FreeRegs.push_back(i);
             }
         }   
-
         return FreeRegs;     
     }
 
@@ -107,6 +106,12 @@ class Context {
         }
         //if not found return 0
         return 0;
+    }
+
+    void clearArgumentregs() {
+        for (int i=0; i<8;i++) {
+            regavailable[i] = true;
+        }
     }
 };
 

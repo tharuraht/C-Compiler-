@@ -9,11 +9,11 @@
 extern std::vector<std::string> global_vars;
 extern int var_count;
 extern int scopelevel;
+extern int function_call_num;
+extern  std::vector<std::string> function_call_queue;
+static std::vector<std::string> function_def_queue;
+static int function_def_num;
 
-static std::vector<std::string> GlobalNames;
-static std::vector<ExpressionPtr> GlobalNameExpr;
-static std::vector<std::string> LocalNames;
-static std::vector<ExpressionPtr> LocalNameExpr;
 
 class Program : public AST_node
 {
@@ -24,7 +24,10 @@ class Program : public AST_node
 public:
     ~Program() {}
 
-    Program (NodePtr _ExDec, NodePtr _Rest_of_program) : ExDec(_ExDec), Rest_of_program(_Rest_of_program) {}
+    Program (NodePtr _ExDec, NodePtr _Rest_of_program) : ExDec(_ExDec), Rest_of_program(_Rest_of_program) {
+        function_call_num = 0;
+        
+    }
 
     virtual void print (std::ostream &dst) const override {
         ExDec->print(dst);
@@ -40,10 +43,11 @@ public:
         }
     }
 
-    virtual void compile (std::ostream &dst, Context &contxt) const override {
-        ExDec->compile(dst,contxt);
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
+    {
+        ExDec->compile(dst, contxt, destReg);
         if (Rest_of_program != NULL) {
-            Rest_of_program->compile(dst, contxt);
+            Rest_of_program->compile(dst, contxt, destReg);
         }
     }
 
@@ -76,7 +80,8 @@ public:
     NodePtr Scope;
 
     FunctionDec(std::string _Type, std::string _Identifier, ExpressionPtr _Arguments, NodePtr _Scope) 
-    : Type(_Type), Identifier(_Identifier), Arguments(_Arguments), Scope(_Scope) {}
+    : Type(_Type), Identifier(_Identifier), Arguments(_Arguments), Scope(_Scope) {
+    }
 
     ~FunctionDec() {}
 
@@ -129,11 +134,16 @@ public:
         }
     }
 
-    virtual void compile (std::ostream &dst, Context &contxt) const override 
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
-
+        function_def_num++;
+        function_def_queue.push_back(Identifier);
+        if (Identifier == "main") {
+            function_call_queue.insert(function_call_queue.begin(),"main");
+        }
         //dst<<"#MIPS function:"<<std::endl;
         //creating ABI directives
+        dst<<"----------FUNCTION "<<Identifier<<"----------"<<std::endl;
         dst<<"\t"<<".text"<<std::endl;
         dst<<std::endl;
         dst<<"\t"<<".align"<<"\t"<<"2"<<std::endl;
@@ -145,19 +155,19 @@ public:
         dst<<Identifier<<":"<<std::endl;
         //space allocated in stack
         dst<<"#allocating stack"<<std::endl;
-        dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,-"<<(var_count*4)+8<<std::endl; //restoring sp
-        dst<<"\t"<<"sw"<<"\t"<<"$31,"<<(var_count*4)+8<<"($sp)"<<std::endl;
-        dst<<"\t"<<"sw"<<"\t"<<"$fp,"<<(var_count*4)+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
+        dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,-"<<(var_count*4) +parameter_count+12<<std::endl; //restoring sp
+        dst<<"\t"<<"sw"<<"\t"<<"$ra,"<<(var_count*4)+parameter_count+8<<"($sp)"<<std::endl; //store return address at end of stack frame
+        dst<<"\t"<<"sw"<<"\t"<<"$fp,"<<(var_count*4)+parameter_count+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
         dst<<"\t"<<"move"<<"\t"<<"$fp, $sp"<<std::endl;
 
         if(Arguments != NULL){
-            Arguments->compile(dst, contxt);
+            Arguments->compile(dst, contxt, destReg);
         }
 
         contxt.FreeParamRegs();
 
         if(Scope != NULL){
-            Scope->compile(dst, contxt);
+            Scope->compile(dst, contxt, destReg);
         }
         else if(Identifier == "main" && Scope == NULL){
             dst<<"\t"<<"move"<<"\t"<<"$2, $0"<<std::endl; //empty main should return zero in $2
@@ -166,254 +176,24 @@ public:
             dst<<"\t"<<"nop"<<"\t"<<std::endl; //if a function is declared as empty
         }
         
+        dst<<Identifier<<"_function_end_"<<function_def_num<<":"<<std::endl;
         dst<<"#deallocating stack"<<std::endl;
         dst<<"\t"<<"move"<<"\t"<<"$sp, $fp"<<std::endl; //deallocating stack
-        dst<<"\t"<<"lw"<<"\t"<<"$31,"<<(var_count*4)+8<<"($sp)"<<std::endl;
-        dst<<"\t"<<"lw"<<"\t"<<"$fp,"<<(var_count*4)+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
-        dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,"<<(var_count*4)+8<<std::endl; //restoring sp
-        dst<<"\t"<<"j"<<"\t"<<"$31"<<std::endl;
+        dst<<"\t"<<"lw"<<"\t"<<"$ra,"<<(var_count*4)+parameter_count+8<<"($sp)"<<std::endl;
+        dst<<"\t"<<"lw"<<"\t"<<"$fp,"<<(var_count*4)+parameter_count+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
+        dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,"<<(var_count*4)+parameter_count+12<<std::endl; //restoring sp
+        dst<<"\t"<<"j"<<"\t"<<"$ra"<<std::endl;
         dst<<"\t"<<"nop"<<std::endl;
         dst<<std::endl;
 
         dst<<"\t"<<".end"<<"\t" <<Identifier<<std::endl;
+        function_def_queue.pop_back();
 
         contxt.FreeParamRegs();
     }
 };
 
-class GlobalVarDec: public Expression {
-    public:
-    std::string Type;
-    std::string Name;
-    ExpressionPtr Expression;
 
-    GlobalVarDec (std::string _Type, std::string _Name, ExpressionPtr _Expression) : Type(_Type),Name(_Name),Expression(_Expression) {
-        global_vars.push_back(Name);
-        var_count++;
-    }
-    ~GlobalVarDec () {}
-
-    virtual void print(std::ostream &dst) const override {
-        dst << Type << " " << Name;
-        if (Expression != NULL)
-        {
-            dst << " = ";
-            Expression->print(dst);
-        }
-        dst<<";"<<std::endl;
-    }
-
-    virtual void translate(std::ostream &dst) const override {
-        dst<< Name;
-        if (Expression != NULL)
-        {
-            dst<<"=";
-            Expression->translate(dst);
-        }
-        else {
-            dst<<"=0";
-        }
-        dst<<std::endl;
-    }
-
-    virtual void compile (std::ostream &dst, Context &contxt) const override {
-        //only generate assembly if the variable is assigned
-        if (Expression != NULL) {
-            dst<<"\t"<<".globl"<<"\t"<<Name<<std::endl;
-            dst<<"\t"<<".data"<<"\t"<<std::endl;
-            dst<<"\t"<<".align"<<"\t"<<"2"<<std::endl;
-            //dst<<"\t"<<".type"<<"\t"<<Name<<", @object"<<std::endl;
-            //dst<<"\t"<<".size"<<"\t"<<Name<<", 4"<<std::endl;
-            
-            dst<<Name<<":"<<std::endl;
-            //store expression
-            dst<<"\t"<<".word"<<"\t"<<std::endl;
-            Expression->compile(dst, contxt);
-            dst<<std::endl;
-
-            dst<<"\t"<<".text"<<std::endl;
-            dst<<"\t"<<".align"<<"\t"<<"2"<<std::endl;
-        }
-
-        contxt.NewGlobalVar (Name);
-    }
-};
-
-class LocalVarDec : public Expression
-{
-  public:
-    std::string Type;
-    std::string Name;
-    ExpressionPtr Expression;
-
-    LocalVarDec(std::string _Type, std::string _Name, ExpressionPtr _Expression)
-        : Type(_Type), Name(_Name), Expression(_Expression) 
-        { var_count++; }
-
-    ~LocalVarDec() {}
-
-    virtual void print(std::ostream &dst) const override
-    {
-        dst << Type << " " << Name;
-        if (Expression != NULL)
-        {
-            dst << " = ";
-            Expression->print(dst);
-        }
-        dst << ";";
-    }
-
-    virtual void translate(std::ostream &dst) const override
-    {
-        dst << Name;
-        if (Expression != NULL)
-        {
-            dst << " = ";
-            Expression->translate(dst);
-        }
-        else
-        {
-            dst << "=0";
-        }
-    }
-
-    virtual void compile(std::ostream &dst, Context &contxt) const override
-    {
-        dst << "#local variable"<<std::endl;
-        if (Expression != NULL)
-        {
-            Expression->compile(dst, contxt);
-        }
-        else
-        {
-            dst <<"\t"<<"li"<<"\t"<<"$2, 0"<<std::endl;
-        }
-
-
-        dst<<"\t"<<"sw"<<"\t"<<"$2, "<<"8($fp)"<<std::endl;
-    }
-
-};
-
-class MultipleDecs : public Expression {
-private:
-  std::string Type;
-  ExpressionPtr AdditionalNames;
-  bool isGlobal;
-
-protected:
-    
-
-public:
-    ~MultipleDecs() {}
-    MultipleDecs (std::string _Type, std::string _Name, ExpressionPtr _AdditionalNames,  bool _isGlobal) 
-    : Type(_Type), AdditionalNames(_AdditionalNames),  isGlobal(_isGlobal) {
-        if (isGlobal)
-        GlobalNames.push_back(_Name);
-        else
-        LocalNames.push_back(_Name);
-    }
-    MultipleDecs () {} //for inheritance
-
-    virtual void print(std::ostream &dst) const override {
-        AdditionalNames->print(dst);
-        //after recursive call
-        if (isGlobal) {
-            for (unsigned int i = 0; i < GlobalNames.size(); i++) {
-                dst << Type << " " << GlobalNames[i];
-                if (GlobalNameExpr[i] != NULL) {
-                    dst << " = ";
-                    GlobalNameExpr[i]->print(dst);
-                }
-                dst << ";" << std::endl;
-                for (int i = 0; i < scopelevel; i++) {dst << "\t";}
-            }
-        }
-        else {
-            for (unsigned int i = 0; i < LocalNames.size(); i++) {
-                dst << Type << " " << LocalNames[i];
-                if (LocalNameExpr[i] != NULL) {
-                    dst << " = ";
-                    LocalNameExpr[i]->print(dst);
-                }
-                dst << ";" << std::endl;
-                for (int i = 0; i < scopelevel; i++) {dst << "\t";}
-
-            }
-        }
-        
-    }
-
-    virtual void translate (std::ostream &dst) const override {
-        AdditionalNames->translate(dst);
-        //after recursive call
-        if (isGlobal) {
-            for (unsigned int i=0;i<GlobalNames.size();i++) {
-                dst << GlobalNames[i];
-                if (GlobalNameExpr[i] != NULL) {
-                    dst<<" = ";
-                    GlobalNameExpr[i]->translate(dst);
-                }
-                else {
-                    dst<<" = 0";
-                }
-                dst<<std::endl;
-                for (int i = 0; i < scopelevel; i++) {dst << "\t";}
-            }
-        }
-        else {
-           for (unsigned int i=0;i<LocalNames.size();i++) {
-                dst<< LocalNames[i];
-                if (LocalNameExpr[i] != NULL)
-                {
-                    dst<<" = ";
-                    LocalNameExpr[i]->translate(dst);
-                }
-                else {
-                    dst<<" = 0";
-                }
-                dst<<std::endl;
-                for (int i = 0; i < scopelevel; i++) {dst << "\t";}
-            } 
-        }
-    }
-};
-
-class AdditionalDecs: public MultipleDecs {
-private:
-    std::string CurrentVar;
-    ExpressionPtr CurrentExpression;
-    ExpressionPtr NextVar;
-    bool isGlobal;
-public:
-    ~AdditionalDecs () {}
-
-    AdditionalDecs(std::string _CurrentVar, ExpressionPtr _CurrentExpression, ExpressionPtr _NextVar, bool _isGlobal) 
-    : CurrentVar(_CurrentVar), CurrentExpression(_CurrentExpression), NextVar(_NextVar), isGlobal(_isGlobal) {
-        if (isGlobal) {
-            GlobalNames.push_back(CurrentVar);
-            GlobalNameExpr.push_back(CurrentExpression);
-        }
-            
-        else {
-            LocalNames.push_back(CurrentVar);
-            LocalNameExpr.push_back(CurrentExpression);
-        }
-
-    }
-
-    virtual void print (std::ostream &dst) const override {
-        if(NextVar != NULL) {
-            NextVar->print(dst);
-        }
-    }
-    
-    virtual void translate (std::ostream &dst) const override {
-        if (NextVar != NULL) {
-            NextVar->translate(dst);
-        }
-    }
-};
 
 
 class PostIncrement: public AST_node {

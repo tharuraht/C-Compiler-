@@ -23,3 +23,4 @@ Date,Effort,Developers,Milestones
 18.03.19,2,ta2617,"Implemented type definition and assignment of multiple variables"
 19.03.19,2,ta2617,"Fixed implementation of multiple decs, was understood wrong before"
 19.03.19,6,am9717,"Worked on codegen for scope statements and variable declaration, managed to print asm for simple main function"
+20.03.19,6,ta2617,"Added new parameter for compile function, implemented return, function declaractions, and simple expressions"

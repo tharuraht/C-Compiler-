@@ -57,10 +57,13 @@ public:
         }
     }
 
-    virtual void compile(std::ostream &dst, Context &contxt) const override {
-        
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
+    {
+
         if (AdditionalExpressions != NULL) {
-            AdditionalExpressions->compile(dst, contxt);
+            AdditionalExpressions->compile(dst, contxt, destReg);
+            //branch to end of function label
+            dst<<"\t"<<"b "<<function_def_queue.back()<<"_function_end_"<<function_def_num<<"\t#Return statement"<<std::endl;
         }
         else{
             dst<<"\t"<<"move"<<"\t"<<"$sp, $fp"<<std::endl; //deallocating stack
@@ -215,14 +218,16 @@ public:
         }
     }
 
-    virtual void compile(std::ostream &dst, Context &contxt) const override {
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
+    {
         //dst << std::endl;
-        scopelevel++;
-        Body->compile(dst, contxt);
-        scopelevel--;
-        for (int i = 0; i < scopelevel; i++) {
-            dst << "\t";
-        }
+        // scopelevel++;
+        dst<<"#FUNCTION BODY"<<std::endl;
+        Body->compile(dst, contxt, destReg);
+        // scopelevel--;
+        // for (int i = 0; i < scopelevel; i++) {
+        //     dst << "\t";
+        // }
     }
 };
 
@@ -291,13 +296,14 @@ public:
         }
     }
 
-    virtual void compile(std::ostream &dst, Context &contxt) const override {
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
+    {
         // for (int i = 0; i < scopelevel; i++) {
         //     dst << "\t";
         // }
-        Singular_statement->compile(dst, contxt);
+        Singular_statement->compile(dst, contxt, destReg);
         if (Rest_of_statements != NULL) {
-            Rest_of_statements->compile(dst, contxt);
+            Rest_of_statements->compile(dst, contxt, destReg);
         }
     }
 

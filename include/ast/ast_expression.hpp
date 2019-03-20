@@ -6,12 +6,18 @@
 #include <string>
 #include <iostream>
 #include <map>
-
 #include <memory>
+
+
 
 class Expression;
 
 typedef const Expression *ExpressionPtr;
+
+static std::vector<std::string> GlobalNames;
+static std::vector<ExpressionPtr> GlobalNameExpr;
+static std::vector<std::string> LocalNames;
+static std::vector<ExpressionPtr> LocalNameExpr;
 
 class Expression : public AST_node
 {

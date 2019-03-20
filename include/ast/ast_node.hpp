@@ -12,6 +12,9 @@ static std::vector<std::string> global_vars;
 static int var_count;
 static int scopelevel;
 static std::vector<std::string> function_call_queue;
+static int parameter_count = 16;
+static int function_call_num;
+
 
 class AST_node;
 
@@ -36,7 +39,8 @@ public:
         throw std::runtime_error("Translate not implemented.");
     }
 
-    virtual void compile (std::ostream &dst, Context &contxt) const {
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const
+    {
         throw std::runtime_error("Compilation not implemented.");
     }
 };

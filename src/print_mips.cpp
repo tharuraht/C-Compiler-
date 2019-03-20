@@ -8,7 +8,7 @@ int main () {
     const AST_node *ast=parseAST();
 
     Context* contxt = new Context();
-    ast->compile(std::cout, *contxt);
+    ast->compile(std::cout, *contxt, 2);
     std::cout<<std::endl;
 
     

@@ -5,6 +5,7 @@
 #include <cmath>
 
 extern std::vector<std::string> function_call_queue;
+extern int function_call_num;
 
 class FunctionCall : public Expression
 {
@@ -14,8 +15,7 @@ class FunctionCall : public Expression
 
 
   public:
-    FunctionCall(std::string _name, ExpressionPtr _arg) : name(_name), arg(_arg) {
-        function_call_queue.push_back(name);
+    FunctionCall(std::string _name, ExpressionPtr _arg) : name(_name), arg(_arg) {     
     }
     ~FunctionCall() {}
 
@@ -35,6 +35,13 @@ class FunctionCall : public Expression
         }
 
         dst << ")";
+    }
+
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
+        function_call_num++;
+        function_call_queue.push_back(name);
+
+        dst<<"\t"<<"jal"<<"\t"<<name<<"\t#Function called"<<std::endl;
     }
 };
 
