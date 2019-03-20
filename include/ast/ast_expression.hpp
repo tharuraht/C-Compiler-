@@ -35,7 +35,7 @@ public:
     { throw std::runtime_error("Expr evaluate not implemented."); }
 
     virtual int evaluate () const {
-        throw std::runtime_error("Not implemented");
+        throw std::runtime_error("Eval Not implemented");
     }
 };
 

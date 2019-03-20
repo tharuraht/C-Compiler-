@@ -58,35 +58,46 @@ public:
       public:
         AddOperator(ExpressionPtr _left, ExpressionPtr _right)
             : Operator(_left, _right)
-        {
-        }
+        { }
 
-        virtual double evaluate(
-            const std::map<std::string, double> &bindings) const override
-        {
-            // TODO-C : Run bin/eval_expr with something like 5+a, where a=10, to make sure you understand how this works
-            double vl = left->evaluate(bindings);
-            double vr = right->evaluate(bindings);
-            return vl + vr;
+        // virtual double evaluate(
+        //     const std::map<std::string, double> &bindings) const override
+        // {
+        //     // TODO-C : Run bin/eval_expr with something like 5+a, where a=10, to make sure you understand how this works
+        //     double vl = left->evaluate(bindings);
+        //     double vr = right->evaluate(bindings);
+        //     return vl + vr;
 
-            //throw std::runtime_error("AddOperator::evaluate is not implemented.");
-        }
-    
-    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
-    {
-        if (varGlobal) {
+        //     //throw std::runtime_error("AddOperator::evaluate is not implemented.");
+        // }
+
+        virtual int evaluate () const override
+        {
             int vl = left->evaluate();
             int vr = right->evaluate();
-            dst<<vl + vr;
+            return vl + vr;
         }
-        else {
-            std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
-            contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
-            left->compile(dst, contxt, destReg);
-            right->compile(dst, contxt, freeregs[0]);
-            dst << "\t"<< "addu"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" << freeregs[0] <<"\t#Add operator"<< std::endl;
-            contxt.set_unused(freeregs[0]);
-        }
+
+        virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
+        {
+            if (varGlobal)
+            {
+                int vl = left->evaluate();
+                int vr = right->evaluate();
+                dst << vl + vr;
+            }
+            else
+            {
+                std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
+                contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+                left->compile(dst, contxt, destReg);
+                right->compile(dst, contxt, freeregs[0]);
+                dst << "\t"
+                    << "addu"
+                    << "\t"
+                    << "$" << destReg << ", $" << destReg << ", $" << freeregs[0] << "\t#Add operator" << std::endl;
+                contxt.set_unused(freeregs[0]);
+            }
     }
 
 };
@@ -114,7 +125,13 @@ public:
 
     //     //throw std::runtime_error("SubOperator::evaluate is not implemented.");
     // }
-
+    virtual int evaluate() const override
+    {
+        int vl = left->evaluate();
+        int vr = right->evaluate();
+        return vl * vr;
+        
+    }
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
         if (varGlobal) {
@@ -156,6 +173,12 @@ public:
     //     double vr=right->evaluate(bindings);
     //     return vl*vr;
     // }
+    virtual int evaluate () const override
+    {
+        int vl = left->evaluate();
+        int vr = right->evaluate();
+        return vl * vr;
+    }
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
