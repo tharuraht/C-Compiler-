@@ -17,11 +17,12 @@ static int function_call_num;
 static bool varGlobal;
 
 
+
 class AST_node;
 
 typedef const AST_node *NodePtr;
 
-class AST_node
+class AST_node: public Context
 {
 public:
     virtual ~AST_node()

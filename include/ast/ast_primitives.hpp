@@ -45,7 +45,8 @@ public:
             dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
         }
         else{
-            dst<<"\t"<<"lui"<<"\t"<<"$"<<destReg<<", "<<"%hi("<<id<<")"<<"\t#Loading in variable from memory"<<std::endl;
+            //loads global variables
+            dst<<"\t"<<"lui"<<"\t"<<"$"<<destReg<<", "<<"%hi("<<id<<")"<<"\t#Loading in global variable"<<std::endl;
             dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<"%lo("<<id<<")($2)"<<std::endl;
         }
     }   

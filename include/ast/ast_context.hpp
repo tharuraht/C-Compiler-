@@ -5,6 +5,8 @@
 #include <string>
 #include <unordered_map>
 
+static unsigned int localvar_counter;
+static unsigned int globalvar_counter;
 class Context {
     public:
     //track local and global variables
@@ -14,8 +16,7 @@ class Context {
     std::unordered_map<std::string,unsigned int> localbindings;
 
     bool regavailable[32];
-    unsigned int localvar_counter;
-    unsigned int globalvar_counter;
+    
 
     ~Context() {}
 
@@ -91,7 +92,7 @@ class Context {
 
     void NewLocalVar (std::string varname) {
         //assign a new number to keep track of the variable dec
-        localbindings.emplace(varname,++localvar_counter);
+        localbindings.emplace(varname,localvar_counter);
     }
 
     int LookupVariable (std::string varname, int scopelevel) {
@@ -101,7 +102,7 @@ class Context {
             if (localbindings.find(search_str) != localbindings.end()) {
                 //variable found
                 //return the memory location of the variable
-                return ((localbindings.find(search_str)->second + 1)*4);
+                return ((localbindings.find(search_str)->second-1)*4+16);
             }
         }
         //if not found return 0

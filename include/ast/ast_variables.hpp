@@ -6,6 +6,7 @@
 #include <vector>
 
 extern bool varGlobal;
+// extern unsigned int localvar_counter;
 
 class GlobalVarDec : public Expression
 {
@@ -17,7 +18,7 @@ class GlobalVarDec : public Expression
     GlobalVarDec(std::string _Type, std::string _Name, ExpressionPtr _Expression) : Type(_Type), Name(_Name), Expression(_Expression)
     {
         global_vars.push_back(Name);
-        var_count++;
+        // var_count++;
     }
     ~GlobalVarDec() {}
 
@@ -83,14 +84,14 @@ class LocalVarDec : public Expression
 
     LocalVarDec(std::string _Type, std::string _Name, ExpressionPtr _Expression)
         : Type(_Type), Name(_Name), Expression(_Expression)
-    {
-        var_count++;
+    {  
     }
 
     ~LocalVarDec() {}
 
     virtual void print(std::ostream &dst) const override
     {
+        var_count++;
         dst << Type << " " << Name;
         if (Expression != NULL)
         {
@@ -117,6 +118,7 @@ class LocalVarDec : public Expression
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
         dst << "#local variable" << std::endl;
+        localvar_counter++;
         contxt.NewLocalVar(Name+std::to_string(scopelevel));
         if (Expression != NULL)
         {
@@ -126,8 +128,8 @@ class LocalVarDec : public Expression
         {
             dst << "\t"<<"li"<< "\t"<< "$"<<destReg<<", 0" << std::endl;
         }
-
-        dst << "\t"<<"sw"<< "\t"<< "$"<<destReg<<", "<<var_count*4+16<< "($fp)" <<"\t#Storing variable "<<Name<< std::endl;
+    dst<<"#local var counter = "<<localvar_counter<<std::endl;
+        dst << "\t"<<"sw"<< "\t"<< "$"<<destReg<<", "<<(localvar_counter-1)*4+16<< "($fp)" <<"\t#Storing variable "<<Name<< std::endl;
     }
 };
 

@@ -8,6 +8,8 @@
 
 extern std::vector<std::string> global_vars;
 extern int var_count;
+extern unsigned int localvar_counter;
+extern unsigned int globalvar_counter;
 extern int scopelevel;
 extern int function_call_num;
 extern  std::vector<std::string> function_call_queue;
@@ -155,6 +157,14 @@ public:
         dst<<Identifier<<":"<<std::endl;
         //space allocated in stack
         dst<<"#allocating stack"<<std::endl;
+        // var_count = localvar_counter + globalvar_counter;
+        if (Scope != NULL)
+        {
+            std::ostream tmp(0);
+            Scope->print(tmp);
+            std::cout<<"#var_count: "<<var_count<<std::endl;
+        }
+    
         dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,-"<<(var_count*4) +parameter_count+12<<std::endl; //restoring sp
         dst<<"\t"<<"sw"<<"\t"<<"$ra,"<<(var_count*4)+parameter_count+8<<"($sp)"<<std::endl; //store return address at end of stack frame
         dst<<"\t"<<"sw"<<"\t"<<"$fp,"<<(var_count*4)+parameter_count+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
