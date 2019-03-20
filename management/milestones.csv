@@ -14,3 +14,4 @@ Test_python_translator,Implement_function_def,4,ta2617,,"Added tests for convers
 Test_Deliverable_1, , 1, am9717,, Added more tests to formative folder, created c_compiler.cpp and ran the bash script.
 Begin_c_compiler,Test_python_translator,"am9717,ta2617",,"Began writing AST for generating MIPS assembly"
 Understand_MIPS_directives, , 2, "am9717, ta2617", , "Researched on MIPS assembly and purpose of derictives for codegen"
+Create_Simple_Compile_Function, Understand_MIPS_directives, 4, "am9717, ta2617", , "Write MIPS assembly for a simple empty/return 0 main function" 
