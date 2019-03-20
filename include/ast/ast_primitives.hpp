@@ -46,8 +46,9 @@ public:
         }
         else{
             //loads global variables
-            dst<<"\t"<<"lui"<<"\t"<<"$"<<destReg<<", "<<"%hi("<<id<<")"<<"\t#Loading in global variable"<<std::endl;
-            dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<"%lo("<<id<<")($2)"<<std::endl;
+            dst<<"\t"<<"lui"<<"\t"<<"$"<<destReg<<", "<<"%hi("<<id<<")"<<"\t#Loading in global variable: "<<id<<std::endl;
+            dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<"%lo("<<id<<")($"<<destReg<<")"<<std::endl;
+            dst<<"\t"<<"nop"<<"\t#Global variable load nop"<<std::endl;
         }
     }   
 };
