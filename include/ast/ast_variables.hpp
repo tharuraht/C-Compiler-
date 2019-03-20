@@ -127,7 +127,7 @@ class LocalVarDec : public Expression
             dst << "\t"<<"li"<< "\t"<< "$"<<destReg<<", 0" << std::endl;
         }
 
-        dst << "\t"<<"sw"<< "\t"<< "$"<<destReg<<", "<<var_count*4+16<< "(fp)" <<"\t#Storing variable "<<Name<< std::endl;
+        dst << "\t"<<"sw"<< "\t"<< "$"<<destReg<<", "<<var_count*4+16<< "($fp)" <<"\t#Storing variable "<<Name<< std::endl;
     }
 };
 
