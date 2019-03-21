@@ -5,6 +5,7 @@ src/*.o
 src/*.yy.cpp
 bin/*
 c_translator/formative/*
+simple_compiler_tester/simple_compilation_test.sh
 
 Vagrantfile
 

@@ -30,10 +30,9 @@ CHECKED=0
 for DRIVER in test_deliverable/test_cases/*_driver.c ; do
     echo "****************************"
     NAME=$(basename $DRIVER _driver.c)
-    TEST_ID=test_deliverable/test_cases/$NAME.c
-    #echo ""
-    echo "Test case $NAME"
     CHECKED=$(( ${CHECKED}+1 ));
+    TEST_ID=test_deliverable/test_cases/$NAME.c
+    echo "Test case $NAME"
 
     # Step 1: Compile ${NAME}.c using the compiler-under-test into MIPS assembly.
     $COMPILER -S test_deliverable/test_cases/$NAME.c -o test_deliverable/working/$NAME.s
@@ -43,21 +42,21 @@ for DRIVER in test_deliverable/test_cases/*_driver.c ; do
     fi
     
     # Step 2: Compile ${NAME}_driver.c using GCC into a MIPS object file.
-    mips-linux-gnu-gcc -c $DRIVER -o test_deliverable/working/${NAME}_driver.o
+    mips-linux-gnu-gcc -mfp32 -c $DRIVER -o test_deliverable/working/${NAME}_driver.o
     if [[ $? -ne 0 ]]; then
         >&2 echo "ERROR : Test-case is malformed, GCC couldn't compile program"
         continue
     fi
     
     
-    # Link driver object and assembly into executable
+    # Step 3: Link driver object and assembly into executable
     mips-linux-gnu-gcc -mfp32 -static test_deliverable/working/$NAME.s test_deliverable/working/${NAME}_driver.o -o test_deliverable/working/${NAME}_output
     if [[ $? -ne 0 ]]; then
         >&2 echo "ERROR : Linker and assembly not working"
         continue
     fi
     
-    # Run the actual executable
+    # Step 4: Run the actual executable
     qemu-mips test_deliverable/working/${NAME}_output
     GOT_RESULT=$?
     if [[ $result -ne 0 ]]; then
@@ -71,7 +70,7 @@ done
 echo ""
 echo ""
 echo "########################################"
-echo " # Passed ${PASSED} out of ${CHECKED} # "
+echo "       # Passed ${PASSED} out of ${CHECKED} #"
 echo "########################################"
 echo ""
 echo ""
