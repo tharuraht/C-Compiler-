@@ -408,6 +408,19 @@ public:
         double vr=right->evaluate(bindings);
         return (vl==vr);
     }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
+        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+        left->compile(dst, contxt, destReg);
+        right->compile(dst, contxt, freeregs[0]);
+     
+        //checks equivalence, if they are the same will result in zero
+        dst<<"\t"<<"xor"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", $"<<freeregs[0]<<"\t#== operator" << std::endl;
+        //hence if if zero, set destreg to 1 (since they are equal) but 0 otherwise
+        dst<<"\t"<<"sltiu"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", 1"<<std::endl;
+        contxt.set_unused(freeregs[0]);
+    }
 };
 
 class IsNotEqualOperator
@@ -428,6 +441,19 @@ public:
         double vl=left->evaluate(bindings);
         double vr=right->evaluate(bindings);
         return (vl!=vr);
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
+        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+        left->compile(dst, contxt, destReg);
+        right->compile(dst, contxt, freeregs[0]);
+     
+        //checks equivalence, if they are the same will result in zero
+        dst<<"\t"<<"xor"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", $"<<freeregs[0]<<"\t#!= operator" << std::endl;
+        //esnures that if the result is non zero it becomes 1, hence compare with zero register (a non zero will be greater)
+        dst<<"\t"<<"sltu"<<"\t"<<"$"<<destReg<<", $0"<<", $"<<destReg<<std::endl;
+        contxt.set_unused(freeregs[0]);
     }
 };
 

@@ -5,6 +5,7 @@
 
 extern int scopelevel;
 extern int loop_count;
+extern int if_level;
 
 class AssignmentStatement: public Expression {
 public:
@@ -130,27 +131,32 @@ public:
         }
     }
 
-    virtual void compile(std::ostream &dst, Context &contxt, int destReg){
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
         std::vector<int> FreeReg = contxt.FindFreeRegs(16, 24);
         contxt.set_used(FreeReg[0]);
 
         Condition->compile(dst, contxt, FreeReg[0]);
 
-        dst << "\t"<<"beq"<<"\t" << "$0, $" << FreeReg[0] << ", $else" << std::endl; //$else condition yet to be filled
+        dst << "\t"<<"beq"<<"\t" << "$0, $" << FreeReg[0] << ", else_"<<if_level << std::endl; //$else condition yet to be filled
 		dst << "\t"<<"nop"<<"\t" << std::endl;
 		contxt.set_unused(FreeReg[0]);
 
         if(IBody != NULL){
+            if_level++;
             IBody->compile(dst, contxt, destReg);
+            if_level--;
         }
 
-        dst<<"\t"<<"b"<<"\t"<<"$end"<<std::endl;
+        dst<<"\t"<<"b"<<"\t"<<"ifelse_end_"<<if_level<<std::endl;
 
+        dst<<"else_"<<if_level<<":"<<std::endl;
         if(EBody != NULL){
+            if_level++;
             EBody->compile(dst, contxt, destReg);
+            if_level--;
         }
 
-        dst<<"$end  :"<<std::endl;
+        dst<<"ifelse_end_"<<if_level<<":"<<std::endl;
     }
 };
 
@@ -322,6 +328,10 @@ class NoBraces : public Expression
         scopelevel--;
         for (int i = 0; i < scopelevel; i++)  { dst << "\t"; }
 
+    }
+
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
+        Body->compile(dst,contxt,destReg);
     }
 };
 

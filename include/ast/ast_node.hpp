@@ -16,6 +16,7 @@ static int parameter_count = 16;
 static int function_call_num;
 static bool varGlobal;
 static int loop_count;
+static int if_level;
 
 
 
