@@ -129,6 +129,29 @@ public:
             EBody->translate(dst);
         }
     }
+
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg){
+        std::vector<int> FreeReg = contxt.FindFreeRegs(16, 24);
+        contxt.set_used(FreeReg[0]);
+
+        Condition->compile(dst, contxt, FreeReg[0]);
+
+        dst << "\t"<<"beq"<<"\t" << "$0, $" << FreeReg[0] << ", $else" << std::endl; //$else condition yet to be filled
+		dst << "\t"<<"nop"<<"\t" << std::endl;
+		contxt.set_unused(FreeReg[0]);
+
+        if(IBody != NULL){
+            IBody->compile(dst, contxt, destReg);
+        }
+
+        dst<<"\t"<<"b"<<"\t"<<"$end"<<std::endl;
+
+        if(EBody != NULL){
+            EBody->compile(dst, contxt, destReg);
+        }
+
+        dst<<"$end  :"<<std::endl;
+    }
 };
 
 class WhileStatement: public Expression {

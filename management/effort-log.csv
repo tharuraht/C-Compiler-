@@ -25,3 +25,4 @@ Date,Effort,Developers,Milestones
 19.03.19,6,am9717,"Worked on codegen for scope statements and variable declaration, managed to print asm for simple main function"
 20.03.19,10,ta2617,"Added new parameter for compile function, implemented return, function declaractions, and simple expressions, created simple compiler testers, implementing global variables into functions"
 20.03.19,2,ta2617,"Implemented while function compiliation, and comparison expressions"
+20.03.19,3, am9717, "Discussed and adapted current codegen structure with MIPS ABI calls, nearly completed codegen for IfElse statements"
