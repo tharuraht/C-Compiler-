@@ -92,10 +92,7 @@ public:
                 contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
                 left->compile(dst, contxt, destReg);
                 right->compile(dst, contxt, freeregs[0]);
-                dst << "\t"
-                    << "addu"
-                    << "\t"
-                    << "$" << destReg << ", $" << destReg << ", $" << freeregs[0] << "\t#Add operator" << std::endl;
+                dst << "\t"<< "addu"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" << freeregs[0] << "\t#Add operator" << std::endl;
                 contxt.set_unused(freeregs[0]);
             }
     }
@@ -288,6 +285,15 @@ public:
         double vr=right->evaluate(bindings);
         return (vl<vr);
     }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
+        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+        left->compile(dst, contxt, destReg);
+        right->compile(dst, contxt, freeregs[0]);
+        dst << "\t"<< "slt"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" << freeregs[0] << "\t#< operator" << std::endl;
+        contxt.set_unused(freeregs[0]);
+    }
 };
 
 class LessThanEqualOperator
@@ -308,6 +314,17 @@ public:
         double vl=left->evaluate(bindings);
         double vr=right->evaluate(bindings);
         return (vl<=vr);
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
+        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+        left->compile(dst, contxt, destReg);
+        right->compile(dst, contxt, freeregs[0]);
+        dst << "\t"<< "slt"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" <<freeregs[0]<< "\t#<= operator" << std::endl;
+        dst<<"\t"<<"xori"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", 1"<<"\t#>= operator" << std::endl;
+
+        contxt.set_unused(freeregs[0]);
     }
 };
 
@@ -331,6 +348,14 @@ public:
         double vr=right->evaluate(bindings);
         return (vl>vr);
     }
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
+        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+        left->compile(dst, contxt, destReg);
+        right->compile(dst, contxt, freeregs[0]);
+        dst << "\t"<< "slt"<< "\t"<< "$" << destReg << ", $" << freeregs[0] << ", $" << destReg << "\t#> operator" << std::endl;
+        contxt.set_unused(freeregs[0]);
+    }
 };
 
 class GreaterThanEqualOperator
@@ -351,6 +376,16 @@ public:
         double vl=left->evaluate(bindings);
         double vr=right->evaluate(bindings);
         return (vl>=vr);
+    }
+
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
+        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
+        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+        left->compile(dst, contxt, destReg);
+        right->compile(dst, contxt, freeregs[0]);
+        dst<<"\t"<< "slt"<<"\t"<< "$" << destReg << ", $" << destReg << ", $" << freeregs[0] << "\t#>= operator" << std::endl;
+        dst<<"\t"<<"xori"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", 1"<<"\t#>= operator" << std::endl;
+        contxt.set_unused(freeregs[0]);
     }
 };
 

@@ -1,7 +1,11 @@
-int a = 1+2*3;
-
 int main () {
-    
-    int b = 4;
-    return b+ a;
+    int a = 5;
+    int b = 0;
+
+    while (a > 0) {
+        b = b+1;
+        a = a-1;
+    }
+
+    return b;
 }

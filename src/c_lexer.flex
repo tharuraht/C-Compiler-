@@ -97,11 +97,11 @@ extern "C" int fileno(FILE *stream);
 
 [(]             { return T_LBRACKET; }
 [{]             { return T_CURLY_LBRACKET; }
-"["             { return T_SQUARE_LBRACKET; }
+"["           { return T_SQUARE_LBRACKET; }
 [<]             { return T_LHEADER; }
 [)]             { return T_RBRACKET; }
 [}]             { return T_CURLY_RBRACKET; }
-"]"             { return T_SQUARE_RBRACKET; }
+"]"            { return T_SQUARE_RBRACKET; }
 [>]             { return T_RHEADER; }
 
 

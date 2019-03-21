@@ -4,6 +4,7 @@
 #include "ast.hpp"
 
 extern int scopelevel;
+extern int loop_count;
 
 class AssignmentStatement: public Expression {
 public:
@@ -26,6 +27,17 @@ public:
     {
         dst << VarName << " = ";
         Expression->translate(dst);         
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        //find a free register
+        std::vector<int> freeRegs = contxt.FreeTempRegs();
+        contxt.set_used(freeRegs[0]);
+        Expression->compile(dst, contxt, freeRegs[0]);
+        //store result into variable
+        dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#Assign variable "<<VarName<<std::endl;
+
+        contxt.set_unused(freeRegs[0]);
     }
 };
 
@@ -63,17 +75,19 @@ public:
         if (AdditionalExpressions != NULL) {
             AdditionalExpressions->compile(dst, contxt, destReg);
             //branch to end of function label
-            dst<<"\t"<<"b "<<function_def_queue.back()<<"_function_end_"<<function_def_num<<"\t#Return statement"<<std::endl;
         }
         else{
-            dst<<"\t"<<"move"<<"\t"<<"$sp, $fp"<<std::endl; //deallocating stack
-            dst<<"\t"<<"lw"<<"\t"<<"$31,"<<(var_count*4)+8<<"($sp)"<<std::endl;
-            dst<<"\t"<<"lw"<<"\t"<<"$fp,"<<(var_count*4)+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
-            dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,"<<(var_count*4)+8<<std::endl; //restoring sp
-            dst<<"\t"<<"j"<<"\t"<<"$31"<<std::endl;
-            dst<<"\t"<<"nop"<<std::endl;
-            dst<<std::endl;
+            // dst<<"\t"<<"move"<<"\t"<<"$sp, $fp"<<std::endl; //deallocating stack
+            // dst<<"\t"<<"lw"<<"\t"<<"$31,"<<(var_count*4)+8<<"($sp)"<<std::endl;
+            // dst<<"\t"<<"lw"<<"\t"<<"$fp,"<<(var_count*4)+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
+            // dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,"<<(var_count*4)+8<<std::endl; //restoring sp
+            // dst<<"\t"<<"j"<<"\t"<<"$31"<<std::endl;
+            // dst<<"\t"<<"nop"<<std::endl;
+            // dst<<std::endl;
+            
         }
+        dst<<"\t"<<"b "<<function_def_queue.back()<<"_function_end_"<<function_def_num<<"\t#Return statement"<<std::endl;
+
     }
 };
 
@@ -139,6 +153,30 @@ public:
         Condition->translate(dst);
         dst<<"): ";
         Body->translate(dst);
+    }
+
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
+        //use a free register for condition check
+        std::vector<int> freeRegs = contxt.FreeTempRegs();
+        contxt.set_used(freeRegs[0]);
+
+        dst<<"while_loop_"<<loop_count<<"_begin:"<<"\t#Begin while loop"<<std::endl;
+        
+        //evalute the condition into the free register
+        Condition->compile(dst, contxt, freeRegs[0]);
+        //branch to end if condition evaluates false (0)
+        dst<<"\t"<<"beq"<<"\t"<<"$0, $"<<freeRegs[0]<<", end_loop_"<<loop_count<<std::endl;
+        dst<<"\t"<<"nop"<<std::endl;
+
+        loop_count++;
+        Body->compile(dst, contxt, destReg);
+        loop_count--;
+
+        //branch back to top
+        dst<<"\t"<<"b"<<"\t"<<"while_loop_"<<loop_count<<"_begin"<<std::endl;
+        //end of loop
+        dst<<"end_loop_"<<loop_count<<":"<<"\t#End while loop"<<std::endl;
+        contxt.set_unused(freeRegs[0]);
     }
 };
 
