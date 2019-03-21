@@ -149,13 +149,13 @@ public:
             dst<<vl - vr;
         }
         else {
-            std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
-            contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+            std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+            contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
             
             left->compile(dst, contxt, destReg);
-            right->compile(dst, contxt, freeregs[0]);
-            dst << "\t"<< "sub"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" << freeregs[0] <<"\t#Sub Operator"<< std::endl;
-            contxt.set_unused(freeregs[0]);
+            right->compile(dst, contxt, freeReg[0]);
+            dst << "\t"<< "sub"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" << freeReg[0] <<"\t#Sub Operator"<< std::endl;
+            contxt.set_unused(freeReg[0]);
         }
     }
 };
@@ -313,12 +313,12 @@ public:
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
-        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
-        right->compile(dst, contxt, freeregs[0]);
-        dst << "\t"<< "slt"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" << freeregs[0] << "\t#< operator" << std::endl;
-        contxt.set_unused(freeregs[0]);
+        right->compile(dst, contxt, freeReg[0]);
+        dst << "\t"<< "slt"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" << freeReg[0] << "\t#< operator" << std::endl;
+        contxt.set_unused(freeReg[0]);
     }
 };
 
@@ -343,14 +343,13 @@ public:
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
-        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
-        right->compile(dst, contxt, freeregs[0]);
-        dst << "\t"<< "slt"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" <<freeregs[0]<< "\t#<= operator" << std::endl;
+        right->compile(dst, contxt, freeReg[0]);
+        dst << "\t"<< "slt"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" <<freeReg[0]<< "\t#<= operator" << std::endl;
         dst<<"\t"<<"xori"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", 1"<<"\t#>= operator" << std::endl;
-
-        contxt.set_unused(freeregs[0]);
+        contxt.set_unused(freeReg[0]);
     }
 };
 
@@ -375,12 +374,12 @@ public:
         return (vl>vr);
     }
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
-        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
-        right->compile(dst, contxt, freeregs[0]);
-        dst << "\t"<< "slt"<< "\t"<< "$" << destReg << ", $" << freeregs[0] << ", $" << destReg << "\t#> operator" << std::endl;
-        contxt.set_unused(freeregs[0]);
+        right->compile(dst, contxt, freeReg[0]);
+        dst << "\t"<< "slt"<< "\t"<< "$" << destReg << ", $" << freeReg[0] << ", $" << destReg << "\t#> operator" << std::endl;
+        contxt.set_unused(freeReg[0]);
     }
 };
 
@@ -405,13 +404,13 @@ public:
     }
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
-        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
-        right->compile(dst, contxt, freeregs[0]);
-        dst<<"\t"<< "slt"<<"\t"<< "$" << destReg << ", $" << destReg << ", $" << freeregs[0] << "\t#>= operator" << std::endl;
+        right->compile(dst, contxt, freeReg[0]);
+        dst<<"\t"<< "slt"<<"\t"<< "$" << destReg << ", $" << destReg << ", $" << freeReg[0] << "\t#>= operator" << std::endl;
         dst<<"\t"<<"xori"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", 1"<<"\t#>= operator" << std::endl;
-        contxt.set_unused(freeregs[0]);
+        contxt.set_unused(freeReg[0]);
     }
 };
 
@@ -436,16 +435,16 @@ public:
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
-        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
-        right->compile(dst, contxt, freeregs[0]);
+        right->compile(dst, contxt, freeReg[0]);
      
         //checks equivalence, if they are the same will result in zero
-        dst<<"\t"<<"xor"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", $"<<freeregs[0]<<"\t#== operator" << std::endl;
+        dst<<"\t"<<"xor"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", $"<<freeReg[0]<<"\t#== operator" << std::endl;
         //hence if if zero, set destreg to 1 (since they are equal) but 0 otherwise
         dst<<"\t"<<"sltiu"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", 1"<<std::endl;
-        contxt.set_unused(freeregs[0]);
+        contxt.set_unused(freeReg[0]);
     }
 };
 
@@ -470,16 +469,16 @@ public:
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
-        contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
-        right->compile(dst, contxt, freeregs[0]);
+        right->compile(dst, contxt, freeReg[0]);
      
         //checks equivalence, if they are the same will result in zero
-        dst<<"\t"<<"xor"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", $"<<freeregs[0]<<"\t#!= operator" << std::endl;
+        dst<<"\t"<<"xor"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", $"<<freeReg[0]<<"\t#!= operator" << std::endl;
         //esnures that if the result is non zero it becomes 1, hence compare with zero register (a non zero will be greater)
         dst<<"\t"<<"sltu"<<"\t"<<"$"<<destReg<<", $0"<<", $"<<destReg<<std::endl;
-        contxt.set_unused(freeregs[0]);
+        contxt.set_unused(freeReg[0]);
     }
 };
 
@@ -508,6 +507,18 @@ public:
         dst << " and ";
         right->translate(dst);
     }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
+        left->compile(dst, contxt, destReg);
+        right->compile(dst, contxt, freeReg[0]);
+     
+        //checks equivalence, if they are the same will result in zero
+        dst<<"\t"<<"and"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", $"<<freeReg[0]<<"\t#&& logical operator" << std::endl;
+        //and operation ensures that if the result is non zero it becomes 1
+        contxt.set_unused(freeReg[0]);
+    }
 };
 
 class LogicalOrOperator
@@ -532,6 +543,18 @@ public:
         left->translate(dst);
         dst << " or ";
         right->translate(dst);
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
+        left->compile(dst, contxt, destReg);
+        right->compile(dst, contxt, freeReg[0]);
+     
+        //checks equivalence, if they are the same will result in zero
+        dst<<"\t"<<"or"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", $"<<freeReg[0]<<"\t#&& logical operator" << std::endl;
+        //or operation ensures that if the result is non zero it becomes 1
+        contxt.set_unused(freeReg[0]);
     }
 };
 
