@@ -252,6 +252,34 @@ public:
         dst<<"\t";
         Body->print(dst);        
     }
+
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
+        //use a free register for condition check
+        std::vector<int> freeRegs = contxt.FreeTempRegs();
+        contxt.set_used(freeRegs[0]);
+
+        dst<<"for_loop_"<<loop_count<<"_begin:"<<"\t#Begin for loop"<<std::endl;
+
+        Init->compile(dst, contxt, freeRegs[0]);
+        
+        //evalute the condition into the free register
+        Condition->compile(dst, contxt, destReg);
+        //branch to end if condition evaluates false (0)
+        dst<<"\t"<<"beq"<<"\t"<<"$0, $"<<freeRegs[0]<<", end_loop_"<<loop_count<<std::endl;
+        dst<<"\t"<<"nop"<<std::endl;
+
+        loop_count++;
+        Body->compile(dst, contxt, destReg);
+        loop_count--;
+
+        Increment->compile(dst, contxt, destReg);
+
+        //branch back to top
+        dst<<"\t"<<"b"<<"\t"<<"for_loop_"<<loop_count<<"_begin"<<std::endl;
+        //end of loop
+        dst<<"end_loop_"<<loop_count<<":"<<"\t#End while loop"<<std::endl;
+        contxt.set_unused(freeRegs[0]);
+    }
 };
 
 

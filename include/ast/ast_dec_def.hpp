@@ -220,12 +220,20 @@ public:
         dst<<variable<<"++";
     }
 
-    // virtual void translate (std::ostream &dst) const override {
-    //     ExDec->translate(dst);
-    //     if (Rest_of_program != NULL) {
-    //         Rest_of_program->translate(dst);
-    //     }
-    // }
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
+    {
+        std::vector<int> freeReg = contxt.FreeTempRegs();
+        contxt.set_used(freeReg[0]);
+
+        int var_offset = contxt.LookupVariable(variable, scopelevel);
+
+        dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
+        dst<<"\t"<<"addiu"<<"\t"<<"$"<<freeReg[0]<<", $"<<destReg<<", 1"<<std::endl;
+        dst<<"\t"<<"sw"<<"\t"<<"$"<<freeReg[0]<<", "<<var_offset<<"($fp)"<<std::endl;
+
+        contxt.set_unused(freeReg[0]);
+    }
+    
 };
 
 class PreIncrement: public Expression {
@@ -242,12 +250,20 @@ public:
         dst<<"++"<<variable;
     }
 
-    // virtual void translate (std::ostream &dst) const override {
-    //     ExDec->translate(dst);
-    //     if (Rest_of_program != NULL) {
-    //         Rest_of_program->translate(dst);
-    //     }
-    // }
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
+    {
+        std::vector<int> freeReg = contxt.FreeTempRegs();
+        contxt.set_used(freeReg[0]);
+
+        int var_offset = contxt.LookupVariable(variable, scopelevel);
+
+        dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
+        dst<<"\t"<<"addiu"<<"\t"<<"$"<<freeReg[0]<<", $"<<destReg<<", 1"<<std::endl;
+        dst<<"\t"<<"sw"<<"\t"<<"$"<<freeReg[0]<<", "<<var_offset<<"($fp)"<<std::endl;
+        dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
+
+        contxt.set_unused(freeReg[0]);
+    }
 };
 
 class PostDecrement: public Expression {
@@ -263,6 +279,21 @@ public:
     virtual void print (std::ostream &dst) const override {
         dst<<variable<<"--";
     }
+
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
+    {
+        std::vector<int> freeReg = contxt.FreeTempRegs();
+        contxt.set_used(freeReg[0]);
+
+        int var_offset = contxt.LookupVariable(variable, scopelevel);
+
+        dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
+        dst<<"\t"<<"addiu"<<"\t"<<"$"<<freeReg[0]<<", $"<<destReg<<", -1"<<std::endl;
+        dst<<"\t"<<"sw"<<"\t"<<"$"<<freeReg[0]<<", "<<var_offset<<"($fp)"<<std::endl;
+
+        contxt.set_unused(freeReg[0]);
+    }
+
 
     
 };
@@ -281,12 +312,20 @@ public:
         dst<<"--"<<variable;
     }
 
-    // virtual void translate (std::ostream &dst) const override {
-    //     ExDec->translate(dst);
-    //     if (Rest_of_program != NULL) {
-    //         Rest_of_program->translate(dst);
-    //     }
-    // }
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
+    {
+        std::vector<int> freeReg = contxt.FreeTempRegs();
+        contxt.set_used(freeReg[0]);
+
+        int var_offset = contxt.LookupVariable(variable, scopelevel);
+
+        dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
+        dst<<"\t"<<"addiu"<<"\t"<<"$"<<freeReg[0]<<", $"<<destReg<<", -1"<<std::endl;
+        dst<<"\t"<<"sw"<<"\t"<<"$"<<freeReg[0]<<", "<<var_offset<<"($fp)"<<std::endl;
+        dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
+
+        contxt.set_unused(freeReg[0]);
+    }
 };
 
 #endif
