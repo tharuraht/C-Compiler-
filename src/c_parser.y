@@ -98,7 +98,7 @@ GLOBAL_DECLARATION:
     TYPE_SPECIFY T_VARIABLE T_SEMICOLON                         {$$ = new GlobalVarDec(*$1,*$2,NULL);}
   | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON    {$$ = new GlobalVarDec(*$1,*$2,$4);}
   | TYPE_SPECIFY T_VARIABLE T_COMMA G_ADDITIONAL_DECS T_SEMICOLON {$$ = new MultipleDecs (*$1,*$2,$4, true);}
-  | TYPE_SPECIFY T_VARIABLE T_EQUAL G_ADDITIONAL_DECS T_SEMICOLON  {$$ = new MultipleDecs (*$1,*$2,$4, true);}
+  // | TYPE_SPECIFY T_VARIABLE T_EQUAL G_ADDITIONAL_DECS T_SEMICOLON  {$$ = new MultipleDecs (*$1,*$2,$4, true);}
   ;
 
 G_ADDITIONAL_DECS:
@@ -170,11 +170,11 @@ DECLARE_VAR:
     TYPE_SPECIFY T_VARIABLE                        {$$ = new LocalVarDec (*$1,*$2,NULL);}
   | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION   {$$ = new LocalVarDec (*$1,*$2,$4);}
   | TYPE_SPECIFY T_VARIABLE T_COMMA L_ADDITIONAL_DECS  {$$ = new MultipleDecs (*$1,*$2,$4,false);}
-  | TYPE_SPECIFY T_VARIABLE T_EQUAL L_ADDITIONAL_DECS  {$$ = new MultipleDecs (*$1,*$2,$4,false);}
+  // | TYPE_SPECIFY T_VARIABLE T_EQUAL L_ADDITIONAL_DECS  {$$ = new MultipleDecs (*$1,*$2,$4,false);}
   ;
 
 L_ADDITIONAL_DECS:
-    T_VARIABLE T_EQUAL C_EXPRESSION T_COMMA L_ADDITIONAL_DECS       {$$ = new AdditionalDecs (*$1,$3,$5, false);}
+  T_VARIABLE T_EQUAL C_EXPRESSION T_COMMA L_ADDITIONAL_DECS       {$$ = new AdditionalDecs (*$1,$3,$5, false);}
   | T_VARIABLE T_COMMA L_ADDITIONAL_DECS                            {$$ = new AdditionalDecs (*$1,NULL,$3, false);}
   | T_VARIABLE T_EQUAL C_EXPRESSION                                 {$$ = new AdditionalDecs(*$1,$3,NULL,false);}
   | T_VARIABLE                                                      {$$ = new AdditionalDecs (*$1,NULL, NULL, false);}
