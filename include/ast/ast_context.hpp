@@ -41,10 +41,14 @@ class Context {
     }
 
     void set_used(unsigned int regno) {
+        // std::cout<<"#locked: "<<regno<<std::endl;
+        // std::cout<<"#: "<<regavailable[regno]<<std::endl;
         regavailable[regno] = false;
     }
 
     void set_unused(unsigned int regno) {
+        // std::cout << "#unlocked: " << regno << std::endl;
+        // std::cout << "#: " << regavailable[regno] << std::endl;
         regavailable[regno] = true;
     }
 
@@ -59,6 +63,22 @@ class Context {
         return FreeRegs;     
     }
 
+    std::vector<int> FindLockedTempRegs () {
+        //finds and returns tempreg nos that are locked
+        std::vector<int> LockedRegs;
+        for (unsigned int i = 8; i <= 15; i++) {
+            if (!regavailable[i]) {
+                LockedRegs.push_back(i);
+            }
+        }
+        for (unsigned int i = 24; i <= 25; i++) {
+            if (!regavailable[i]) {
+                LockedRegs.push_back(i);
+            }
+        }    
+        return LockedRegs;     
+    }
+
     std::vector<int> FreeTempRegs () {
         std::vector<int> FreeTemp;
         std::vector<int> set1 = FindFreeRegs(8,15);
@@ -66,6 +86,11 @@ class Context {
         FreeTemp.reserve(set1.size() + set2.size());
         FreeTemp.insert(FreeTemp.end(), set1.begin(), set1.end());
         FreeTemp.insert(FreeTemp.end(), set2.begin(), set2.end());
+        // std::cout<<"#registers:" << std::endl;
+        // for (int  i=0;i<32;i++) {
+        //     std::cout<<"#"<<i<<": "<<regavailable[i]<<std::endl;
+        // }
+        // std::cout<<"#End list"<<std::endl;
         return FreeTemp;
     }
 

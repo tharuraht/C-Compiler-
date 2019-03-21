@@ -164,10 +164,10 @@ public:
             Scope->print(tmp);
             std::cout<<"#var_count: "<<var_count<<std::endl;
         }
-    
-        dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,-"<<(var_count*4) +parameter_count+12<<std::endl; //restoring sp
-        dst<<"\t"<<"sw"<<"\t"<<"$ra,"<<(var_count*4)+parameter_count+8<<"($sp)"<<std::endl; //store return address at end of stack frame
-        dst<<"\t"<<"sw"<<"\t"<<"$fp,"<<(var_count*4)+parameter_count+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
+        int stack_end = (var_count*4) +parameter_count+12+50;
+        dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,-"<<stack_end<<std::endl; //restoring sp
+        dst<<"\t"<<"sw"<<"\t"<<"$ra,"<<stack_end-4<<"($sp)"<<std::endl; //store return address at end of stack frame
+        dst<<"\t"<<"sw"<<"\t"<<"$fp,"<<stack_end-8<<"($sp)"<<std::endl; //old fp = top of stack address - 4
         dst<<"\t"<<"move"<<"\t"<<"$fp, $sp"<<std::endl;
 
         if(Arguments != NULL){
@@ -189,9 +189,9 @@ public:
         dst<<Identifier<<"_function_end_"<<function_def_num<<":"<<std::endl;
         dst<<"#deallocating stack"<<std::endl;
         dst<<"\t"<<"move"<<"\t"<<"$sp, $fp"<<std::endl; //deallocating stack
-        dst<<"\t"<<"lw"<<"\t"<<"$ra,"<<(var_count*4)+parameter_count+8<<"($sp)"<<std::endl;
-        dst<<"\t"<<"lw"<<"\t"<<"$fp,"<<(var_count*4)+parameter_count+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
-        dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,"<<(var_count*4)+parameter_count+12<<std::endl; //restoring sp
+        dst<<"\t"<<"lw"<<"\t"<<"$ra,"<<stack_end-4<<"($sp)"<<std::endl;
+        dst<<"\t"<<"lw"<<"\t"<<"$fp,"<<stack_end-8<<"($sp)"<<std::endl; //old fp = top of stack address - 4
+        dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,"<<stack_end<<std::endl; //restoring sp
         dst<<"\t"<<"j"<<"\t"<<"$ra"<<std::endl;
         dst<<"\t"<<"nop"<<std::endl;
         dst<<std::endl;
@@ -206,7 +206,7 @@ public:
 
 
 
-class PostIncrement: public AST_node {
+class PostIncrement: public Expression {
 
 private:
 std::string variable;
@@ -228,7 +228,7 @@ public:
     // }
 };
 
-class PreIncrement: public AST_node {
+class PreIncrement: public Expression {
 
 private:
 std::string variable;
@@ -250,7 +250,7 @@ public:
     // }
 };
 
-class PostDecrement: public AST_node {
+class PostDecrement: public Expression {
 
 private:
 std::string variable;
@@ -264,15 +264,10 @@ public:
         dst<<variable<<"--";
     }
 
-    // virtual void translate (std::ostream &dst) const override {
-    //     ExDec->translate(dst);
-    //     if (Rest_of_program != NULL) {
-    //         Rest_of_program->translate(dst);
-    //     }
-    // }
+    
 };
 
-class PreDecrement: public AST_node {
+class PreDecrement: public Expression {
 
 private:
 std::string variable;

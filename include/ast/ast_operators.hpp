@@ -90,10 +90,22 @@ public:
             {
                 std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
                 contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
-                left->compile(dst, contxt, destReg);
-                right->compile(dst, contxt, freeregs[0]);
-                dst << "\t"<< "addu"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" << freeregs[0] << "\t#Add operator" << std::endl;
+                contxt.set_used(freeregs[1]);
+                int current_function_depth = function_call_num;
+                std::cout<<"#function call depth: "<<current_function_depth<<std::endl;
+                left->compile(dst, contxt, freeregs[0]);
+                if (current_function_depth != function_call_num) {
+                    dst<<"\t"<<"move"<<"\t"<<"$"<<freeregs[0]<<", $"<<destReg<<"\t#Function call result"<<std::endl;
+                }
+                current_function_depth = function_call_num;
+
+                right->compile(dst, contxt, freeregs[1]);
+                if (current_function_depth != function_call_num) {
+                    dst<<"\t"<<"move"<<"\t"<<"$"<<freeregs[1]<<", $"<<destReg<<"\t#Function call result"<<std::endl;
+                }
+                dst << "\t"<< "addu"<< "\t"<< "$" << destReg << ", $" << freeregs[0] << ", $" << freeregs[1] << "\t#Add operator" << std::endl;
                 contxt.set_unused(freeregs[0]);
+                contxt.set_unused(freeregs[1]);
             }
     }
 
@@ -187,12 +199,26 @@ public:
         else {
             std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
             contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
-            
-            left->compile(dst, contxt, destReg);
-            right->compile(dst, contxt, freeregs[0]);
-            dst << "\t"<<"mult"<<"\t"<< "$" << destReg << ", $" << freeregs[0] <<"\t#Multiply Operator"<< std::endl;
+            contxt.set_used(freeregs[1]);
+            int current_function_depth = function_call_num;
+            std::cout << "#function call depth: " << current_function_depth << std::endl;
+
+            left->compile(dst, contxt, freeregs[0]);
+            if (current_function_depth != function_call_num) {
+                    dst<<"\t"<<"move"<<"\t"<<"$"<<freeregs[0]<<", $"<<destReg<<"\t#Function call result"<<std::endl;
+                }
+            current_function_depth = function_call_num;
+
+            right->compile(dst, contxt, freeregs[1]);
+            if (current_function_depth != function_call_num) {
+                    dst<<"\t"<<"move"<<"\t"<<"$"<<freeregs[1]<<", $"<<destReg<<"\t#Function call result"<<std::endl;
+                }
+
+            dst << "\t"<<"mult"<<"\t"<< "$" << freeregs[0] << ", $" << freeregs[1] <<"\t#Multiply Operator"<< std::endl;
             dst << "\t"<<"mflo"<<"\t"<<"$"<<destReg<<"\t#Store result of multiply"<<std::endl;
             contxt.set_unused(freeregs[0]);
+            contxt.set_unused(freeregs[1]);
+
         }
     }
 };

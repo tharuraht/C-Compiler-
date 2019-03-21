@@ -1,17 +1,22 @@
+// //multiple functions declared whic call each other
+// int f() {
+//     return 1;
+// }
+
+// int g() {
+//     return 3+f();
+// }
+
+// int main () {
+//     return 3*g();
+// }
+
 int main () {
-    int a = 5;
-    int b = 0;
+    int c = 3;
+    f();
+    return c;
+}
 
-    while (a > 0) {
-        b = b+1;
-        a = a-1;
-    }
-
-    if (b == 5)
-    return 10;
-    else
-    {
-        return 4;
-    }
-    
+void f() {
+    int c = 5;
 }

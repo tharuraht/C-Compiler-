@@ -40,8 +40,23 @@ class FunctionCall : public Expression
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
         function_call_num++;
         function_call_queue.push_back(name);
-
+        std::vector<int> lockedRegs = contxt.FindLockedTempRegs();
+        int stack_count = localvar_counter;
+        //store temp registers before function call in stack
+        for (int i = 0; i < lockedRegs.size();i++) {
+            stack_count++;
+            dst << "\t"<<"sw"<< "\t"<< "$"<<lockedRegs[i]<<", "<<(stack_count)*4+16<< "($fp)";
+            dst <<"\t#Storing temp register: "<<lockedRegs[i]<< std::endl;
+        }
+        //function call
         dst<<"\t"<<"jal"<<"\t"<<name<<"\t#Function called"<<std::endl;
+
+        //restore temp registers
+        for (int i = lockedRegs.size()-1; i >= 0;i--) {
+            dst << "\t"<<"lw"<< "\t"<< "$"<<lockedRegs[i]<<", "<<(stack_count)*4+16<< "($fp)";
+            dst <<"\t#Loading temp register: "<<lockedRegs[i]<< std::endl;
+            stack_count--;
+        }
     }
 };
 
