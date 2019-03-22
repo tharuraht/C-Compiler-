@@ -17,3 +17,5 @@ tmp/*
 simple_compiler_tester/*.o
 simple_compiler_tester/*.s
 simple_compiler_tester/test_program
+
+test_deliverable/working/*

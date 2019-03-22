@@ -128,8 +128,10 @@ class LocalVarDec : public Expression
         {
             dst << "\t"<<"li"<< "\t"<< "$"<<destReg<<", 0" << std::endl;
         }
-    dst<<"#local var counter = "<<localvar_counter<<std::endl;
-        dst << "\t"<<"sw"<< "\t"<< "$"<<destReg<<", "<<(localvar_counter-1)*4+16<< "($fp)" <<"\t#Storing variable "<<Name<< std::endl;
+        dst<<"#local var counter = "<<localvar_counter<<std::endl;
+        dst << "\t"<<"sw"<< "\t"<< "$"<<destReg<<", "<<(localvar_counter-1)*4+16<< "($fp)";
+        dst<<"\t#Storing variable "<<Name<< std::endl;
+        localvar_counter--;
     }
 };
 
