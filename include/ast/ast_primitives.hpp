@@ -40,9 +40,23 @@ public:
         int var_offset = contxt.LookupVariable(id, scopelevel);
         // std::cout<<"VAR OFFSET: "<<var_offset<<std::endl;
 
+        int stack_end = (var_count*4) +parameter_count+12+50; 
+
+        std::vector<int> freeArgReg = contxt.FindFreeRegs(4, 7);
+
         if(var_offset != 0){  //if (var_offset == 0)
             //looks for local variables in the scopes
             dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
+            dst<<"\t"<<"nop"<<std::endl;
+        }
+        else if(contxt.find_parameter(id) > -1){
+            // for(int i =0; i<4; i++){
+            //     contxt.set_used(destReg+i);
+            //     dst<<"\t"<<"lw"<<"\t"<<"$"<<(destReg+i)<<", "<<stack_end+(4*i)<<"($fp)"<<"\t"<<"#loading param argument register"<<std::endl;
+            // }
+            dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<(contxt.find_parameter(id))*4+stack_end<<"($fp)";
+            dst<<"\t #found variable "<<id<<" in parameters"<<std::endl;
+            dst<<"\t"<<"nop"<<std::endl;
         }
         else{
             //loads global variables

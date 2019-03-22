@@ -12,8 +12,11 @@ Vagrantfile
 ubuntu-xenial-16.04-cloudimg-console.log
 
 tmp/*
+.vagrant/*
 
 .vscode/
 simple_compiler_tester/*.o
 simple_compiler_tester/*.s
 simple_compiler_tester/test_program
+
+test_deliverable/working/*

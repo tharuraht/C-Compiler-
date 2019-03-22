@@ -9,16 +9,23 @@
 
 // int main () {
 //     return 3*g();
+
+// int g() {
+//     return 3+f();
+// }
+
+// int main () {
+//     return 3*g();
+// }
+
+// void f() {
+//     int e = 5;
 // }
 
 // int main () {
 //     int c = 3;
-//     f();
+    
 //     return c;
-// }
-
-// void f() {
-//     int c = 5;
 // }
 
 // int main () {
@@ -36,8 +43,12 @@ return x + y + z;
 
 int main(){
 
-int output = f(10,10,10);
-
-return output;
+// int output = f(10,10,10);
+int a = 3;
+while (a > 0) {
+    // int x = 3;
+    a = a - 1;
+}
+return a;
 
 }

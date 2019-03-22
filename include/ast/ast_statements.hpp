@@ -31,13 +31,26 @@ public:
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        
+        int stack_end = (var_count*4) +parameter_count+12+50;
+        
         //find a free register
         std::vector<int> freeRegs = contxt.FreeTempRegs();
         contxt.set_used(freeRegs[0]);
         Expression->compile(dst, contxt, freeRegs[0]);
         //store result into variable
-        dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#Assign variable "<<VarName<<std::endl;
+        if (contxt.LookupVariable(VarName, scopelevel) != 0) 
+            dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#Assign variable "<<VarName<<std::endl;
 
+        else if (contxt.find_parameter(VarName) > -1) {
+            dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<(contxt.find_parameter(VarName))*4+stack_end<<"($fp)"<<"\t#Assign passed variable "<<VarName<<std::endl;
+        }
+        // if(varGlobal == false){
+        //     dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<stack_end<<"($fp)"<<"\t#Assign function result"<<VarName<<std::endl;
+        // }
+        // else{
+        //     dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#Assign variable "<<VarName<<std::endl;
+        // }
         contxt.set_unused(freeRegs[0]);
     }
 };
@@ -76,16 +89,6 @@ public:
         if (AdditionalExpressions != NULL) {
             AdditionalExpressions->compile(dst, contxt, destReg);
             //branch to end of function label
-        }
-        else{
-            // dst<<"\t"<<"move"<<"\t"<<"$sp, $fp"<<std::endl; //deallocating stack
-            // dst<<"\t"<<"lw"<<"\t"<<"$31,"<<(var_count*4)+8<<"($sp)"<<std::endl;
-            // dst<<"\t"<<"lw"<<"\t"<<"$fp,"<<(var_count*4)+4<<"($sp)"<<std::endl; //old fp = top of stack address - 4
-            // dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,"<<(var_count*4)+8<<std::endl; //restoring sp
-            // dst<<"\t"<<"j"<<"\t"<<"$31"<<std::endl;
-            // dst<<"\t"<<"nop"<<std::endl;
-            // dst<<std::endl;
-            
         }
         dst<<"\t"<<"b "<<function_def_queue.back()<<"_function_end_"<<function_def_num<<"\t#Return statement"<<std::endl;
 
@@ -426,6 +429,10 @@ public:
         dst<<"(";
         Expression->translate(dst);
         dst<<")";
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        Expression->compile(dst, contxt, destReg);
     }
 };
 

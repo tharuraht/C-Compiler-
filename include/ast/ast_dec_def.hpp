@@ -170,11 +170,19 @@ public:
         dst<<"\t"<<"sw"<<"\t"<<"$fp,"<<stack_end-8<<"($sp)"<<std::endl; //old fp = top of stack address - 4
         dst<<"\t"<<"move"<<"\t"<<"$fp, $sp"<<std::endl;
 
+        
         if(Arguments != NULL){
+            //int stack_end = (var_count*4) +parameter_count+12+50; 
+            contxt.clearArgumentregs();
+            std::vector<int> freeArgReg = contxt.FindFreeRegs(4, 7);
+
+            for(int i =0; i<4; i++){
+                // contxt.set_used(freeArgReg[i]);
+                dst<<"\t"<<"sw"<<"\t"<<"$"<<freeArgReg[i]<<", "<<stack_end+(4*i)<<"($fp)"<<"\t"<<"#storing param argument register"<<std::endl;
+            }
+
             Arguments->compile(dst, contxt, destReg);
         }
-
-        contxt.FreeParamRegs();
 
         if(Scope != NULL){
             Scope->compile(dst, contxt, destReg);
@@ -185,12 +193,25 @@ public:
         else{
             dst<<"\t"<<"nop"<<"\t"<<std::endl; //if a function is declared as empty
         }
+
         
         dst<<Identifier<<"_function_end_"<<function_def_num<<":"<<std::endl;
         dst<<"#deallocating stack"<<std::endl;
+
+        if(Arguments != NULL){
+            //int stack_end = (var_count*4) +parameter_count+12+50;
+            int argreg = 4;
+            for(int i =0; i<4; i++){
+                dst<<"\t"<<"lw"<<"\t"<<"$"<<argreg++<<", "<<stack_end+(4*i)<<"($fp)"<<"\t"<<"#loading param argument register"<<std::endl;
+                dst<<"\t"<<"nop"<<std::endl;
+            }
+        }
+
         dst<<"\t"<<"move"<<"\t"<<"$sp, $fp"<<std::endl; //deallocating stack
         dst<<"\t"<<"lw"<<"\t"<<"$ra,"<<stack_end-4<<"($sp)"<<std::endl;
+        dst<<"\t"<<"nop"<<std::endl;
         dst<<"\t"<<"lw"<<"\t"<<"$fp,"<<stack_end-8<<"($sp)"<<std::endl; //old fp = top of stack address - 4
+        dst<<"\t"<<"nop"<<std::endl;
         dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,"<<stack_end<<std::endl; //restoring sp
         dst<<"\t"<<"j"<<"\t"<<"$ra"<<std::endl;
         dst<<"\t"<<"nop"<<std::endl;
@@ -199,7 +220,7 @@ public:
         dst<<"\t"<<".end"<<"\t" <<Identifier<<std::endl;
         function_def_queue.pop_back();
 
-        contxt.FreeParamRegs();
+        
     }
 };
 
@@ -228,6 +249,7 @@ public:
         int var_offset = contxt.LookupVariable(variable, scopelevel);
 
         dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
+        dst<<"\t"<<"nop"<<std::endl;
         dst<<"\t"<<"addiu"<<"\t"<<"$"<<freeReg[0]<<", $"<<destReg<<", 1"<<std::endl;
         dst<<"\t"<<"sw"<<"\t"<<"$"<<freeReg[0]<<", "<<var_offset<<"($fp)"<<std::endl;
 
@@ -258,9 +280,11 @@ public:
         int var_offset = contxt.LookupVariable(variable, scopelevel);
 
         dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
+        dst<<"\t"<<"nop"<<std::endl;
         dst<<"\t"<<"addiu"<<"\t"<<"$"<<freeReg[0]<<", $"<<destReg<<", 1"<<std::endl;
         dst<<"\t"<<"sw"<<"\t"<<"$"<<freeReg[0]<<", "<<var_offset<<"($fp)"<<std::endl;
         dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
+        dst<<"\t"<<"nop"<<std::endl;
 
         contxt.set_unused(freeReg[0]);
     }
@@ -288,6 +312,7 @@ public:
         int var_offset = contxt.LookupVariable(variable, scopelevel);
 
         dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
+        dst<<"\t"<<"nop"<<std::endl;
         dst<<"\t"<<"addiu"<<"\t"<<"$"<<freeReg[0]<<", $"<<destReg<<", -1"<<std::endl;
         dst<<"\t"<<"sw"<<"\t"<<"$"<<freeReg[0]<<", "<<var_offset<<"($fp)"<<std::endl;
 
@@ -320,9 +345,11 @@ public:
         int var_offset = contxt.LookupVariable(variable, scopelevel);
 
         dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
+        dst<<"\t"<<"nop"<<std::endl;
         dst<<"\t"<<"addiu"<<"\t"<<"$"<<freeReg[0]<<", $"<<destReg<<", -1"<<std::endl;
         dst<<"\t"<<"sw"<<"\t"<<"$"<<freeReg[0]<<", "<<var_offset<<"($fp)"<<std::endl;
         dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)"<<std::endl;
+        dst<<"\t"<<"nop"<<std::endl;
 
         contxt.set_unused(freeReg[0]);
     }

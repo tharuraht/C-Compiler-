@@ -14,6 +14,7 @@ class Context {
     //int is relative location in memory
     std::unordered_map<std::string, unsigned int> globalbindings;
     std::unordered_map<std::string,unsigned int> localbindings;
+    std::vector<std::string>parameter_list;
 
     bool regavailable[32];
     
@@ -59,7 +60,10 @@ class Context {
             if (regavailable[i]) {
                 FreeRegs.push_back(i);
             }
-        }   
+        } 
+        if (FreeRegs.size() == 0) {
+            throw std::runtime_error ("No free temp regs");
+        } 
         return FreeRegs;     
     }
 
@@ -98,7 +102,7 @@ class Context {
         return FindFreeRegs(16,23);
 
     }
-    std::vector<int> FreeParamRegs () {
+    std::vector<int> FindFreeParamRegs () {
         return FindFreeRegs(4,7);
     }
 
@@ -135,10 +139,33 @@ class Context {
     }
 
     void clearArgumentregs() {
-        for (int i=0; i<8;i++) {
+        for (int i=4; i<8;i++) {
             regavailable[i] = true;
         }
     }
+
+    void set_parameter_list(std::string parameter_name){
+        if(parameter_list.size()>4){
+            throw std::runtime_error("Too many parameters"); 
+        }
+        parameter_list.push_back(parameter_name);
+    }
+
+    int find_parameter(std::string parameter_name){
+        for(unsigned int i =0; i<parameter_list.size(); i++){
+            if(parameter_name == parameter_list[i]){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    void clear_parameter_list(){
+        parameter_list.clear();
+    }
+
+
 };
 
 #endif

@@ -115,7 +115,7 @@ extern "C" int fileno(FILE *stream);
 [-][-]            { return T_DECREMENT; }
 
 [ \n\t]         {;}
-.                 { fprintf(stderr, "Invalid token\n", yytext); exit(1); }
+.                 { fprintf(stderr, "Invalid token\n"); exit(1); }
 
 %%
 

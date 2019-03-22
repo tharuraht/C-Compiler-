@@ -42,12 +42,16 @@ class FunctionCall : public Expression
         function_call_queue.push_back(name);
         std::vector<int> lockedRegs = contxt.FindLockedTempRegs();
         int stack_count = localvar_counter;
+        
         //store temp registers before function call in stack
         for (unsigned int i = 0; i < lockedRegs.size();i++) {
             stack_count++;
             dst << "\t"<<"sw"<< "\t"<< "$"<<lockedRegs[i]<<", "<<(stack_count)*4+16<< "($fp)";
             dst <<"\t#Storing temp register: "<<lockedRegs[i]<< std::endl;
         }
+
+        arg->compile(dst,contxt,destReg);
+
         //function call
         dst<<"\t"<<"jal"<<"\t"<<name<<"\t#Function called"<<std::endl;
 
@@ -55,6 +59,7 @@ class FunctionCall : public Expression
         for ( int i = lockedRegs.size()-1; i >= 0;i--) {
             dst << "\t"<<"lw"<< "\t"<< "$"<<lockedRegs[i]<<", "<<(stack_count)*4+16<< "($fp)";
             dst <<"\t#Loading temp register: "<<lockedRegs[i]<< std::endl;
+            dst<<"\t"<<"nop"<<std::endl;
             stack_count--;
         }
     }
@@ -84,6 +89,15 @@ public:
             OtherParameters->translate(dst);
         }
     }
+
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
+    {
+        SingleParameter->compile(dst, contxt, destReg);
+        if (OtherParameters != NULL) {
+            OtherParameters->compile(dst, contxt, destReg);
+        }
+    }
+
 };
 
 class Parameter: public Expression {
@@ -103,6 +117,22 @@ public:
     virtual void translate (std::ostream &dst) const override {
         dst<< Identifier;
     }
+
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
+    {
+        contxt.set_parameter_list(Identifier);
+
+        // if(destReg < 8){  //check that we only have argument registers
+        //     //looks for local variables in the scopes
+        //     dst<<"\t"<<"sw"<<"\t"<<"$"<<freeArgReg[0]<<", "<<var_offset<<"($fp)"<<"\t"<<"#storing param argument register"<<std::endl;
+        // }
+        // destReg++; //increment destReg incase we have more than one parameter.
+
+        // for(int i =0; i<4; i++){
+        //     contxt.set_unused(freeArgReg[i]);
+        // }
+        
+    } 
 };
 
 class PassedParams : public Expression {
@@ -130,6 +160,21 @@ public:
             OtherParams->translate(dst);
         }
     }
+
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
+    {
+
+        std::vector<int> freeParamReg = contxt.FindFreeRegs(4, 7);
+        contxt.set_used(freeParamReg[0]);
+
+        CurrentParam->compile(dst, contxt, destReg);
+
+        dst<<"\t"<<"move"<<"\t"<<"$"<<freeParamReg[0]<<", $"<<destReg<<"\t #move param to arg reg"<<std::endl;
+
+        if (OtherParams != NULL) {
+            OtherParams->compile(dst, contxt, destReg);
+        }
+    } 
 };
 
 class Function: public Expression {
