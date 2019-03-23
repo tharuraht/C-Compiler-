@@ -88,7 +88,16 @@ public:
         if (var_offset !=0) {
             dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<var_offset<<"($fp)"<<"\t#Assign element "<<index_no<<" of array "<<Identifier<<std::endl;
         }
-        contxt.set_used(freeRegs[0]);
+        else {
+            //global array
+            dst<<"\t"<<"lui"<<"\t"<<"$"<<destReg<<", "<<"%hi("<<Identifier<<")"<<"\t#Loading in array: "<<Identifier<<std::endl;
+            dst<<"\t"<<"addiu"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", %lo("<<Identifier<<")"<<std::endl;
+            dst<<"\t"<<"nop"<<std::endl;
+            dst<<"\t"<<"addiu"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", "<<index_no*4<<"\t#Add offset for element "<<index_no<<std::endl;
+            dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", ($"<<destReg<<")"<<"\t#Store into global array "<<Identifier<<std::endl;
+        }
+        dst<<"\t"<<"nop"<<std::endl;
+        contxt.set_unused(freeRegs[0]);
     }
 };
 
@@ -128,7 +137,9 @@ public:
             //branch to end of function label
         }
         dst<<"\t"<<"b "<<function_def_queue.back()<<"_function_end_"<<function_def_num<<"\t#Return statement"<<std::endl;
-
+        if (function_def_queue.back()=="main") {
+            main_returned = true;
+        }
     }
 };
 

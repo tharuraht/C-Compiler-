@@ -98,6 +98,7 @@ GLOBAL_DECLARATION:
     TYPE_SPECIFY T_VARIABLE T_SEMICOLON                         {$$ = new GlobalVarDec(*$1,*$2,NULL);}
   | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON    {$$ = new GlobalVarDec(*$1,*$2,$4);}
   | TYPE_SPECIFY T_VARIABLE T_COMMA G_ADDITIONAL_DECS T_SEMICOLON {$$ = new MultipleDecs (*$1,*$2,$4, true);}
+  | TYPE_SPECIFY T_VARIABLE T_SQUARE_LBRACKET T_NUMBER T_SQUARE_RBRACKET T_SEMICOLON {$$ = new GlobalArrayDec (*$1,*$2,$4);}
   // | TYPE_SPECIFY T_VARIABLE T_EQUAL G_ADDITIONAL_DECS T_SEMICOLON  {$$ = new MultipleDecs (*$1,*$2,$4, true);}
   ;
 
@@ -139,18 +140,18 @@ SCOPE_STATEMENTS:
 ;
 
 STATEMENT:
-    T_RETURN LOGICAL_OP T_SEMICOLON                         {$$ = new ReturnStatement($2);}
-  | T_RETURN T_SEMICOLON                                      {$$ = new ReturnStatement(NULL);}
-  | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON               {$$ = new AssignmentStatement(*$1,$3);}
-  | T_VARIABLE T_SQUARE_LBRACKET C_EXPRESSION T_SQUARE_RBRACKET T_EQUAL C_EXPRESSION T_SEMICOLON        {$$ = new ArrayAssignment(*$1,$3,$6);}
-  | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE      {$$ = new IfElseStatement($3,$5,NULL);}
-  | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE {$$ = new IfElseStatement($3, $5, $7);}
-  | T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE          {$$ = new WhileStatement($3,$5);}
-  | T_DO STAT_SCOPE T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET T_SEMICOLON {$$ = new DoWhileStatement($5, $2);}
-  | T_FOR T_LBRACKET STATEMENT LOGICAL_OP T_SEMICOLON C_INCREMENT_DECREMENT T_RBRACKET STAT_SCOPE {$$ = new ForStatement($3, $4, $6, $8);}
-  | T_BREAK T_SEMICOLON {$$ = new BreakStatement();}
-  | DECLARE_VAR  T_SEMICOLON                                               {$$ = $1;}
-  | C_EXPRESSION T_SEMICOLON                                             {$$ = $1;}
+    T_RETURN LOGICAL_OP T_SEMICOLON                                                                    {$$ = new ReturnStatement($2);}
+  | T_RETURN T_SEMICOLON                                                                               {$$ = new ReturnStatement(NULL);}
+  | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON                                                        {$$ = new AssignmentStatement(*$1,$3);}
+  | T_VARIABLE T_SQUARE_LBRACKET C_EXPRESSION T_SQUARE_RBRACKET T_EQUAL C_EXPRESSION T_SEMICOLON       {$$ = new ArrayAssignment(*$1,$3,$6);}
+  | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE                                                   {$$ = new IfElseStatement($3,$5,NULL);}
+  | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE                                 {$$ = new IfElseStatement($3, $5, $7);}
+  | T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE                                                {$$ = new WhileStatement($3,$5);}
+  | T_DO STAT_SCOPE T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET T_SEMICOLON                               {$$ = new DoWhileStatement($5, $2);}
+  | T_FOR T_LBRACKET STATEMENT LOGICAL_OP T_SEMICOLON C_INCREMENT_DECREMENT T_RBRACKET STAT_SCOPE      {$$ = new ForStatement($3, $4, $6, $8);}
+  | T_BREAK T_SEMICOLON                                                                                {$$ = new BreakStatement();}
+  | DECLARE_VAR  T_SEMICOLON                                                                           {$$ = $1;}
+  | C_EXPRESSION T_SEMICOLON                                                                           {$$ = $1;}
   ;
 
 STAT_SCOPE:

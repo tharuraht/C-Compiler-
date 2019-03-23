@@ -28,7 +28,7 @@ public:
 
     Program (NodePtr _ExDec, NodePtr _Rest_of_program) : ExDec(_ExDec), Rest_of_program(_Rest_of_program) {
         function_call_num = 0;
-        
+        main_returned = false;
     }
 
     virtual void print (std::ostream &dst) const override {
@@ -145,9 +145,9 @@ public:
         }
         //dst<<"#MIPS function:"<<std::endl;
         //creating ABI directives
-        dst<<"#----------FUNCTION "<<Identifier<<"----------"<<std::endl;
         dst<<"\t"<<".text"<<std::endl;
         dst<<std::endl;
+        dst<<"#----------FUNCTION "<<Identifier<<"----------"<<std::endl;
         // dst<<"\t"<<".align"<<"\t"<<"2"<<std::endl;
         dst<<"\t"<<".globl"<<"\t"<<Identifier<<std::endl;
         // dst<<std::endl;
@@ -213,9 +213,14 @@ public:
         dst<<"\t"<<"lw"<<"\t"<<"$fp,"<<stack_end-8<<"($sp)"<<std::endl; //old fp = top of stack address - 4
         dst<<"\t"<<"nop"<<std::endl;
         dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,"<<stack_end<<std::endl; //restoring sp
+        //returns 0 if no return defined for main
+        if (Identifier == "main" && main_returned == false) {
+            dst<<"\t"<<"li"<<"\t"<<"$2"<<", 0"<<"\t#No return defined, return 0 by default"<<std::endl;
+        }
         dst<<"\t"<<"j"<<"\t"<<"$ra"<<std::endl;
         dst<<"\t"<<"nop"<<std::endl;
         dst<<std::endl;
+        
 
         dst<<"\t"<<".end"<<"\t" <<Identifier<<std::endl;
         function_def_queue.pop_back();

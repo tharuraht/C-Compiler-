@@ -6,9 +6,9 @@
 extern bool varGlobal;
 
 class Variable: public Expression {
-private:
+    private:
     std::string id;
-public:
+    public:
     Variable(const std::string &_id)
         : id(_id)
     {}
@@ -68,11 +68,11 @@ public:
 };
 
 class ArrayElement : public Expression {
-private:
+    private:
     std::string id;
     int element_no;
 
-public:
+    public:
     ~ArrayElement() {};
     ArrayElement(std::string _id, int _element_no) : id(_id), element_no(_element_no) {}
     virtual void print (std::ostream &dst) const override {
@@ -90,6 +90,14 @@ public:
             dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)";
             dst<<"\t#Accessing element "<<element_no<<" of array "<<id<<std::endl;
             dst<<"\t"<<"nop"<<std::endl;
+        }
+        else {
+            //global array
+            dst<<"\t"<<"lui"<<"\t"<<"$"<<destReg<<", "<<"%hi("<<id<<")"<<"\t#Loading in array: "<<id<<std::endl;
+            dst<<"\t"<<"addiu"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", %lo("<<id<<")"<<std::endl;
+            dst<<"\t"<<"nop"<<std::endl;
+            dst<<"\t"<<"addiu"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", "<<element_no*4<<"\t#Add offset for element "<<element_no<<std::endl;
+            dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<"0($"<<destReg<<")"<<"\t#Load in element "<<element_no<<" of global array "<<id<<std::endl;
         }
     }
 };

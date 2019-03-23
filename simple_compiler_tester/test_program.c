@@ -18,9 +18,9 @@
 //     return 3*g();
 // }
 
-// void f() {
-//     int e = 5;
-// }
+void f() {
+    int e = 5;
+}
 
 // int main () {
 //     int c = 3;
@@ -33,12 +33,16 @@
 //     int a = b;
 //     return a;
 // }
+int a[5];
+int b = 5;
 
 int main()
 {
-    int a[5];
-    a[2 + 2] = 4;
-    return a[4];
+    // int a[5] = {0,1,2,3,4};
+    //int x = a[5] + a[3] + a[1];
+    a[4] = 2;
+    int x = a[4];
+    // return x + b;
 }
 
 // int main()

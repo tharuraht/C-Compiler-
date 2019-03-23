@@ -55,7 +55,7 @@ class GlobalVarDec : public Expression
         {
             dst << "\t"<< ".globl"<< "\t" << Name <<"\t#New global variable"<< std::endl;
             dst << "\t"<< ".data"<< "\t" << std::endl;
-            dst << "\t"<< ".align"<< "\t"<< "2" << std::endl;
+            // dst << "\t"<< ".align"<< "\t"<< "2" << std::endl;
             //dst<<"\t"<<".type"<<"\t"<<Name<<", @object"<<std::endl;
             //dst<<"\t"<<".size"<<"\t"<<Name<<", 4"<<std::endl;
 
@@ -67,8 +67,8 @@ class GlobalVarDec : public Expression
             varGlobal = false;
             dst << std::endl;
 
-            dst << "\t"<< ".text" << std::endl;
-            dst << "\t"<< ".align"<< "\t"<< "2" << std::endl;
+            // dst << "\t"<< ".text" << std::endl;
+            // dst << "\t"<< ".align"<< "\t"<< "2" << std::endl;
         }
 
         contxt.NewGlobalVar(Name);
@@ -288,7 +288,36 @@ class AdditionalDecs : public MultipleDecs
     }
 };
 
-class LocalArrayDec : public Expression {
+class GlobalArrayDec : public Expression {
+private:
+  std::string Type;
+  std::string Identifier;
+  int arraysize;
+public:
+  ~GlobalArrayDec() {}
+  GlobalArrayDec(std::string _Type, std::string _Identifier, int _arraysize) : Type(_Type), Identifier(_Identifier), arraysize(_arraysize) {}
+
+  virtual void print(std::ostream &dst) const override{
+    //   var_count = var_count + arraysize;
+        dst << Type << " " << Identifier << "[" << arraysize << "];";
+  }
+
+  virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        // dst<<"#global array"<<std::endl;
+        for (int i=0;i<arraysize;i++) {
+            // localvar_counter++;
+            std::string arrayid = Identifier + std::to_string(i);
+            contxt.NewGlobalVar(arrayid + std::to_string(scopelevel));
+        }
+        dst<<"\t"<<".data"<<std::endl;
+        dst<<Identifier<<":\t"<<".space "<<arraysize*4<<"\t#Global array of size "<<arraysize<<std::endl;
+        dst<<std::endl;
+
+  }
+};
+
+class LocalArrayDec : public Expression 
+{
 private:
     std::string Type;
     std::string Identifier;
@@ -302,7 +331,7 @@ public:
         dst<<Type<<" "<<Identifier<<"["<<arraysize<<"];";
     }
 
-    virtual void compile (std::ostream &dst, Context &contxt, int destreg) const override {
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
         
         dst << "#local array" << std::endl;
         for (int i=0;i<arraysize;i++) {

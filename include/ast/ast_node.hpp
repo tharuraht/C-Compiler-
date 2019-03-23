@@ -17,6 +17,7 @@ static int function_call_num;
 static bool varGlobal;
 static int loop_count;
 static int if_level;
+static bool main_returned;
 // static int index_no;
 
 
