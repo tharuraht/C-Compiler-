@@ -476,4 +476,25 @@ public:
     }
 };
 
+class BreakStatement : public Expression {
+private:
+    
+public:
+    ~BreakStatement() {}
+    BreakStatement() {}
+
+    virtual void print (std::ostream &dst) const override {
+        dst<<"break;"<<std::endl;
+    }
+
+    virtual void translate (std::ostream &dst) const override {
+        dst<<"("<<"break"<<")"<<std::endl;
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        dst<<"\t"<<"b"<<"\t"<<"end_break_"<<loop_count<<std::endl;
+    }
+};
+
+
 #endif

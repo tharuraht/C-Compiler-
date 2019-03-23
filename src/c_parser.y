@@ -148,6 +148,7 @@ STATEMENT:
   | T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE          {$$ = new WhileStatement($3,$5);}
   | T_DO STAT_SCOPE T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET T_SEMICOLON {$$ = new DoWhileStatement($5, $2);}
   | T_FOR T_LBRACKET STATEMENT LOGICAL_OP T_SEMICOLON C_INCREMENT_DECREMENT T_RBRACKET STAT_SCOPE {$$ = new ForStatement($3, $4, $6, $8);}
+  | T_BREAK T_SEMICOLON {$$ = new BreakStatement();}
   | DECLARE_VAR  T_SEMICOLON                                               {$$ = $1;}
   | C_EXPRESSION T_SEMICOLON                                             {$$ = $1;}
   ;
