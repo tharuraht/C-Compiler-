@@ -86,7 +86,7 @@ public:
         std::vector<int> freeArgReg = contxt.FindFreeParamRegs();
 
         if(var_offset != 0) {  
-            dst<<"#var offset: "<<var_offset<<std::endl;
+            // dst<<"#var offset: "<<var_offset<<std::endl;
             dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)";
             dst<<"\t#Accessing element "<<element_no<<" of array "<<id<<std::endl;
             dst<<"\t"<<"nop"<<std::endl;

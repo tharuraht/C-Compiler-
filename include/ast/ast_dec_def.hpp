@@ -148,21 +148,21 @@ public:
         dst<<"#----------FUNCTION "<<Identifier<<"----------"<<std::endl;
         dst<<"\t"<<".text"<<std::endl;
         dst<<std::endl;
-        dst<<"\t"<<".align"<<"\t"<<"2"<<std::endl;
+        // dst<<"\t"<<".align"<<"\t"<<"2"<<std::endl;
         dst<<"\t"<<".globl"<<"\t"<<Identifier<<std::endl;
-        dst<<std::endl;
+        // dst<<std::endl;
         dst<<"\t"<<".ent"<<"\t"<<Identifier<<std::endl;
         dst<<"\t"<<".type"<<"\t"<<Identifier<<", @function"<<std::endl;
 
         dst<<Identifier<<":"<<std::endl;
         //space allocated in stack
-        dst<<"#allocating stack"<<std::endl;
+        dst<<"#ALLOCATING STACK"<<std::endl;
         // var_count = localvar_counter + globalvar_counter;
         if (Scope != NULL)
         {
             std::ostream tmp(0);
             Scope->print(tmp);
-            std::cout<<"#var_count: "<<var_count<<std::endl;
+            // std::cout<<"#var_count: "<<var_count<<std::endl;
         }
         int stack_end = (var_count*4) +parameter_count+12+50;
         dst<<"\t"<<"addiu"<<"\t"<<"$sp, $sp,-"<<stack_end<<std::endl; //restoring sp
@@ -196,7 +196,7 @@ public:
 
         
         dst<<Identifier<<"_function_end_"<<function_def_num<<":"<<std::endl;
-        dst<<"#deallocating stack"<<std::endl;
+        dst<<"#DEALLOCATING STACK"<<std::endl;
 
         if(Arguments != NULL){
             //int stack_end = (var_count*4) +parameter_count+12+50;
