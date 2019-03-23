@@ -45,12 +45,13 @@ extern "C" int fileno(FILE *stream);
 "struct"        { yylval.string = new std::string(yytext); return T_STRUCT; }
 "return"        { yylval.string = new std::string(yytext); return T_RETURN; }
 
-[0-9]+([.][0-9]*)? { yylval.number=strtod(yytext, 0); return T_NUMBER; }
+[(]             { return T_LBRACKET; }
+[{]             { return T_CURLY_LBRACKET; }
+\[              { return T_SQUARE_LBRACKET; }
 
-[a-zA-Z]+[a-z0-9_]*        { yylval.string=new std::string(yytext); return T_VARIABLE; }
-
-["][a-z]+[a-z0-9]*["]    { yylval.string=new std::string(yytext); return T_STRING; }
-
+[)]             { return T_RBRACKET; }
+[}]             { return T_CURLY_RBRACKET; }
+\]              { return T_SQUARE_RBRACKET; }
 
 
 [*]             { return T_TIMES; }
@@ -59,63 +60,49 @@ extern "C" int fileno(FILE *stream);
 [/]             { return T_DIVIDE; }
 [%]             { return T_MODULUS; }
 
-
-
 [=]             { return T_EQUAL; }
-[+][=]            { return T_PLUS_EQUAL; }
-[-][=]            { return T_MINUS_EQUAL; }
-[*][=]            { return T_TIMES_EQUAL; }
-[/][=]            { return T_DIVIDE_EQUAL; }
-[%][=]            { return T_MODULUS_EQUAL; }
+[+][=]          { return T_PLUS_EQUAL; }
+[-][=]          { return T_MINUS_EQUAL; }
+[*][=]          { return T_TIMES_EQUAL; }
+[/][=]          { return T_DIVIDE_EQUAL; }
+[%][=]          { return T_MODULUS_EQUAL; }
 
+[=][=]          { return T_IS_EQUAL; }
+[!][=]          { return T_IS_NOT_EQUAL; }
+\<             { return T_LESS_THAN; }
+[<][=]          { return T_LESS_EQUAL_THAN; }
+[=][<]          { return T_LESS_EQUAL_THAN; }
+\>             { return T_GREATER_THAN; }
+[>][=]          { return T_GREATER_EQUAL_THAN; }
+[=][>]          { return T_GREATER_EQUAL_THAN; }
 
-
-[=][=]            { return T_IS_EQUAL; }
-[!][=]            { return T_IS_NOT_EQUAL; }
-[<]             { return T_LESS_THAN; }
-[<][=]            { return T_LESS_EQUAL_THAN; }
-[=][<]            { return T_LESS_EQUAL_THAN; }
-[>]             { return T_GREATER_THAN; }
-[>][=]            { return T_GREATER_EQUAL_THAN; }
-[=][>]            { return T_GREATER_EQUAL_THAN; }
-
-
-[|][|]            { return T_LOGICAL_OR; }
-[&][&]            { return T_LOGICAL_AND; }
+[|][|]          { return T_LOGICAL_OR; }
+[&][&]          { return T_LOGICAL_AND; }
 [!]             { return T_NOT; }
-
-
 
 [&]             { return T_BITWISE_AND; }
 [|]             { return T_BITWISE_OR; }
-["^"]             { return T_BITWISE_XOR; }
+["^"]           { return T_BITWISE_XOR; }
 [~]             { return T_BITWISE_COMPLEMENT; }
-[<][<]            { return T_LSHIFT; }
-[>][>]            { return T_RSHIFT; }
-
-
-
-[(]             { return T_LBRACKET; }
-[{]             { return T_CURLY_LBRACKET; }
-"["           { return T_SQUARE_LBRACKET; }
-[<]             { return T_LHEADER; }
-[)]             { return T_RBRACKET; }
-[}]             { return T_CURLY_RBRACKET; }
-"]"            { return T_SQUARE_RBRACKET; }
-[>]             { return T_RHEADER; }
-
+[<][<]          { return T_LSHIFT; }
+[>][>]          { return T_RSHIFT; }
 
 
 [;]				      { return T_SEMICOLON; }
 [:]				      { return T_COLON; }
 [,]				      { return T_COMMA; }
 
+[+][+]          { return T_INCREMENT; }
+[-][-]          { return T_DECREMENT; }
 
-[+][+]            { return T_INCREMENT; }
-[-][-]            { return T_DECREMENT; }
+[0-9]+([.][0-9]*)? { yylval.number=strtod(yytext, 0); return T_NUMBER; }
+
+[a-zA-Z]+[a-z0-9_]*        { yylval.string=new std::string(yytext); return T_VARIABLE; }
+
+["][a-z]+[a-z0-9]*["]    { yylval.string=new std::string(yytext); return T_STRING; }
 
 [ \n\t]         {;}
-.                 { fprintf(stderr, "Invalid token\n"); exit(1); }
+.               { fprintf(stderr, "Invalid token\n"); exit(1); }
 
 %%
 

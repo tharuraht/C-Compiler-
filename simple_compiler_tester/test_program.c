@@ -34,21 +34,20 @@
 //     return a;
 // }
 
-int f(int x, int y, int z){
-
-x = x-1;
-y = y+1;
-return x + y + z;
+int main()
+{
+    int a[5];
+    a[2 + 2] = 4;
+    return a[4];
 }
 
-int main(){
-
-// int output = f(10,10,10);
-int a = 3;
-while (a > 0) {
-    // int x = 3;
-    a = a - 1;
-}
-return a;
-
-}
+// int main()
+// {
+//     int a = 0;
+//     int b[5];
+//     while (a < 5) {
+//         b[a] = 1 + a;
+//         a++;
+//     }
+//     return b[4];
+// }

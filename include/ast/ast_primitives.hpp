@@ -67,6 +67,33 @@ public:
     }   
 };
 
+class ArrayElement : public Expression {
+private:
+    std::string id;
+    int element_no;
+
+public:
+    ~ArrayElement() {};
+    ArrayElement(std::string _id, int _element_no) : id(_id), element_no(_element_no) {}
+    virtual void print (std::ostream &dst) const override {
+        dst<<id<<"["<<element_no<<"]";
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override{
+        int var_offset = contxt.LookupVariable(id+std::to_string(element_no), scopelevel);
+        // int stack_end = (var_count*4) +parameter_count+12+50;
+
+        std::vector<int> freeArgReg = contxt.FindFreeParamRegs();
+
+        if(var_offset != 0) {  
+            dst<<"#var offset: "<<var_offset<<std::endl;
+            dst<<"\t"<<"lw"<<"\t"<<"$"<<destReg<<", "<<var_offset<<"($fp)";
+            dst<<"\t#Accessing element "<<element_no<<" of array "<<id<<std::endl;
+            dst<<"\t"<<"nop"<<std::endl;
+        }
+    }
+};
+
 class Number: public Expression
 {
 private:

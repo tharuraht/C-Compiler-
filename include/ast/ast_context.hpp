@@ -83,7 +83,7 @@ class Context {
         return LockedRegs;     
     }
 
-    std::vector<int> FreeTempRegs () {
+    std::vector<int> FindFreeTempRegs () {
         std::vector<int> FreeTemp;
         std::vector<int> set1 = FindFreeRegs(8,15);
         std::vector<int> set2 = FindFreeRegs(24,25);
@@ -98,7 +98,7 @@ class Context {
         return FreeTemp;
     }
 
-    std::vector<int> FreeConstantRegs () {
+    std::vector<int> FindFreeConstantRegs () {
         return FindFreeRegs(16,23);
 
     }
@@ -106,9 +106,9 @@ class Context {
         return FindFreeRegs(4,7);
     }
 
-    void DeleteGlobalVar (std::string varname) {
-        globalbindings.erase(varname);
-    }
+    // void DeleteGlobalVar (std::string varname) {
+    //     globalbindings.erase(varname);
+    // }
 
     void NewGlobalVar (std::string varname) {
         globalbindings.emplace(varname,++globalvar_counter);

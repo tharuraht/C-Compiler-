@@ -243,7 +243,7 @@ public:
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
-        std::vector<int> freeReg = contxt.FreeTempRegs();
+        std::vector<int> freeReg = contxt.FindFreeTempRegs();
         contxt.set_used(freeReg[0]);
 
         int var_offset = contxt.LookupVariable(variable, scopelevel);
@@ -274,7 +274,7 @@ public:
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
-        std::vector<int> freeReg = contxt.FreeTempRegs();
+        std::vector<int> freeReg = contxt.FindFreeTempRegs();
         contxt.set_used(freeReg[0]);
 
         int var_offset = contxt.LookupVariable(variable, scopelevel);
@@ -306,7 +306,7 @@ public:
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
-        std::vector<int> freeReg = contxt.FreeTempRegs();
+        std::vector<int> freeReg = contxt.FindFreeTempRegs();
         contxt.set_used(freeReg[0]);
 
         int var_offset = contxt.LookupVariable(variable, scopelevel);
@@ -339,7 +339,7 @@ public:
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
-        std::vector<int> freeReg = contxt.FreeTempRegs();
+        std::vector<int> freeReg = contxt.FindFreeTempRegs();
         contxt.set_used(freeReg[0]);
 
         int var_offset = contxt.LookupVariable(variable, scopelevel);

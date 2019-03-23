@@ -35,7 +35,7 @@ public:
         int stack_end = (var_count*4) +parameter_count+12+50;
         
         //find a free register
-        std::vector<int> freeRegs = contxt.FreeTempRegs();
+        std::vector<int> freeRegs = contxt.FindFreeTempRegs();
         contxt.set_used(freeRegs[0]);
         Expression->compile(dst, contxt, freeRegs[0]);
         //store result into variable
@@ -52,6 +52,43 @@ public:
         //     dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#Assign variable "<<VarName<<std::endl;
         // }
         contxt.set_unused(freeRegs[0]);
+    }
+};
+
+class ArrayAssignment : public Expression {
+private:
+    std::string Identifier;
+    // int index_no;
+    ExpressionPtr Expression;
+    ExpressionPtr IndexExpr;
+public:
+    ~ArrayAssignment() {}
+    // ArrayAssignment(std::string _Identifier, int _index_no, ExpressionPtr _Expression)
+    //  : Identifier(_Identifier), index_no(_index_no), Expression(_Expression), IndexExpr(NULL) {}
+    ArrayAssignment(std::string _Identifier, ExpressionPtr _IndexExpr, ExpressionPtr _Expression)
+     : Identifier(_Identifier), Expression(_Expression), IndexExpr(_IndexExpr) {}
+
+
+    virtual void print (std::ostream &dst) const override {
+        dst<<Identifier<<"[";
+        IndexExpr->print(dst);
+        dst<<"] = ";
+        Expression->print(dst);
+        dst<<";";
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+
+        std::vector<int> freeRegs = contxt.FindFreeTempRegs();
+        contxt.set_used(freeRegs[0]);
+        int index_no = IndexExpr->evaluate();
+        Expression->compile(dst, contxt, freeRegs[0]);
+
+        int var_offset = contxt.LookupVariable(Identifier + std::to_string(index_no), scopelevel);
+        if (var_offset !=0) {
+            dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<var_offset<<"($fp)"<<"\t#Assign element "<<index_no<<" of array "<<Identifier<<std::endl;
+        }
+        contxt.set_used(freeRegs[0]);
     }
 };
 
@@ -151,6 +188,7 @@ public:
         }
 
         dst<<"\t"<<"b"<<"\t"<<"ifelse_end_"<<if_level<<std::endl;
+        dst<<"\t"<<"nop"<<std::endl;
 
         dst<<"else_"<<if_level<<":"<<std::endl;
         if(EBody != NULL){
@@ -189,7 +227,7 @@ public:
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
         //use a free register for condition check
-        std::vector<int> freeRegs = contxt.FreeTempRegs();
+        std::vector<int> freeRegs = contxt.FindFreeConstantRegs();
         contxt.set_used(freeRegs[0]);
 
         dst<<"while_loop_"<<loop_count<<"_begin:"<<"\t#Begin while loop"<<std::endl;
@@ -206,6 +244,7 @@ public:
 
         //branch back to top
         dst<<"\t"<<"b"<<"\t"<<"while_loop_"<<loop_count<<"_begin"<<std::endl;
+        dst<<"\t"<<"nop"<<std::endl;
         //end of loop
         dst<<"end_loop_"<<loop_count<<":"<<"\t#End while loop"<<std::endl;
         contxt.set_unused(freeRegs[0]);
@@ -258,7 +297,7 @@ public:
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
         //use a free register for condition check
-        std::vector<int> freeRegs = contxt.FreeTempRegs();
+        std::vector<int> freeRegs = contxt.FindFreeConstantRegs();
         contxt.set_used(freeRegs[0]);
 
         dst<<"for_loop_"<<loop_count<<"_begin:"<<"\t#Begin for loop"<<std::endl;
@@ -279,6 +318,7 @@ public:
 
         //branch back to top
         dst<<"\t"<<"b"<<"\t"<<"for_loop_"<<loop_count<<"_begin"<<std::endl;
+        dst<<"\t"<<"nop"<<std::endl;
         //end of loop
         dst<<"end_loop_"<<loop_count<<":"<<"\t#End while loop"<<std::endl;
         contxt.set_unused(freeRegs[0]);

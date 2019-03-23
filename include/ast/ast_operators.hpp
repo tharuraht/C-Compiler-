@@ -88,7 +88,7 @@ public:
             }
             else
             {
-                std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
+                std::vector<int> freeregs = contxt.FindFreeTempRegs(); //finds available registers
                 contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
                 contxt.set_used(freeregs[1]);
                 int current_function_depth = function_call_num;
@@ -149,7 +149,7 @@ public:
             dst<<vl - vr;
         }
         else {
-            std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+            std::vector<int> freeReg = contxt.FindFreeTempRegs(); //finds available registers
             contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
             
             left->compile(dst, contxt, destReg);
@@ -197,7 +197,7 @@ public:
             dst<<vl * vr;
         }
         else {
-            std::vector<int> freeregs = contxt.FreeTempRegs(); //finds available registers
+            std::vector<int> freeregs = contxt.FindFreeTempRegs(); //finds available registers
             contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
             contxt.set_used(freeregs[1]);
             int current_function_depth = function_call_num;
@@ -313,7 +313,7 @@ public:
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        std::vector<int> freeReg = contxt.FindFreeTempRegs(); //finds available registers
         contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
         right->compile(dst, contxt, freeReg[0]);
@@ -343,7 +343,7 @@ public:
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        std::vector<int> freeReg = contxt.FindFreeTempRegs(); //finds available registers
         contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
         right->compile(dst, contxt, freeReg[0]);
@@ -374,7 +374,7 @@ public:
         return (vl>vr);
     }
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        std::vector<int> freeReg = contxt.FindFreeTempRegs(); //finds available registers
         contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
         right->compile(dst, contxt, freeReg[0]);
@@ -404,7 +404,7 @@ public:
     }
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        std::vector<int> freeReg = contxt.FindFreeTempRegs(); //finds available registers
         contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
         right->compile(dst, contxt, freeReg[0]);
@@ -435,7 +435,7 @@ public:
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        std::vector<int> freeReg = contxt.FindFreeTempRegs(); //finds available registers
         contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
         right->compile(dst, contxt, freeReg[0]);
@@ -469,7 +469,7 @@ public:
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        std::vector<int> freeReg = contxt.FindFreeTempRegs(); //finds available registers
         contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
         right->compile(dst, contxt, freeReg[0]);
@@ -509,7 +509,7 @@ public:
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        std::vector<int> freeReg = contxt.FindFreeTempRegs(); //finds available registers
         contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
         right->compile(dst, contxt, freeReg[0]);
@@ -546,7 +546,7 @@ public:
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> freeReg = contxt.FreeTempRegs(); //finds available registers
+        std::vector<int> freeReg = contxt.FindFreeTempRegs(); //finds available registers
         contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
         right->compile(dst, contxt, freeReg[0]);

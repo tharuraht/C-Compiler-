@@ -131,7 +131,7 @@ class LocalVarDec : public Expression
         dst<<"#local var counter = "<<localvar_counter<<std::endl;
         dst << "\t"<<"sw"<< "\t"<< "$"<<destReg<<", "<<(localvar_counter-1)*4+16<< "($fp)";
         dst<<"\t#Storing variable "<<Name<< std::endl;
-        localvar_counter--;
+        // localvar_counter--;
     }
 };
 
@@ -285,6 +285,33 @@ class AdditionalDecs : public MultipleDecs
         {
             NextVar->translate(dst);
         }
+    }
+};
+
+class LocalArrayDec : public Expression {
+private:
+    std::string Type;
+    std::string Identifier;
+    int arraysize;
+public:
+    ~LocalArrayDec() {}
+    LocalArrayDec (std::string _Type, std::string _Identifier, int _arraysize) : Type(_Type), Identifier(_Identifier), arraysize(_arraysize) {}
+
+    virtual void print (std::ostream &dst) const override {
+        var_count = var_count + arraysize;
+        dst<<Type<<" "<<Identifier<<"["<<arraysize<<"];";
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destreg) const override {
+        
+        dst << "#local array" << std::endl;
+        for (int i=0;i<arraysize;i++) {
+            localvar_counter++;
+            std::string arrayid = Identifier + std::to_string(i);
+            contxt.NewLocalVar(arrayid + std::to_string(scopelevel));
+        }
+        
+        // localvar_counter = localvar_counter - arraysize;
     }
 };
 

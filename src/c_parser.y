@@ -54,17 +54,17 @@
 
 
 %type <expr>  TERM FACTOR BINARY_EXPRESSION_TREE STATEMENT
-%type <expr> C_EXPRESSION COMPARISON_OP LOGICAL_OP COMPARISONEXPR C_ARGS DECLARE_VAR FUNCTION_CALL PASSED_PARAMS G_ADDITIONAL_DECS L_ADDITIONAL_DECS
+%type <expr> C_EXPRESSION COMPARISON_OP LOGICAL_OP C_ARGS DECLARE_VAR FUNCTION_CALL PASSED_PARAMS G_ADDITIONAL_DECS L_ADDITIONAL_DECS C_INCREMENT_DECREMENT
 
 //C_INCREMENT_DECREMENT, , EXPR, SCOPE_BODY
 
 %type <node> PROGRAM EX_DECLARATION FUNCTION_DEC_DEF  GLOBAL_DECLARATION
 %type <node> SCOPE  SCOPE_STATEMENTS STAT_SCOPE PARAMETER
-%type <node>  T_IF T_ELSE T_WHILE T_FOR T_RETURN C_INCREMENT_DECREMENT
+%type <node>  T_IF T_ELSE T_WHILE T_FOR T_RETURN 
 //%type <node> BINARY 
 
 %type <number> T_NUMBER 
-%type <string> T_VARIABLE FUNCTION_NAME T_VOID T_INT T_DOUBLE T_FLOAT TYPE_SPECIFY
+%type <string> T_VARIABLE T_VOID T_INT T_DOUBLE T_FLOAT TYPE_SPECIFY
 
 //%right "then" T_ELSE solution for dangling if else problem
 %nonassoc "then" //solution for dangling if else problem
@@ -142,6 +142,7 @@ STATEMENT:
     T_RETURN LOGICAL_OP T_SEMICOLON                         {$$ = new ReturnStatement($2);}
   | T_RETURN T_SEMICOLON                                      {$$ = new ReturnStatement(NULL);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON               {$$ = new AssignmentStatement(*$1,$3);}
+  | T_VARIABLE T_SQUARE_LBRACKET C_EXPRESSION T_SQUARE_RBRACKET T_EQUAL C_EXPRESSION T_SEMICOLON        {$$ = new ArrayAssignment(*$1,$3,$6);}
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE      {$$ = new IfElseStatement($3,$5,NULL);}
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE {$$ = new IfElseStatement($3, $5, $7);}
   | T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE          {$$ = new WhileStatement($3,$5);}
@@ -170,6 +171,7 @@ DECLARE_VAR:
     TYPE_SPECIFY T_VARIABLE                        {$$ = new LocalVarDec (*$1,*$2,NULL);}
   | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION   {$$ = new LocalVarDec (*$1,*$2,$4);}
   | TYPE_SPECIFY T_VARIABLE T_COMMA L_ADDITIONAL_DECS  {$$ = new MultipleDecs (*$1,*$2,$4,false);}
+  | TYPE_SPECIFY T_VARIABLE T_SQUARE_LBRACKET T_NUMBER T_SQUARE_RBRACKET {$$ = new LocalArrayDec (*$1,*$2,$4);}
   // | TYPE_SPECIFY T_VARIABLE T_EQUAL L_ADDITIONAL_DECS  {$$ = new MultipleDecs (*$1,*$2,$4,false);}
   ;
 
@@ -228,32 +230,17 @@ LOGICAL_OP:
 
 FACTOR: 
     T_VARIABLE         {$$ = new Variable(*$1);}
+  | T_VARIABLE T_SQUARE_LBRACKET T_NUMBER T_SQUARE_RBRACKET {$$ = new ArrayElement(*$1,$3); }
   | T_NUMBER           {$$ = new Number( $1 );}
   | T_MINUS T_NUMBER   {$$ = new Number(-$2);}
   | FUNCTION_CALL      {$$ = $1;}
+  | C_INCREMENT_DECREMENT {$$ = $1;}
   | T_LBRACKET C_EXPRESSION T_RBRACKET {$$ = new BracketedExpr($2);}
   ;
 
-/*
-COMPARISONEXPR : 
-    C_EXPRESSION COMPARISON_OP C_EXPRESSION     {$$ = new ComparisonExpr($1,$2,$3);}
-  | COMPARISONEXPR T_LOGICAL_AND COMPARISONEXPR {$$ = new ComparisonExpr($1,new std::string("&&"));}
-  | COMPARISONEXPR T_LOGICAL_OR COMPARISONEXPR  {$$ = new ComparisonExpr($1,new std::string("||"));}
-  | COMPARISONEXPR                              {$$ = $1;}
-
-
-COMPARISON_OP :   
-    T_IS_EQUAL            {$$ = new std::string("==");}
-  | T_IS_NOT_EQUAL        {$$ = new std::string("!=");}
-  | T_LESS_THAN           {$$ = new std::string("<");}
-  | T_GREATER_THAN        {$$ = new std::string(">");}
-  | T_LESS_EQUAL_THAN     {$$ = new std::string("<=");}
-  | T_GREATER_EQUAL_THAN  {$$ = new std::string(">=");}  
-
-*/
 
 /*TODO
-COMPARISONEXPR
+
 BINARY_EXPRESSION_TREE
 C_INCREMENT_DECREMENT
 C_ARGS
