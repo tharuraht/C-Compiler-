@@ -6,6 +6,8 @@
 extern int scopelevel;
 extern int loop_count;
 extern int if_level;
+extern bool loop_while;
+extern bool loop_for;
 
 class AssignmentStatement: public Expression {
 public:
@@ -237,6 +239,10 @@ public:
     }
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
+        loop_while = true;
+
+        if(loop_while == true){
+        
         //use a free register for condition check
         std::vector<int> freeRegs = contxt.FindFreeConstantRegs();
         contxt.set_used(freeRegs[0]);
@@ -259,6 +265,9 @@ public:
         //end of loop
         dst<<"end_loop_"<<loop_count<<":"<<"\t#End while loop"<<std::endl;
         contxt.set_unused(freeRegs[0]);
+        }
+
+        loop_while = false;
     }
 };
 
@@ -307,11 +316,16 @@ public:
     }
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
+
+        loop_for = true;
+
+        if(loop_for == true){
         //use a free register for condition check
         std::vector<int> freeRegs = contxt.FindFreeConstantRegs();
         contxt.set_used(freeRegs[0]);
 
         dst<<"for_loop_"<<loop_count<<"_begin:"<<"\t#Begin for loop"<<std::endl;
+        loop_for = true;
 
         Init->compile(dst, contxt, freeRegs[0]);
         
@@ -331,8 +345,11 @@ public:
         dst<<"\t"<<"b"<<"\t"<<"for_loop_"<<loop_count<<"_begin"<<std::endl;
         dst<<"\t"<<"nop"<<std::endl;
         //end of loop
-        dst<<"end_loop_"<<loop_count<<":"<<"\t#End while loop"<<std::endl;
+        dst<<"end_loop_"<<loop_count<<":"<<"\t#End for loop"<<std::endl;
         contxt.set_unused(freeRegs[0]);
+        }
+
+        loop_for = false;
     }
 };
 
@@ -499,11 +516,38 @@ public:
     }
 
     virtual void translate (std::ostream &dst) const override {
-        dst<<"("<<"break"<<")"<<std::endl;
+        dst<<"break"<<std::endl;
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
         dst<<"\t"<<"b"<<"\t"<<"end_loop_"<<loop_count-1<<std::endl;
+    }
+};
+
+class ContinueStatement : public Expression {
+private:
+    
+public:
+    ~ContinueStatement() {}
+    ContinueStatement() {}
+
+    virtual void print (std::ostream &dst) const override {
+        dst<<"continue;"<<std::endl;
+    }
+
+    virtual void translate (std::ostream &dst) const override {
+        dst<<"continue"<<std::endl;
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+
+        if(loop_while == true){
+            dst<<"\t"<<"b"<<"\t"<<"while_loop_"<<loop_count-1<<"_begin"<<"\t #while continue statement"<<std::endl;
+        }
+        else if(loop_for == true){
+            dst<<"\t"<<"b"<<"\t"<<"for_loop_"<<loop_count-1<<"_begin"<<"\t #for continue statement"<<std::endl;
+            //dst<<"\t"<<"b"<<"\t"<<"ifelse_end_"<<loop_count-1<<"\t #for continue statement"<<std::endl;
+        }
     }
 };
 
