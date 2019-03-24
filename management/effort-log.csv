@@ -30,3 +30,4 @@ Date,Effort,Developers,Milestones
 21.03.19,6, "am9717", "Resolved errors in translator testbench, updated FOR_N test and ran testbench on present compiler. Implemented codegen for FOR loops."
 22.03.19,9,"am9717,ta2617","Implemented parameters, fixed testbench, recursive function call"
 23.03.19,7,ta2617,"Implemented local and global arrays and access via square brackets, defined default return to 0"
+24.03.19,2,ta2617,"Implemented parsing of enum keyword, changed some compiler tests"

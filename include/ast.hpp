@@ -10,7 +10,7 @@
 #include "ast/ast_dec_def.hpp"
 #include "ast/ast_statements.hpp"
 #include "ast/ast_variables.hpp"
-
+#include "ast/ast_enum.hpp"
 
 extern const AST_node *parseAST();
 

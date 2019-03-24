@@ -36,7 +36,7 @@
 
 %token T_IS_EQUAL T_IS_NOT_EQUAL T_LESS_THAN T_LESS_EQUAL_THAN T_GREATER_THAN T_GREATER_EQUAL_THAN
 
-%token T_LOGICAL_OR T_LOGICAL_AND T_NOT
+%token T_LOGICAL_OR T_LOGICAL_AND T_NOT T_ENUM
 
 %token T_BITWISE_AND T_BITWISE_OR T_BITWISE_XOR T_BITWISE_COMPLEMENT T_LSHIFT T_RSHIFT
 
@@ -48,19 +48,19 @@
 
 %right T_SEMICOLON T_COLON T_COMMA
 
-%right T_NUMBER T_VARIABLE T_RETURN T_STRING
+%right T_NUMBER T_VARIABLE T_RETURN T_STRING 
 
 %token T_SIGNED T_GO_TO T_AUTO T_STRUCT 
 
 
-%type <expr>  TERM FACTOR BINARY_EXPRESSION_TREE STATEMENT
+%type <expr>  TERM FACTOR BINARY_EXPRESSION_TREE STATEMENT ENUM_LIST
 %type <expr> C_EXPRESSION COMPARISON_OP LOGICAL_OP C_ARGS DECLARE_VAR FUNCTION_CALL PASSED_PARAMS G_ADDITIONAL_DECS L_ADDITIONAL_DECS C_INCREMENT_DECREMENT
 
 //C_INCREMENT_DECREMENT, , EXPR, SCOPE_BODY
 
 %type <node> PROGRAM EX_DECLARATION FUNCTION_DEC_DEF  GLOBAL_DECLARATION
 %type <node> SCOPE  SCOPE_STATEMENTS STAT_SCOPE PARAMETER
-%type <node>  T_IF T_ELSE T_WHILE T_FOR T_RETURN 
+%type <node>  T_IF T_ELSE T_WHILE T_FOR T_RETURN T_ENUM 
 //%type <node> BINARY 
 
 %type <number> T_NUMBER 
@@ -142,6 +142,7 @@ SCOPE_STATEMENTS:
 STATEMENT:
     T_RETURN LOGICAL_OP T_SEMICOLON                                                                    {$$ = new ReturnStatement($2);}
   | T_RETURN T_SEMICOLON                                                                               {$$ = new ReturnStatement(NULL);}
+  | T_ENUM T_VARIABLE T_CURLY_LBRACKET ENUM_LIST T_CURLY_RBRACKET T_SEMICOLON                          {$$ = new EnumDeclaration(*$2,$4);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON                                                        {$$ = new AssignmentStatement(*$1,$3);}
   | T_VARIABLE T_SQUARE_LBRACKET C_EXPRESSION T_SQUARE_RBRACKET T_EQUAL C_EXPRESSION T_SEMICOLON       {$$ = new ArrayAssignment(*$1,$3,$6);}
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE                                                   {$$ = new IfElseStatement($3,$5,NULL);}
@@ -159,7 +160,7 @@ STAT_SCOPE:
   | SCOPE {$$=$1;}
   ;
 
-  FUNCTION_CALL:
+FUNCTION_CALL:
     T_VARIABLE T_LBRACKET PASSED_PARAMS T_RBRACKET  {$$ = new FunctionCall(*$1, $3);}
   | T_VARIABLE T_LBRACKET T_RBRACKET {$$ = new FunctionCall(*$1, NULL);}
   ;
@@ -190,6 +191,15 @@ TYPE_SPECIFY:
   | T_DOUBLE  {$$ = $1;}
   | T_FLOAT   {$$ = $1;}
   ;
+
+ENUM_LIST:
+    T_VARIABLE T_COMMA ENUM_LIST  {$$ = new EnumElement(*$1,0,$3, false);}
+  | T_VARIABLE T_EQUAL T_NUMBER T_COMMA ENUM_LIST {$$ = new EnumElement(*$1,$3,$5, true);} 
+  | T_VARIABLE T_EQUAL T_NUMBER                   {$$ = new EnumElement(*$1,$3,NULL, true);}
+  | T_VARIABLE                    {$$ = new EnumElement(*$1,0,NULL, false);}
+  ;
+
+
 
 C_EXPRESSION:  BINARY_EXPRESSION_TREE {$$ = $1;};
 

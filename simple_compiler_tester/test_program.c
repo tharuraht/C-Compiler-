@@ -40,8 +40,9 @@ int main()
 {
     // int a[5] = {0,1,2,3,4};
     //int x = a[5] + a[3] + a[1];
-    a[4] = 2;
-    int x = a[4];
+    int a = 5*3*2;
+    int b = 6;
+    return a;
     // return x + b;
 }
 
