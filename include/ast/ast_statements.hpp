@@ -214,25 +214,28 @@ public:
     }
 };
 
-class SwitchBody : public Expression {
+class SwitchBody : public AST_node {
   private:
     std::string name;
     ExpressionPtr CaseExpression;
-    ExpressionPtr Statements;
-    ExpressionPtr Next_case;
+    NodePtr Statements;
+    NodePtr Next_case;
 
   public:
     ~SwitchBody() {}
-    SwitchBody(std::string _name, ExpressionPtr _CaseExpression, ExpressionPtr _Statements, ExpressionPtr _Next_case) 
+    SwitchBody(std::string _name, ExpressionPtr _CaseExpression, NodePtr _Statements, NodePtr _Next_case) 
      : name(_name), CaseExpression(_CaseExpression), Statements(_Statements), Next_case(_Next_case) {}
 
     virtual void print(std::ostream &dst) const override {
-        dst<<name<<" ";
-        CaseExpression->print(dst);
-        dst<<":"<<std::endl;
         for (int i = 0; i < scopelevel; i++) {dst << "\t";}
+        dst<<name<<" ";
+        if (CaseExpression!=NULL)
+            CaseExpression->print(dst);
+        dst<<":"<<std::endl;
+        // for (int i = 0; i < scopelevel; i++) {dst << "\t";}
         Statements->print(dst);
-        Next_case->print(dst);
+        if (Next_case!=NULL)
+            Next_case->print(dst);
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
@@ -403,9 +406,13 @@ public:
     virtual void print (std::ostream &dst) const override {
         dst<<"switch(";
         Condition->print(dst);
-        dst <<");"<<std::endl;
-        dst<<"\t";
+        dst <<") {"<<std::endl;
+        // dst<<"\t";
+        scopelevel++;
         Body->print(dst);
+        scopelevel--;
+        for (int i = 0; i < scopelevel; i++) {dst << "\t";}
+        dst<<"}"<<std::endl;
     }
     virtual void compile(std::ostream &dst, Context &contxt, int destReg){
         Condition->compile(dst, contxt, destReg);

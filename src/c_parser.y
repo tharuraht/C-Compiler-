@@ -53,18 +53,18 @@
 %token T_SIGNED T_GO_TO T_AUTO T_STRUCT 
 
 
-%type <expr>  TERM FACTOR BINARY_EXPRESSION_TREE STATEMENT ENUM_LIST G_ENUM_LIST
+%type <expr>  TERM FACTOR BINARY_EXPRESSION_TREE STATEMENT ENUM_LIST G_ENUM_LIST 
 %type <expr> C_EXPRESSION COMPARISON_OP LOGICAL_OP C_ARGS DECLARE_VAR FUNCTION_CALL PASSED_PARAMS G_ADDITIONAL_DECS L_ADDITIONAL_DECS C_INCREMENT_DECREMENT
 
 //C_INCREMENT_DECREMENT, , EXPR, SCOPE_BODY
 
 %type <node> PROGRAM EX_DECLARATION FUNCTION_DEC_DEF  GLOBAL_DECLARATION
-%type <node> SCOPE  SCOPE_STATEMENTS STAT_SCOPE PARAMETER
+%type <node> SCOPE  SCOPE_STATEMENTS STAT_SCOPE PARAMETER SWITCH_SCOPE
 %type <node>  T_IF T_ELSE T_WHILE T_FOR T_RETURN T_ENUM 
 //%type <node> BINARY 
 
 %type <number> T_NUMBER 
-%type <string> T_VARIABLE T_VOID T_INT T_DOUBLE T_FLOAT TYPE_SPECIFY
+%type <string> T_VARIABLE T_VOID T_INT T_DOUBLE T_FLOAT TYPE_SPECIFY T_CASE T_DEFAULT
 
 //%right "then" T_ELSE solution for dangling if else problem
 %nonassoc "then" //solution for dangling if else problem
@@ -139,7 +139,7 @@ SCOPE: T_CURLY_LBRACKET SCOPE_STATEMENTS T_CURLY_RBRACKET  {$$ = new ScopeBody($
 SCOPE_STATEMENTS:
     STATEMENT SCOPE_STATEMENTS  { $$ = new ScopeStatements($1,$2);}
   | STATEMENT                   { $$ = new ScopeStatements($1,NULL);}
-
+  ;
 
 STATEMENT:
     T_RETURN LOGICAL_OP T_SEMICOLON                                                                    {$$ = new ReturnStatement($2);}
@@ -165,9 +165,9 @@ STAT_SCOPE:
   ;
 
 SWITCH_SCOPE:
-    T_CASE C_EXPRESSION T_COLON SCOPE_STATEMENTS SWITCH_SCOPE  {$$ = new SwitchBody($2, $4, $5);}
-  | T_CASE C_EXPRESSION T_COLON SCOPE_STATEMENTS               {$$ = new SwitchBody($2,$4,NULL);}
-  | T_DEFAULT C_EXPRESSION T_COLON SCOPE_STATEMENTS            {$$ = new SwitchBody($2,$4, NULL);}
+    T_CASE C_EXPRESSION T_COLON SCOPE_STATEMENTS SWITCH_SCOPE  {$$ = new SwitchBody(*$1,$2, $4, $5);}
+  | T_CASE C_EXPRESSION T_COLON SCOPE_STATEMENTS               {$$ = new SwitchBody(*$1,$2,$4,NULL);}
+  | T_DEFAULT T_COLON SCOPE_STATEMENTS            {$$ = new SwitchBody(*$1,NULL,$3, NULL);}
   ;
 
 FUNCTION_CALL:
