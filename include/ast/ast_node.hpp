@@ -20,6 +20,8 @@ static int if_level;
 static bool main_returned;
 // static int index_no;
 static int enum_list_size;
+static bool loop_while = false;
+static bool loop_for = false;
 
 
 class AST_node;
