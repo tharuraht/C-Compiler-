@@ -214,6 +214,32 @@ public:
     }
 };
 
+class SwitchBody : public Expression {
+  private:
+    std::string name;
+    ExpressionPtr CaseExpression;
+    ExpressionPtr Statements;
+    ExpressionPtr Next_case;
+
+  public:
+    ~SwitchBody() {}
+    SwitchBody(std::string _name, ExpressionPtr _CaseExpression, ExpressionPtr _Statements, ExpressionPtr _Next_case) 
+     : name(_name), CaseExpression(_CaseExpression), Statements(_Statements), Next_case(_Next_case) {}
+
+    virtual void print(std::ostream &dst) const override {
+        dst<<name<<" ";
+        CaseExpression->print(dst);
+        dst<<":"<<std::endl;
+        for (int i = 0; i < scopelevel; i++) {dst << "\t";}
+        Statements->print(dst);
+        Next_case->print(dst);
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        
+    }
+};
+
 class ScopeBody : public Expression {
 private:
     NodePtr Body;
