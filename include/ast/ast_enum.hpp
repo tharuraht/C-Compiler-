@@ -58,13 +58,12 @@ class LocalEnumElement: public Expression {
         contxt.NewLocalVar(current_element + std::to_string(scopelevel));
         
         if (value_assigned) {
-            dst<<"\t"<<"li"<<"\t"<<"$"<<destReg<<", "<<el_value;
-            dst<<"\t#enum variable "<<current_element<<" assigned "<<el_value<<std::endl;
+            enum_list_size = el_value;
         }
-        else {
-            dst<<"\t"<<"li"<<"\t"<<"$"<<destReg<<", "<<enum_list_size;
-                dst<<"\t#enum variable "<<current_element<<" assigned default "<<enum_list_size<<std::endl;
-        }
+        
+        dst<<"\t"<<"li"<<"\t"<<"$"<<destReg<<", "<<enum_list_size;
+         dst<<"\t#enum variable "<<current_element<<" assigned "<<enum_list_size<<std::endl;
+        
         enum_list_size++;
         
         dst<<"\t"<<"sw"<<"\t"<<"$"<<destReg<<", "<<contxt.LookupVariable(current_element, scopelevel)<<"($fp)";
@@ -111,11 +110,11 @@ class GlobalEnumElement: public Expression {
             
 
             if (value_assigned) {
-               dst << "\t"<< ".word"<< "\t"<<el_value;
+               enum_list_size = el_value;
             }
-            else {
-                dst << "\t"<< ".word"<< "\t"<<enum_list_size;
-            }
+            
+            dst << "\t"<< ".word"<< "\t"<<enum_list_size;
+            
             enum_list_size++;
             dst<<std::endl;
             contxt.NewGlobalVar(current_element);

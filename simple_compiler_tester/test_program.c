@@ -34,26 +34,27 @@
 //     return a;
 // }
 
-// int a[5];
-// int b = 5;
-// int m = 10;
-// enum a{x,y,z=10};
-// int main () {
-// 	int b[5];
-// 	b[0] = 5;
-// 	return z + b[0];
-// }
-
+int a[5];
+int b = 5;
+int m = 10;
+enum a{x,y=9,z};
 int main () {
-	int y=0;
-	for (int x=2; x<10; x++) {
-		if (x==5) {
-			continue;
-		}
-		y = y + (y+x);
-	}
-	return y;
+	int b[5];
+	b[0] = 5;
+	enum g{j=3,k,l};
+	return z + b[0] + l;
 }
+
+// int main () {
+// 	int y=0;
+// 	for (int x=2; x<10; x++) {
+// 		if (x==5) {
+// 			continue;
+// 		}
+// 		y = y + (y+x);
+// 	}
+// 	return y;
+// }
 
 
 // int main()
