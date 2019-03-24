@@ -390,6 +390,29 @@ public:
     }
 };
 
+class SwitchStatement: public Expression {
+private:
+    ExpressionPtr Condition;
+    NodePtr Body;
+
+public:
+    ~SwitchStatement() {}
+
+    SwitchStatement (ExpressionPtr _Condition, NodePtr _Body) : Condition(_Condition) , Body(_Body) {}
+
+    virtual void print (std::ostream &dst) const override {
+        dst<<"switch(";
+        Condition->print(dst);
+        dst <<");"<<std::endl;
+        dst<<"\t";
+        Body->print(dst);
+    }
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg){
+        Condition->compile(dst, contxt, destReg);
+        Body->compile(dst, contxt, destReg);
+    }
+};  
+
 class BreakStatement : public Expression {
 private:
     

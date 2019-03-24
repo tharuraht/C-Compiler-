@@ -28,7 +28,7 @@
   std::string *string;
 }
 
-%token T_INT T_DOUBLE T_FLOAT T_VOID T_CHAR T_SHORT T_LONG T_IF T_ELSE T_WHILE T_FOR T_DO T_BREAK T_CONTINUE T_GOTO
+%token T_INT T_DOUBLE T_FLOAT T_VOID T_CHAR T_SHORT T_LONG T_IF T_ELSE T_WHILE T_FOR T_DO T_SWITCH T_CASE T_DEFAULT T_BREAK T_CONTINUE T_GOTO
 
 %token   T_MODULUS  T_INCREMENT T_DECREMENT
 
@@ -139,13 +139,7 @@ SCOPE: T_CURLY_LBRACKET SCOPE_STATEMENTS T_CURLY_RBRACKET  {$$ = new ScopeBody($
 SCOPE_STATEMENTS:
     STATEMENT SCOPE_STATEMENTS  { $$ = new ScopeStatements($1,$2);}
   | STATEMENT                   { $$ = new ScopeStatements($1,NULL);}
-/*
-  : STATEMENT                {$$ = new ScopeBody($1, NULL);}
-  | STATEMENT SCOPE_BODY     {$$ = new ScopeBody($1, $2);}
-  | DECLARE_VAR              {$$ = new ScopeBody($1,NULL);}
-  | DECLARE_VAR SCOPE_BODY   {$$ = new ScopeBody($1,$2);}
-*/
-;
+
 
 STATEMENT:
     T_RETURN LOGICAL_OP T_SEMICOLON                                                                    {$$ = new ReturnStatement($2);}
@@ -158,6 +152,7 @@ STATEMENT:
   | T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE                                                {$$ = new WhileStatement($3,$5);}
   | T_DO STAT_SCOPE T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET T_SEMICOLON                               {$$ = new DoWhileStatement($5, $2);}
   | T_FOR T_LBRACKET STATEMENT LOGICAL_OP T_SEMICOLON C_INCREMENT_DECREMENT T_RBRACKET STAT_SCOPE      {$$ = new ForStatement($3, $4, $6, $8);}
+  | T_SWITCH T_LBRACKET C_EXPRESSION T_RBRACKET T_CURLY_LBRACKET SWITCH_SCOPE T_CURLY_RBRACKET         {$$ = new SwitchStatement($3, $6);}
   | T_BREAK T_SEMICOLON                                                                                {$$ = new BreakStatement();}
   | T_CONTINUE T_SEMICOLON                                                                             {$$ = new ContinueStatement();}
   | DECLARE_VAR  T_SEMICOLON                                                                           {$$ = $1;}
@@ -167,6 +162,12 @@ STATEMENT:
 STAT_SCOPE:
     STATEMENT {$$ = new NoBraces($1);}
   | SCOPE {$$=$1;}
+  ;
+
+SWITCH_SCOPE:
+    T_CASE C_EXPRESSION T_COLON SCOPE_STATEMENTS SWITCH_SCOPE  {$$ = new SwitchBody($2, $4, $5);}
+  | T_CASE C_EXPRESSION T_COLON SCOPE_STATEMENTS               {$$ = new SwitchBody($2,$4,NULL);}
+  | T_DEFAULT C_EXPRESSION T_COLON SCOPE_STATEMENTS            {$$ = new SwitchBody($2,$4, NULL);}
   ;
 
 FUNCTION_CALL:
