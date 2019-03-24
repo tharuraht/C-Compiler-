@@ -503,7 +503,7 @@ public:
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        dst<<"\t"<<"b"<<"\t"<<"end_break_"<<loop_count<<std::endl;
+        dst<<"\t"<<"b"<<"\t"<<"end_loop_"<<loop_count-1<<std::endl;
     }
 };
 
