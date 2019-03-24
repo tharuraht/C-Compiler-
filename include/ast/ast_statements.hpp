@@ -521,7 +521,13 @@ public:
         dst<<"\t";
         Body->print(dst);
     }
+    virtual void compile(std::ostream &dst, Context &contxt, int destReg){
+        Condition->compile(dst, contxt, destReg);
+        Body->compile(dst, contxt, destReg);
+    }
 };
+
+
 
 
 
