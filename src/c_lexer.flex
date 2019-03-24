@@ -44,6 +44,7 @@ extern "C" int fileno(FILE *stream);
 "auto"          { yylval.string = new std::string(yytext); return T_AUTO; }
 "struct"        { yylval.string = new std::string(yytext); return T_STRUCT; }
 "return"        { yylval.string = new std::string(yytext); return T_RETURN; }
+"enum"          { yylval.string = new std::string(yytext); return T_ENUM; }
 
 [(]             { return T_LBRACKET; }
 [{]             { return T_CURLY_LBRACKET; }
