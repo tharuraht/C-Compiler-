@@ -325,7 +325,7 @@ public:
         contxt.set_used(freeRegs[0]);
 
         dst<<"for_loop_"<<loop_count<<"_begin:"<<"\t#Begin for loop"<<std::endl;
-        loop_for = true;
+        //loop_for = true;
 
         Init->compile(dst, contxt, freeRegs[0]);
         
@@ -504,6 +504,28 @@ public:
     }
 };
 
+class SwitchStatement: public Expression {
+private:
+    ExpressionPtr Condition;
+    NodePtr Body;
+
+public:
+    ~SwitchStatement() {}
+
+    SwitchStatement (ExpressionPtr _Condition, NodePtr _Body) : Condition(_Condition) , Body(_Body) {}
+
+    virtual void print (std::ostream &dst) const override {
+        dst<<"switch(";
+        Condition->print(dst);
+        dst <<");"<<std::endl;
+        dst<<"\t";
+        Body->print(dst);
+    }
+};
+
+
+
+
 class BreakStatement : public Expression {
 private:
     
@@ -546,7 +568,6 @@ public:
         }
         else if(loop_for == true){
             dst<<"\t"<<"b"<<"\t"<<"for_loop_"<<loop_count-1<<"_begin"<<"\t #for continue statement"<<std::endl;
-            //dst<<"\t"<<"b"<<"\t"<<"ifelse_end_"<<loop_count-1<<"\t #for continue statement"<<std::endl;
         }
     }
 };

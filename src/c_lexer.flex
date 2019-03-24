@@ -38,6 +38,9 @@ extern "C" int fileno(FILE *stream);
 "while"         { yylval.string = new std::string(yytext); return T_WHILE; }
 "for"           { yylval.string = new std::string(yytext); return T_FOR; }
 "do"            { yylval.string = new std::string(yytext); return T_DO; }
+"switch"        { yylval.string = new std::string(yytext); return T_SWITCH; }
+"case"          { yylval.string = new std::string(yytext); return T_CASE; }
+"default"       { yylval.string = new std::string(yytext); return T_DEFAULT; }
 "break"			    { yylval.string = new std::string(yytext); return T_BREAK; }
 "continue"		  { yylval.string = new std::string(yytext); return T_CONTINUE; }
 "go to"			    { yylval.string = new std::string(yytext); return T_GO_TO; }
