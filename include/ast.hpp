@@ -11,6 +11,7 @@
 #include "ast/ast_statements.hpp"
 #include "ast/ast_variables.hpp"
 #include "ast/ast_enum.hpp"
+#include "ast/ast_loops.hpp"
 
 extern const AST_node *parseAST();
 
