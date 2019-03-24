@@ -525,12 +525,7 @@ public:
         Condition->compile(dst, contxt, destReg);
         Body->compile(dst, contxt, destReg);
     }
-};
-
-
-
-
-
+};  
 
 class BreakStatement : public Expression {
 private:
