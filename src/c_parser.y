@@ -53,7 +53,7 @@
 %token T_SIGNED T_GO_TO T_AUTO T_STRUCT 
 
 
-%type <expr>  TERM FACTOR BINARY_EXPRESSION_TREE STATEMENT ENUM_LIST
+%type <expr>  TERM FACTOR BINARY_EXPRESSION_TREE STATEMENT ENUM_LIST G_ENUM_LIST
 %type <expr> C_EXPRESSION COMPARISON_OP LOGICAL_OP C_ARGS DECLARE_VAR FUNCTION_CALL PASSED_PARAMS G_ADDITIONAL_DECS L_ADDITIONAL_DECS C_INCREMENT_DECREMENT
 
 //C_INCREMENT_DECREMENT, , EXPR, SCOPE_BODY
@@ -95,11 +95,12 @@ EX_DECLARATION:
 
 
 GLOBAL_DECLARATION:
-    TYPE_SPECIFY T_VARIABLE T_SEMICOLON                         {$$ = new GlobalVarDec(*$1,*$2,NULL);}
-  | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON    {$$ = new GlobalVarDec(*$1,*$2,$4);}
-  | TYPE_SPECIFY T_VARIABLE T_COMMA G_ADDITIONAL_DECS T_SEMICOLON {$$ = new MultipleDecs (*$1,*$2,$4, true);}
-  | TYPE_SPECIFY T_VARIABLE T_SQUARE_LBRACKET T_NUMBER T_SQUARE_RBRACKET T_SEMICOLON {$$ = new GlobalArrayDec (*$1,*$2,$4);}
-  // | TYPE_SPECIFY T_VARIABLE T_EQUAL G_ADDITIONAL_DECS T_SEMICOLON  {$$ = new MultipleDecs (*$1,*$2,$4, true);}
+    TYPE_SPECIFY T_VARIABLE T_SEMICOLON                                                   {$$ = new GlobalVarDec(*$1,*$2,NULL);}
+  | TYPE_SPECIFY T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON                              {$$ = new GlobalVarDec(*$1,*$2,$4);}
+  | TYPE_SPECIFY T_VARIABLE T_COMMA G_ADDITIONAL_DECS T_SEMICOLON                         {$$ = new MultipleDecs (*$1,*$2,$4, true);}
+  | TYPE_SPECIFY T_VARIABLE T_SQUARE_LBRACKET T_NUMBER T_SQUARE_RBRACKET T_SEMICOLON      {$$ = new GlobalArrayDec (*$1,*$2,$4);}
+  | T_ENUM T_VARIABLE T_CURLY_LBRACKET G_ENUM_LIST T_CURLY_RBRACKET T_SEMICOLON             {$$ = new EnumDeclaration(*$2,$4);}
+  // | TYPE_SPECIFY T_VARIABLE T_EQUAL G_ADDITIONAL_DECS T_SEMICOLON                      {$$ = new MultipleDecs (*$1,*$2,$4, true);}
   ;
 
 G_ADDITIONAL_DECS:
@@ -107,6 +108,13 @@ G_ADDITIONAL_DECS:
   | T_VARIABLE T_COMMA G_ADDITIONAL_DECS                            {$$ = new AdditionalDecs (*$1,NULL,$3, true);}
   | T_VARIABLE T_EQUAL C_EXPRESSION                                 {$$ = new AdditionalDecs(*$1,$3,NULL,true);}
   | T_VARIABLE                                                      {$$ = new AdditionalDecs (*$1,NULL, NULL, true);}
+  ;
+
+G_ENUM_LIST:
+    T_VARIABLE T_COMMA G_ENUM_LIST                  {$$ = new GlobalEnumElement(*$1,0,$3, false);}
+  | T_VARIABLE T_EQUAL T_NUMBER T_COMMA G_ENUM_LIST {$$ = new GlobalEnumElement(*$1,$3,$5, true);} 
+  | T_VARIABLE T_EQUAL T_NUMBER                     {$$ = new GlobalEnumElement(*$1,$3,NULL, true);}
+  | T_VARIABLE                                      {$$ = new GlobalEnumElement(*$1,0,NULL, false);}
   ;
 
 FUNCTION_DEC_DEF: 
@@ -193,25 +201,22 @@ TYPE_SPECIFY:
   ;
 
 ENUM_LIST:
-    T_VARIABLE T_COMMA ENUM_LIST  {$$ = new EnumElement(*$1,0,$3, false);}
-  | T_VARIABLE T_EQUAL T_NUMBER T_COMMA ENUM_LIST {$$ = new EnumElement(*$1,$3,$5, true);} 
-  | T_VARIABLE T_EQUAL T_NUMBER                   {$$ = new EnumElement(*$1,$3,NULL, true);}
-  | T_VARIABLE                    {$$ = new EnumElement(*$1,0,NULL, false);}
+    T_VARIABLE T_COMMA ENUM_LIST  {$$ = new LocalEnumElement(*$1,0,$3, false);}
+  | T_VARIABLE T_EQUAL T_NUMBER T_COMMA ENUM_LIST {$$ = new LocalEnumElement(*$1,$3,$5, true);} 
+  | T_VARIABLE T_EQUAL T_NUMBER                   {$$ = new LocalEnumElement(*$1,$3,NULL, true);}
+  | T_VARIABLE                    {$$ = new LocalEnumElement(*$1,0,NULL, false);}
   ;
 
-
-
 C_EXPRESSION:  BINARY_EXPRESSION_TREE {$$ = $1;};
-
 
 BINARY_EXPRESSION_TREE:
     TERM T_PLUS C_EXPRESSION     { $$ = new AddOperator($1, $3);}
   | TERM T_MINUS C_EXPRESSION    { $$ = new SubOperator($1, $3);}
-  | TERM                    { $$ = $1; }
+  | TERM                         { $$ = $1; }
   ;
 
 TERM: 
-  FACTOR T_TIMES TERM  { $$ = new MulOperator($1, $3);}
+    FACTOR T_TIMES TERM  { $$ = new MulOperator($1, $3);}
   | FACTOR T_DIVIDE TERM { $$ = new DivOperator($1, $3);}
   | FACTOR T_MODULUS TERM { $$ = new ModOperator($1, $3);}
   | FACTOR  { $$ = $1;}

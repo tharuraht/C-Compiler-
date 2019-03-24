@@ -35,16 +35,14 @@
 // }
 // int a[5];
 // int b = 5;
-
-int main()
-{
-    // int a[5] = {0,1,2,3,4};
-    //int x = a[5] + a[3] + a[1];
-    int a = 5*3*2;
-    int b = 6;
-    return a;
-    // return x + b;
+int m = 10;
+enum a{x,y,z=10};
+int main () {
+	int b[5];
+	b[0] = 5;
+	return z + b[0];
 }
+
 
 // int main()
 // {
@@ -65,18 +63,18 @@ int main()
 //     return a;
 // }
 
-int main() {
-	int x=999;
-	int y = 9;
-    int z = 2;
-   	while(y) {
-       		y = y+ x;
-        	break;
-       		z = 465; /*dead code*/ 
-    	}
+// int main() {
+// 	int x=999;
+// 	int y = 9;
+//     int z = 2;
+//    	while(y) {
+//        		y = y+ x;
+//         	break;
+//        		z = 465; /*dead code*/ 
+//     	}
 
-    	return z;
-}
+//     	return z;
+// }
 
 // int main()                    
 // {     
