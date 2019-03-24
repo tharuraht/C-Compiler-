@@ -302,7 +302,8 @@ private:
 public:
     ~ForStatement() {}
 
-    ForStatement (NodePtr _Init, ExpressionPtr _Condition, NodePtr _Increment, NodePtr _Body) : Init(_Init), Condition(_Condition) , Increment(_Increment), Body(_Body) {}
+    ForStatement (NodePtr _Init, ExpressionPtr _Condition, NodePtr _Increment, NodePtr _Body)
+     : Init(_Init), Condition(_Condition) , Increment(_Increment), Body(_Body) {}
 
     virtual void print (std::ostream &dst) const override {
         dst << "for(";
@@ -320,33 +321,34 @@ public:
         loop_for = true;
 
         if(loop_for == true){
-        //use a free register for condition check
-        std::vector<int> freeRegs = contxt.FindFreeConstantRegs();
-        contxt.set_used(freeRegs[0]);
+            //use a free register for condition check
+            std::vector<int> freeRegs = contxt.FindFreeConstantRegs();
+            contxt.set_used(freeRegs[0]);
 
-        dst<<"for_loop_"<<loop_count<<"_begin:"<<"\t#Begin for loop"<<std::endl;
-        //loop_for = true;
+            loop_for = true;
 
-        Init->compile(dst, contxt, freeRegs[0]);
-        
-        //evalute the condition into the free register
-        Condition->compile(dst, contxt, destReg);
-        //branch to end if condition evaluates false (0)
-        dst<<"\t"<<"beq"<<"\t"<<"$0, $"<<freeRegs[0]<<", end_loop_"<<loop_count<<std::endl;
-        dst<<"\t"<<"nop"<<std::endl;
+            Init->compile(dst, contxt, freeRegs[0]);
+            dst<<"for_loop_"<<loop_count<<"_begin:"<<"\t#Begin for loop"<<std::endl;
+            
+            //evalute the condition into the free register
+            Condition->compile(dst, contxt, destReg);
+            //branch to end if condition evaluates false (0)
+            dst<<"\t"<<"beq"<<"\t"<<"$0, $"<<destReg<<", end_loop_"<<loop_count<<std::endl;
+            dst<<"\t"<<"nop"<<std::endl;
 
-        loop_count++;
-        Body->compile(dst, contxt, destReg);
-        loop_count--;
+            loop_count++;
+            Body->compile(dst, contxt, destReg);
+            loop_count--;
 
-        Increment->compile(dst, contxt, destReg);
+            dst<<"for_increment_"<<loop_count<<":"<<"\t#Increment stage of for loop"<<std::endl;
+            Increment->compile(dst, contxt, destReg);
 
-        //branch back to top
-        dst<<"\t"<<"b"<<"\t"<<"for_loop_"<<loop_count<<"_begin"<<std::endl;
-        dst<<"\t"<<"nop"<<std::endl;
-        //end of loop
-        dst<<"end_loop_"<<loop_count<<":"<<"\t#End for loop"<<std::endl;
-        contxt.set_unused(freeRegs[0]);
+            //branch back to top
+            dst<<"\t"<<"b"<<"\t"<<"for_loop_"<<loop_count<<"_begin"<<std::endl;
+            dst<<"\t"<<"nop"<<std::endl;
+            //end of loop
+            dst<<"end_loop_"<<loop_count<<":"<<"\t#End for loop"<<std::endl;
+            contxt.set_unused(freeRegs[0]);
         }
 
         loop_for = false;
@@ -568,7 +570,8 @@ public:
             dst<<"\t"<<"b"<<"\t"<<"while_loop_"<<loop_count-1<<"_begin"<<"\t #while continue statement"<<std::endl;
         }
         else if(loop_for == true){
-            dst<<"\t"<<"b"<<"\t"<<"for_loop_"<<loop_count-1<<"_begin"<<"\t #for continue statement"<<std::endl;
+            dst<<"\t"<<"b"<<"\t"<<"for_increment_"<<loop_count-1<<"\t #for continue statement"<<std::endl;
+            //dst<<"\t"<<"b"<<"\t"<<"ifelse_end_"<<loop_count-1<<"\t #for continue statement"<<std::endl;
         }
     }
 };
