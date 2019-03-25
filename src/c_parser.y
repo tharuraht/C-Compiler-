@@ -30,7 +30,7 @@
 
 %token T_INT T_DOUBLE T_FLOAT T_VOID T_CHAR T_SHORT T_LONG T_IF T_ELSE T_WHILE T_FOR T_DO T_SWITCH T_CASE T_DEFAULT T_BREAK T_CONTINUE T_GOTO
 
-%token   T_MODULUS  T_INCREMENT T_DECREMENT
+%token   T_MODULUS  T_INCREMENT T_DECREMENT T_TERNARY
 
 %nonassoc T_EQUAL T_PLUS_EQUAL T_MINUS_EQUAL T_TIMES_EQUAL T_DIVIDE_EQUAL T_MODULUS_EQUAL
 
@@ -53,8 +53,9 @@
 %token T_SIGNED T_GO_TO T_AUTO T_STRUCT 
 
 
-%type <expr>  TERM FACTOR BINARY_EXPRESSION_TREE STATEMENT ENUM_LIST G_ENUM_LIST 
-%type <expr> C_EXPRESSION COMPARISON_OP LOGICAL_OP C_ARGS DECLARE_VAR FUNCTION_CALL PASSED_PARAMS G_ADDITIONAL_DECS L_ADDITIONAL_DECS C_INCREMENT_DECREMENT
+%type <expr> STATEMENT ENUM_LIST G_ENUM_LIST 
+%type <expr> C_EXPRESSION C_ARGS DECLARE_VAR FUNCTION_CALL PASSED_PARAMS G_ADDITIONAL_DECS L_ADDITIONAL_DECS C_INCREMENT_DECREMENT
+%type <expr> CONDITIONAL LOG_OR LOG_AND BIT_OR BIT_XOR BIT_AND EQUALITY RELATIONAL SHIFT ADDITIVE TERM UNARY FACTOR
 
 //C_INCREMENT_DECREMENT, , EXPR, SCOPE_BODY
 
@@ -153,16 +154,16 @@ STATEMENT:
   | T_VARIABLE T_TIMES_EQUAL C_EXPRESSION T_SEMICOLON                                                  {$$ = new MulAssignmentStatement(*$1, $3);}
   | T_VARIABLE T_DIVIDE_EQUAL C_EXPRESSION T_SEMICOLON                                                 {$$ = new DivAssignmentStatement(*$1, $3);}
   | T_VARIABLE T_SQUARE_LBRACKET C_EXPRESSION T_SQUARE_RBRACKET T_EQUAL C_EXPRESSION T_SEMICOLON       {$$ = new ArrayAssignment(*$1,$3,$6);}
-  | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE                                                   {$$ = new IfElseStatement($3,$5,NULL);}
-  | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE                                 {$$ = new IfElseStatement($3, $5, $7);}
-  | T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE                                                {$$ = new WhileStatement($3,$5);}
-  | T_DO STAT_SCOPE T_WHILE T_LBRACKET LOGICAL_OP T_RBRACKET T_SEMICOLON                               {$$ = new DoWhileStatement($5, $2);}
-  | T_FOR T_LBRACKET STATEMENT LOGICAL_OP T_SEMICOLON C_INCREMENT_DECREMENT T_RBRACKET STAT_SCOPE      {$$ = new ForStatement($3, $4, $6, $8);}
+  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE                                                   {$$ = new IfElseStatement($3,$5,NULL);}
+  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE                                 {$$ = new IfElseStatement($3, $5, $7);}
+  | T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE                                                {$$ = new WhileStatement($3,$5);}
+  | T_DO STAT_SCOPE T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET T_SEMICOLON                               {$$ = new DoWhileStatement($5, $2);}
+  | T_FOR T_LBRACKET STATEMENT C_EXPRESSION T_SEMICOLON C_INCREMENT_DECREMENT T_RBRACKET STAT_SCOPE      {$$ = new ForStatement($3, $4, $6, $8);}
   | T_SWITCH T_LBRACKET C_EXPRESSION T_RBRACKET T_CURLY_LBRACKET SWITCH_SCOPE T_CURLY_RBRACKET         {$$ = new SwitchStatement($3, $6);}
   | T_BREAK T_SEMICOLON                                                                                {$$ = new BreakStatement();}
   | T_CONTINUE T_SEMICOLON                                                                             {$$ = new ContinueStatement();}
   | DECLARE_VAR  T_SEMICOLON                                                                           {$$ = $1;}
-  | C_EXPRESSION T_SEMICOLON                                                                           {std::cout<<"hi"<<std::endl;}
+  | C_EXPRESSION T_SEMICOLON                                                                           {$$ = $1;}
   ;
 
 STAT_SCOPE:
@@ -182,8 +183,8 @@ FUNCTION_CALL:
   ;
 
 PASSED_PARAMS:
-    BINARY_EXPRESSION_TREE T_COMMA PASSED_PARAMS {$$ = new PassedParams($1, $3);}
-  | BINARY_EXPRESSION_TREE                       {$$ = new PassedParams($1,NULL);}
+    ADDITIVE T_COMMA PASSED_PARAMS {$$ = new PassedParams($1, $3);}
+  | ADDITIVE                       {$$ = new PassedParams($1,NULL);}
   ;
 
 DECLARE_VAR:
@@ -215,19 +216,69 @@ ENUM_LIST:
   | T_VARIABLE                    {$$ = new LocalEnumElement(*$1,0,NULL, false);}
   ;
 
-C_EXPRESSION:  BINARY_EXPRESSION_TREE {$$ = $1;};
+C_EXPRESSION:  CONDITIONAL {$$ = $1;};
 
-BINARY_EXPRESSION_TREE:
+CONDITIONAL:
+    C_EXPRESSION T_TERNARY CONDITIONAL LOG_OR {$$ = new IfElseStatement($1, $3, $4);}
+  | LOG_OR                                    {$$ = $1;}
+  ;
+
+LOG_OR:
+    LOG_AND T_LOGICAL_OR LOG_OR           {$$ = new LogicalOrOperator($1, $3);}
+  | LOG_AND                               {$$ = $1;}
+  ;
+
+LOG_AND:
+    BIT_OR T_LOGICAL_AND LOG_AND          {$$ = new LogicalAndOperator($1, $3);} 
+  | BIT_OR                                {$$ = $1;}      
+  ; 
+
+BIT_OR:
+    BIT_XOR T_BITWISE_OR BIT_OR           {$$ = new BitwiseOrOperator($1,$3);}
+  | BIT_XOR                               {$$ = $1;}  
+  ;                      
+
+BIT_XOR: 
+    BIT_AND T_BITWISE_XOR BIT_XOR         {$$ = new BitwiseXorOperator($1,$3);}
+  | BIT_AND                               {$$ = $1;}
+  ;
+
+BIT_AND: 
+    EQUALITY T_BITWISE_AND BIT_AND        {$$ = new BitwiseAndOperator($1,$3);}
+  | EQUALITY                              {$$ = $1;}
+  ;
+
+EQUALITY:
+    RELATIONAL T_IS_EQUAL EQUALITY { $$ = new IsEqualOperator($1, $3);}
+  | RELATIONAL T_IS_NOT_EQUAL EQUALITY { $$ = new IsNotEqualOperator($1, $3);}
+  | RELATIONAL { $$ = $1;}
+  ;
+
+RELATIONAL:
+    SHIFT T_LESS_THAN RELATIONAL          { $$ = new LessThanOperator($1, $3);}
+  | SHIFT T_LESS_EQUAL_THAN RELATIONAL    { $$ = new LessThanEqualOperator($1, $3);}
+  | SHIFT T_GREATER_THAN RELATIONAL       { $$ = new GreaterThanOperator($1, $3);}
+  | SHIFT T_GREATER_EQUAL_THAN RELATIONAL { $$ = new GreaterThanEqualOperator($1, $3);}
+  | SHIFT                                 {$$ = $1;}
+  ;
+
+SHIFT:
+    ADDITIVE T_LSHIFT SHIFT       {$$ = new LeftShiftOperator($1,$3);}
+  | ADDITIVE T_RSHIFT SHIFT       {$$ = new RightShiftOperator($1,$3);}
+  | ADDITIVE                      {$$ = $1;}
+  ;
+
+ADDITIVE:
     TERM T_PLUS C_EXPRESSION     { $$ = new AddOperator($1, $3);}
   | TERM T_MINUS C_EXPRESSION    { $$ = new SubOperator($1, $3);}
   | TERM                         { $$ = $1; }
   ;
 
 TERM: 
-    FACTOR T_TIMES TERM  { $$ = new MulOperator($1, $3);}
-  | FACTOR T_DIVIDE TERM { $$ = new DivOperator($1, $3);}
-  | FACTOR T_MODULUS TERM { $$ = new ModOperator($1, $3);}
-  | COMPARISON_OP  { $$ = $1;}
+    UNARY T_TIMES TERM  { $$ = new MulOperator($1, $3);}
+  | UNARY T_DIVIDE TERM { $$ = new DivOperator($1, $3);}
+  | UNARY T_MODULUS TERM { $$ = new ModOperator($1, $3);}
+  | UNARY  { $$ = $1;}
   ;
 
 C_INCREMENT_DECREMENT: 
@@ -237,6 +288,7 @@ C_INCREMENT_DECREMENT:
   | T_DECREMENT T_VARIABLE  {$$ = new PreDecrement(*$2);}
   ;
 
+/*
 COMPARISON_OP: 
     FACTOR T_LESS_THAN COMPARISON_OP { $$ = new LessThanOperator($1, $3);}
   | FACTOR T_LESS_EQUAL_THAN COMPARISON_OP { $$ = new LessThanEqualOperator($1, $3);}
@@ -247,15 +299,23 @@ COMPARISON_OP:
   | FACTOR { $$ = $1;}
   ;
 
-LOGICAL_OP: 
-  COMPARISON_OP T_LOGICAL_AND LOGICAL_OP { $$ = new LogicalAndOperator($1, $3);}
-  | COMPARISON_OP T_LOGICAL_OR LOGICAL_OP { $$ = new LogicalOrOperator($1, $3);}
+C_EXPRESSION: 
+  COMPARISON_OP T_LOGICAL_AND C_EXPRESSION { $$ = new LogicalAndOperator($1, $3);}
+  | COMPARISON_OP T_LOGICAL_OR C_EXPRESSION { $$ = new LogicalOrOperator($1, $3);}
   | COMPARISON_OP               { $$ = $1; }
+  ;
+
+*/
+UNARY:
+    T_BITWISE_COMPLEMENT FACTOR         {$$ = new BitwiseComplement(NULL,$2);}
+  | T_NOT FACTOR                        {$$ = new NotOperator(NULL,$2);}
+  | FACTOR                              {$$ = $1;}
   ;
 
 FACTOR: 
     T_VARIABLE         {$$ = new Variable(*$1);}
   | T_VARIABLE T_SQUARE_LBRACKET T_NUMBER T_SQUARE_RBRACKET {$$ = new ArrayElement(*$1,$3); }
+
   | T_NUMBER           {$$ = new Number( $1 );}
   | T_MINUS T_NUMBER   {$$ = new Number(-$2);}
   | FUNCTION_CALL      {$$ = $1;}
@@ -266,7 +326,7 @@ FACTOR:
 
 /*TODO
 
-BINARY_EXPRESSION_TREE
+ADDITIVE
 C_INCREMENT_DECREMENT
 C_ARGS
 DECLARATION

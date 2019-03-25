@@ -28,20 +28,24 @@ public:
     virtual void print(std::ostream &dst) const override
     {
         // dst<<"( ";
-        left->print(dst);
+        if (left != NULL)
+            left->print(dst);
         
         dst<<getOpcode();
         
-        right->print(dst);
+        if (right != NULL)
+            right->print(dst);
     //    dst<<" )";
     }
 
     virtual void translate(std::ostream &dst) const {
-        left ->translate(dst);
+        if (left != NULL)
+            left->translate(dst);
         dst << " ";
         dst << getOpcode();
         dst << " ";
-        right->translate(dst);
+        if (right != NULL)
+            right->translate(dst);
     }
 
 };
@@ -59,17 +63,6 @@ public:
         AddOperator(ExpressionPtr _left, ExpressionPtr _right)
             : Operator(_left, _right)
         { }
-
-        // virtual double evaluate(
-        //     const std::map<std::string, double> &bindings) const override
-        // {
-        //     // TODO-C : Run bin/eval_expr with something like 5+a, where a=10, to make sure you understand how this works
-        //     double vl = left->evaluate(bindings);
-        //     double vr = right->evaluate(bindings);
-        //     return vl + vr;
-
-        //     //throw std::runtime_error("AddOperator::evaluate is not implemented.");
-        // }
 
         virtual int evaluate () const override
         {
@@ -122,18 +115,6 @@ public:
         : Operator(_left, _right)
     {}
     
-    // virtual double evaluate(
-    //     const std::map<std::string,double> &bindings
-    // ) const override 
-    // {
-    //     // TODO-D : Implement this, based on AddOperator::evaluate
-
-    //     double vl=left->evaluate(bindings);
-    //     double vr=right->evaluate(bindings);
-    //     return vl-vr;
-
-    //     //throw std::runtime_error("SubOperator::evaluate is not implemented.");
-    // }
     virtual int evaluate() const override
     {
         int vl = left->evaluate();
@@ -199,25 +180,25 @@ public:
         else {
             std::vector<int> freeregs = contxt.FindFreeTempRegs(); //finds available registers
             contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
-            contxt.set_used(freeregs[1]);
-            int current_function_depth = function_call_num;
-            std::cout << "#function call depth: " << current_function_depth << std::endl;
+            // contxt.set_used(freeregs[1]);
+            // int current_function_depth = function_call_num;
+            // std::cout << "#function call depth: " << current_function_depth << std::endl;
 
             left->compile(dst, contxt, freeregs[0]);
-            if (current_function_depth != function_call_num) {
-                    dst<<"\t"<<"move"<<"\t"<<"$"<<freeregs[0]<<", $"<<destReg<<"\t#Function call result"<<std::endl;
-                }
-            current_function_depth = function_call_num;
+            // if (current_function_depth != function_call_num) {
+            //         dst<<"\t"<<"move"<<"\t"<<"$"<<freeregs[0]<<", $"<<destReg<<"\t#Function call result"<<std::endl;
+            //     }
+            // current_function_depth = function_call_num;
 
-            right->compile(dst, contxt, freeregs[1]);
-            if (current_function_depth != function_call_num) {
-                    dst<<"\t"<<"move"<<"\t"<<"$"<<freeregs[1]<<", $"<<destReg<<"\t#Function call result"<<std::endl;
-                }
+            right->compile(dst, contxt, destReg);
+            // if (current_function_depth != function_call_num) {
+            //         dst<<"\t"<<"move"<<"\t"<<"$"<<freeregs[1]<<", $"<<destReg<<"\t#Function call result"<<std::endl;
+            //     }
 
-            dst << "\t"<<"mult"<<"\t"<< "$" << freeregs[0] << ", $" << freeregs[1] <<"\t#Multiply Operator"<< std::endl;
+            dst << "\t"<<"mult"<<"\t"<< "$" << freeregs[0] << ", $" << destReg <<"\t#Multiply Operator"<< std::endl;
             dst << "\t"<<"mflo"<<"\t"<<"$"<<destReg<<"\t#Store result of multiply"<<std::endl;
             contxt.set_unused(freeregs[0]);
-            contxt.set_unused(freeregs[1]);
+            // contxt.set_unused(freeregs[1]);
 
         }
     }
@@ -234,15 +215,44 @@ public:
         : Operator(_left, _right)
     {}
 
-    virtual double evaluate(
-        const std::map<std::string,double> &bindings
-    ) const override
+    virtual int evaluate() const override
     {
         //throw std::runtime_error("DivOperator::evaluate is not implemented.");
 
-        double vl=left->evaluate(bindings);
-        double vr=right->evaluate(bindings);
+        double vl=left->evaluate();
+        double vr=right->evaluate();
         return vl/vr;
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        if (varGlobal) {
+            int vl = left->evaluate();
+            int vr = right->evaluate();
+            dst<<vl / vr;
+        }
+        else {
+            std::vector<int> freeregs = contxt.FindFreeTempRegs(); //finds available registers
+            contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+            // int current_function_depth = function_call_num;
+            // std::cout << "#function call depth: " << current_function_depth << std::endl;
+
+            left->compile(dst, contxt, freeregs[0]);
+            // if (current_function_depth != function_call_num) {
+            //         dst<<"\t"<<"move"<<"\t"<<"$"<<freeregs[0]<<", $2"<<"\t#Function call result"<<std::endl;
+            //     }
+            // current_function_depth = function_call_num;
+
+            right->compile(dst, contxt, destReg);
+            // if (current_function_depth != function_call_num) {
+            //         dst<<"\t"<<"move"<<"\t"<<"$"<<freeregs[1]<<", $2"<<"\t#Function call result"<<std::endl;
+            //     }
+
+            dst << "\t"<<"div"<<"\t"<< "$" << freeregs[0] << ", $" << destReg <<"\t#Division Operator"<< std::endl;
+            dst << "\t"<<"mflo"<<"\t"<<"$"<<destReg<<"\t#Store result"<<std::endl;
+            contxt.set_unused(freeregs[0]);
+            // contxt.set_unused(freeregs[1]);
+
+        }
     }
 };
 
@@ -257,15 +267,32 @@ public:
         : Operator(_left, _right)
     {}
 
-    virtual double evaluate(
-        const std::map<std::string,double> &bindings
-    ) const override
+    virtual int evaluate() const override
     {
-        //throw std::runtime_error("ModOperator::evaluate is not implemented.");
-
-        int vl=left->evaluate(bindings);
-        int vr=right->evaluate(bindings);
+        int vl=left->evaluate();
+        int vr=right->evaluate();
         return vl%vr;
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        if (varGlobal) {
+            int vl = left->evaluate();
+            int vr = right->evaluate();
+            dst<<vl / vr;
+        }
+        else {
+            std::vector<int> freeregs = contxt.FindFreeTempRegs(); //finds available registers
+            contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
+
+            left->compile(dst, contxt, freeregs[0]);
+  
+            right->compile(dst, contxt, destReg);
+          
+            dst << "\t"<<"div"<<"\t"<< "$" << freeregs[0] << ", $" << destReg <<"\t#Mod Operator"<< std::endl;
+            dst << "\t"<<"mfhi"<<"\t"<<"$"<<destReg<<"\t#Store result of mod operator"<<std::endl;
+            contxt.set_unused(freeregs[0]);
+
+        }
     }
 };
 
@@ -482,6 +509,7 @@ public:
     }
 };
 
+
 class LogicalAndOperator
     : public Operator
 {
@@ -556,6 +584,55 @@ public:
         //or operation ensures that if the result is non zero it becomes 1
         contxt.set_unused(freeReg[0]);
     }
+};
+
+class BitwiseComplement : public Operator {
+  protected:
+    virtual const char *getOpcode() const override
+    { return "~"; }
+
+  public:
+    BitwiseComplement(ExpressionPtr _left, ExpressionPtr _right) : Operator(_left, _right)
+    {}
+
+    virtual int evaluate() const override {
+        // double vl=left->evaluate(bindings);
+        int vr=right->evaluate();
+        return (~vr);
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        right->compile(dst, contxt, destReg);
+        dst<<"\t"<<"nor"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", $zero"<<"\t#~ operator" << std::endl;
+    }  
+};
+
+class BitwiseOrOperator : public Operator {
+  protected:
+    virtual const char *getOpcode() const override
+    { return "|"; }
+
+  public:
+    BitwiseOrOperator(ExpressionPtr _left, ExpressionPtr _right) : Operator(_left, _right)
+    {}
+
+    virtual int evaluate() const override {
+        int vl=left->evaluate();
+        int vr=right->evaluate();
+        return (vl|vr);
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        std::vector<int> freeReg = contxt.FindFreeTempRegs(); //finds available registers
+        contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
+        left->compile(dst, contxt, destReg);
+        right->compile(dst, contxt, freeReg[0]);
+     
+        //checks equivalence, if they are the same will result in zero
+        dst<<"\t"<<"or"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", $"<<freeReg[0]<<"\t#| bitwise operator" << std::endl;
+        //or operation ensures that if the result is non zero it becomes 1
+        contxt.set_unused(freeReg[0]);
+    }   
 };
 
 #endif

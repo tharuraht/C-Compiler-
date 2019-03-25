@@ -1,15 +1,15 @@
-//multiple functions declared whic call each other
-// int f() {
-//     return 1;
-// }
+// multiple functions declared whic call each other
+int f() {
+    return 1;
+}
 
-// int g() {
-//     return 3+f();
-// }
+int g() {
+    return 2+f();
+}
 
-// int main () {
-//     return 3*g();
-
+int main () {
+    return 12/g();
+}
 // int g() {
 //     return 3+f();
 // }
@@ -34,16 +34,16 @@
 //     return a;
 // }
 
-int a[5];
-int b = 5;
-int m = 10;
-enum a{x,y=9,z};
-int main () {
-	int b[5];
-	b[0] = 5;
-	enum g{j=3,k,l};
-	return z + b[0] + l;
-}
+// int a[5];
+// int b = 5;
+// int m = 10;
+// enum a{x,y=9,z};
+// int main () {
+// 	int b[5];
+// 	b[0] = 5;
+// 	enum g{j=3,k,l};
+// 	return z + b[0] + l;
+// }
 
 // int main () {
 // 	int y=0;
