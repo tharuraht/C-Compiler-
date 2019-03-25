@@ -57,6 +57,189 @@ public:
     }
 };
 
+class AddAssignmentStatement: public Expression {
+public:
+    std::string VarName;
+    ExpressionPtr Expression;
+
+    ~AddAssignmentStatement() {}
+
+    AddAssignmentStatement (std::string _VarName, ExpressionPtr _Expression)
+     : VarName(_VarName), Expression(_Expression) {}
+
+    virtual void print(std::ostream &dst) const override
+    {
+        dst << VarName << " += ";
+        Expression->print(dst);
+        dst << ";";
+    }
+
+    virtual void translate(std::ostream &dst) const override
+    {
+        dst << VarName << " += ";
+        Expression->translate(dst);         
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+         
+        //find a free registers
+        std::vector<int> freeRegs = contxt.FindFreeTempRegs();
+        contxt.set_used(freeRegs[0]);
+        contxt.set_used(freeRegs[1]);
+        Expression->compile(dst, contxt, freeRegs[0]);
+        
+        //load result into free reg 1
+        dst<<"\t"<<"lw"<<"\t"<<"$"<<freeRegs[1]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#AddAssign loading variable: "<<VarName<<std::endl;
+
+        //increment reg 1 = reg 1 + reg 0
+        dst<<"\t"<<"addu"<<"\t"<<"$"<<freeRegs[0]<<", $"<<freeRegs[1]<<", $"<<freeRegs[0]<<"\t #Incrementing variable: "<<VarName<<std::endl;
+
+        //load result into reg 0
+        dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#AddAssign storing variable: "<<VarName<<std::endl;
+
+        contxt.set_unused(freeRegs[0]);
+        contxt.set_unused(freeRegs[1]);
+    }
+};
+
+class SubAssignmentStatement: public Expression {
+public:
+    std::string VarName;
+    ExpressionPtr Expression;
+
+    ~SubAssignmentStatement() {}
+
+    SubAssignmentStatement (std::string _VarName, ExpressionPtr _Expression)
+     : VarName(_VarName), Expression(_Expression) {}
+
+    virtual void print(std::ostream &dst) const override
+    {
+        dst << VarName << " -= ";
+        Expression->print(dst);
+        dst << ";";
+    }
+
+    virtual void translate(std::ostream &dst) const override
+    {
+        dst << VarName << " -= ";
+        Expression->translate(dst);         
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+         
+        //find a free registers
+        std::vector<int> freeRegs = contxt.FindFreeTempRegs();
+        contxt.set_used(freeRegs[0]);
+        contxt.set_used(freeRegs[1]);
+        Expression->compile(dst, contxt, freeRegs[0]);
+        
+        //load result into free reg 1
+        dst<<"\t"<<"lw"<<"\t"<<"$"<<freeRegs[1]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#SubAssign loading variable: "<<VarName<<std::endl;
+
+        //decrement reg 0 = reg 1 - reg 0
+        dst<<"\t"<<"sub"<<"\t"<<"$"<<freeRegs[0]<<", $"<<freeRegs[1]<<", $"<<freeRegs[0]<<"\t #Decrementing variable: "<<VarName<<std::endl;
+
+        //load result into reg 0
+        dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#SubAssign storing variable: "<<VarName<<std::endl;
+
+        contxt.set_unused(freeRegs[0]);
+        contxt.set_unused(freeRegs[1]);
+    }
+};
+
+class MulAssignmentStatement: public Expression {
+public:
+    std::string VarName;
+    ExpressionPtr Expression;
+
+    ~MulAssignmentStatement() {}
+
+    MulAssignmentStatement (std::string _VarName, ExpressionPtr _Expression)
+     : VarName(_VarName), Expression(_Expression) {}
+
+    virtual void print(std::ostream &dst) const override
+    {
+        dst << VarName << " *= ";
+        Expression->print(dst);
+        dst << ";";
+    }
+
+    virtual void translate(std::ostream &dst) const override
+    {
+        dst << VarName << " *= ";
+        Expression->translate(dst);         
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+         
+        //find a free registers
+        std::vector<int> freeRegs = contxt.FindFreeTempRegs();
+        contxt.set_used(freeRegs[0]);
+        contxt.set_used(freeRegs[1]);
+        Expression->compile(dst, contxt, freeRegs[0]);
+        
+        //load result into free reg 1
+        dst<<"\t"<<"lw"<<"\t"<<"$"<<freeRegs[1]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#MulAssign loading variable: "<<VarName<<std::endl;
+
+        //increment reg 1 = reg 1 * reg 0
+        dst<<"\t"<<"mult"<<"\t"<<"$"<<freeRegs[0]<<", $"<<freeRegs[1]<<"\t #Multiplying variable: "<<VarName<<std::endl;
+        dst<<"\t"<<"mflo"<<"\t"<<"$"<<destReg<<std::endl;
+
+        //load result into reg 0
+        dst<<"\t"<<"sw"<<"\t"<<"$"<<destReg<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#MulAssign storing variable: "<<VarName<<std::endl;
+
+        contxt.set_unused(freeRegs[0]);
+        contxt.set_unused(freeRegs[1]);
+    }
+};
+
+class DivAssignmentStatement: public Expression {
+public:
+    std::string VarName;
+    ExpressionPtr Expression;
+
+    ~DivAssignmentStatement() {}
+
+    DivAssignmentStatement (std::string _VarName, ExpressionPtr _Expression)
+     : VarName(_VarName), Expression(_Expression) {}
+
+    virtual void print(std::ostream &dst) const override
+    {
+        dst << VarName << " /= ";
+        Expression->print(dst);
+        dst << ";";
+    }
+
+    virtual void translate(std::ostream &dst) const override
+    {
+        dst << VarName << " /= ";
+        Expression->translate(dst);         
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+         
+        //find a free registers
+        std::vector<int> freeRegs = contxt.FindFreeTempRegs();
+        contxt.set_used(freeRegs[0]);
+        contxt.set_used(freeRegs[1]);
+        Expression->compile(dst, contxt, freeRegs[0]);
+        
+        //load result into free reg 1
+        dst<<"\t"<<"lw"<<"\t"<<"$"<<freeRegs[1]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#DivAssign loading variable: "<<VarName<<std::endl;
+
+        //divide reg 1 = reg 1 / reg 0
+        dst<<"\t"<<"div"<<"\t"<<"$"<<freeRegs[1]<<", $"<<freeRegs[0]<<"\t #Dividing variable: "<<VarName<<std::endl;
+        dst<<"\t"<<"mflo"<<"\t"<<"$"<<destReg<<std::endl;
+
+        //load result into reg 0
+        dst<<"\t"<<"sw"<<"\t"<<"$"<<destReg<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#DivAssign storing variable: "<<VarName<<std::endl;
+
+        contxt.set_unused(freeRegs[0]);
+        contxt.set_unused(freeRegs[1]);
+    }
+};
+
+
 class ArrayAssignment : public Expression {
 private:
     std::string Identifier;

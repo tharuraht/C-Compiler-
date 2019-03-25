@@ -146,6 +146,10 @@ STATEMENT:
   | T_RETURN T_SEMICOLON                                                                               {$$ = new ReturnStatement(NULL);}
   | T_ENUM T_VARIABLE T_CURLY_LBRACKET ENUM_LIST T_CURLY_RBRACKET T_SEMICOLON                          {$$ = new EnumDeclaration(*$2,$4);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON                                                        {$$ = new AssignmentStatement(*$1,$3);}
+  | T_VARIABLE T_PLUS_EQUAL C_EXPRESSION T_SEMICOLON                                                   {$$ = new AddAssignmentStatement(*$1, $3);}
+  | T_VARIABLE T_MINUS_EQUAL C_EXPRESSION T_SEMICOLON                                                  {$$ = new SubAssignmentStatement(*$1, $3);}
+  | T_VARIABLE T_TIMES_EQUAL C_EXPRESSION T_SEMICOLON                                                  {$$ = new MulAssignmentStatement(*$1, $3);}
+  | T_VARIABLE T_DIVIDE_EQUAL C_EXPRESSION T_SEMICOLON                                                 {$$ = new DivAssignmentStatement(*$1, $3);}
   | T_VARIABLE T_SQUARE_LBRACKET C_EXPRESSION T_SQUARE_RBRACKET T_EQUAL C_EXPRESSION T_SEMICOLON       {$$ = new ArrayAssignment(*$1,$3,$6);}
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE                                                   {$$ = new IfElseStatement($3,$5,NULL);}
   | T_IF T_LBRACKET LOGICAL_OP T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE                                 {$$ = new IfElseStatement($3, $5, $7);}
