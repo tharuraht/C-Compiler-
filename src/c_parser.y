@@ -212,10 +212,10 @@ ENUM_LIST:
   | T_VARIABLE                    {$$ = new LocalEnumElement(*$1,0,NULL, false);}
   ;
 
-C_EXPRESSION:  LOG_OR {$$ = $1;};
+C_EXPRESSION:  CONDITIONAL {$$ = $1;};
 
 CONDITIONAL:
-    LOG_OR T_TERNARY CONDITIONAL LOG_OR {$$ = new IfElseStatement($1, $3, $4);}
+    LOG_OR T_TERNARY CONDITIONAL T_COLON CONDITIONAL {$$ = new IfElseStatement($1, $3, $5);}
   | LOG_OR                                    {$$ = $1;}
   ;
 
