@@ -160,7 +160,7 @@ STATEMENT:
   | T_BREAK T_SEMICOLON                                                                                {$$ = new BreakStatement();}
   | T_CONTINUE T_SEMICOLON                                                                             {$$ = new ContinueStatement();}
   | DECLARE_VAR  T_SEMICOLON                                                                           {$$ = $1;}
-  | C_EXPRESSION T_SEMICOLON                                                                           {$$ = $1;}
+  | C_EXPRESSION T_SEMICOLON                                                                           {std::cout<<"hi"<<std::endl;}
   ;
 
 STAT_SCOPE:
@@ -225,7 +225,7 @@ TERM:
     FACTOR T_TIMES TERM  { $$ = new MulOperator($1, $3);}
   | FACTOR T_DIVIDE TERM { $$ = new DivOperator($1, $3);}
   | FACTOR T_MODULUS TERM { $$ = new ModOperator($1, $3);}
-  | FACTOR  { $$ = $1;}
+  | COMPARISON_OP  { $$ = $1;}
   ;
 
 C_INCREMENT_DECREMENT: 
@@ -236,13 +236,13 @@ C_INCREMENT_DECREMENT:
   ;
 
 COMPARISON_OP: 
-    BINARY_EXPRESSION_TREE T_LESS_THAN COMPARISON_OP { $$ = new LessThanOperator($1, $3);}
-  | BINARY_EXPRESSION_TREE T_LESS_EQUAL_THAN COMPARISON_OP { $$ = new LessThanEqualOperator($1, $3);}
-  | BINARY_EXPRESSION_TREE T_GREATER_THAN COMPARISON_OP { $$ = new GreaterThanOperator($1, $3);}
-  | BINARY_EXPRESSION_TREE T_GREATER_EQUAL_THAN COMPARISON_OP { $$ = new GreaterThanEqualOperator($1, $3);}
-  | BINARY_EXPRESSION_TREE T_IS_EQUAL COMPARISON_OP { $$ = new IsEqualOperator($1, $3);}
-  | BINARY_EXPRESSION_TREE T_IS_NOT_EQUAL COMPARISON_OP { $$ = new IsNotEqualOperator($1, $3);}
-  | BINARY_EXPRESSION_TREE { $$ = $1;}
+    FACTOR T_LESS_THAN COMPARISON_OP { $$ = new LessThanOperator($1, $3);}
+  | FACTOR T_LESS_EQUAL_THAN COMPARISON_OP { $$ = new LessThanEqualOperator($1, $3);}
+  | FACTOR T_GREATER_THAN COMPARISON_OP { $$ = new GreaterThanOperator($1, $3);}
+  | FACTOR T_GREATER_EQUAL_THAN COMPARISON_OP { $$ = new GreaterThanEqualOperator($1, $3);}
+  | FACTOR T_IS_EQUAL COMPARISON_OP { $$ = new IsEqualOperator($1, $3);}
+  | FACTOR T_IS_NOT_EQUAL COMPARISON_OP { $$ = new IsNotEqualOperator($1, $3);}
+  | FACTOR { $$ = $1;}
   ;
 
 LOGICAL_OP: 
