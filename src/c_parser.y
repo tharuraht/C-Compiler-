@@ -163,7 +163,7 @@ STATEMENT:
   | T_BREAK T_SEMICOLON                                                                                {$$ = new BreakStatement();}
   | T_CONTINUE T_SEMICOLON                                                                             {$$ = new ContinueStatement();}
   | DECLARE_VAR  T_SEMICOLON                                                                           {$$ = $1;}
-  | C_EXPRESSION T_SEMICOLON                                                                           {std::cout<<"lone statemenet"<<std::endl;$$ = $1;}
+  | C_EXPRESSION T_SEMICOLON                                                                           {$$ = $1;}
   ;
 
 STAT_SCOPE:
