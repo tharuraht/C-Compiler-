@@ -646,4 +646,60 @@ class BitwiseOrOperator : public Operator {
     }   
 };
 
+class BitwiseXorOperator : public Operator {
+  protected:
+    virtual const char *getOpcode() const override
+    { return "^"; }
+
+  public:
+    BitwiseXorOperator(ExpressionPtr _left, ExpressionPtr _right) : Operator(_left, _right)
+    {}
+
+    virtual int evaluate() const override {
+        int vl=left->evaluate();
+        int vr=right->evaluate();
+        return (vl^vr);
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        std::vector<int> freeReg = contxt.FindFreeTempRegs(); //finds available registers
+        contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
+        left->compile(dst, contxt, destReg);
+        right->compile(dst, contxt, freeReg[0]);
+     
+        //checks equivalence, if they are the same will result in zero
+        dst<<"\t"<<"xor"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", $"<<freeReg[0]<<"\t#^ bitwise operator" << std::endl;
+        //or operation ensures that if the result is non zero it becomes 1
+        contxt.set_unused(freeReg[0]);
+    }   
+};
+
+class BitwiseAndOperator : public Operator {
+  protected:
+    virtual const char *getOpcode() const override
+    { return "&"; }
+
+  public:
+    BitwiseAndOperator(ExpressionPtr _left, ExpressionPtr _right) : Operator(_left, _right)
+    {}
+
+    virtual int evaluate() const override {
+        int vl=left->evaluate();
+        int vr=right->evaluate();
+        return (vl|vr);
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        std::vector<int> freeReg = contxt.FindFreeTempRegs(); //finds available registers
+        contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
+        left->compile(dst, contxt, destReg);
+        right->compile(dst, contxt, freeReg[0]);
+     
+        //checks equivalence, if they are the same will result in zero
+        dst<<"\t"<<"and"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", $"<<freeReg[0]<<"\t#& bitwise operator" << std::endl;
+        //or operation ensures that if the result is non zero it becomes 1
+        contxt.set_unused(freeReg[0]);
+    }   
+};
+
 #endif
