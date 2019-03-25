@@ -120,7 +120,7 @@ G_ENUM_LIST:
 FUNCTION_DEC_DEF: 
     TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET SCOPE         {$$ = new FunctionDec(*$1,*$2,NULL,$5);}
   | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET SCOPE  {$$ = new FunctionDec(*$1,*$2,$4,$6);}
-  | TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET T_CURLY_LBRACKET T_CURLY_RBRACKET {$$ = new FunctionDec(*$1,*$2,NULL,NULL);}
+
 
   | TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET T_SEMICOLON        {$$ = new FunctionDef(*$1,*$2, NULL);}
   | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET T_SEMICOLON {$$ = new FunctionDef(*$1,*$2,$4);}
@@ -134,7 +134,8 @@ C_ARGS:
 
 PARAMETER: T_INT T_VARIABLE {$$= new Parameter(*$1,*$2);};
 
-SCOPE: T_CURLY_LBRACKET SCOPE_STATEMENTS T_CURLY_RBRACKET  {$$ = new ScopeBody($2);} ;
+SCOPE: T_CURLY_LBRACKET SCOPE_STATEMENTS T_CURLY_RBRACKET  {$$ = new ScopeBody($2);}
+  | T_CURLY_LBRACKET T_CURLY_RBRACKET {$$ = new ScopeBody(NULL);} ;
 
 SCOPE_STATEMENTS:
     STATEMENT SCOPE_STATEMENTS  { $$ = new ScopeStatements($1,$2);}
@@ -142,9 +143,10 @@ SCOPE_STATEMENTS:
   ;
 
 STATEMENT:
-    T_RETURN LOGICAL_OP T_SEMICOLON                                                                    {$$ = new ReturnStatement($2);}
+    T_RETURN C_EXPRESSION T_SEMICOLON                                                                  {$$ = new ReturnStatement($2);}
   | T_RETURN T_SEMICOLON                                                                               {$$ = new ReturnStatement(NULL);}
   | T_ENUM T_VARIABLE T_CURLY_LBRACKET ENUM_LIST T_CURLY_RBRACKET T_SEMICOLON                          {$$ = new EnumDeclaration(*$2,$4);}
+  | T_ENUM T_CURLY_LBRACKET ENUM_LIST T_CURLY_RBRACKET T_SEMICOLON                                     {$$ = new EnumDeclaration("void",$3);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON                                                        {$$ = new AssignmentStatement(*$1,$3);}
   | T_VARIABLE T_PLUS_EQUAL C_EXPRESSION T_SEMICOLON                                                   {$$ = new AddAssignmentStatement(*$1, $3);}
   | T_VARIABLE T_MINUS_EQUAL C_EXPRESSION T_SEMICOLON                                                  {$$ = new SubAssignmentStatement(*$1, $3);}

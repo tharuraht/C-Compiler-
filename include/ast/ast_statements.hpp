@@ -438,7 +438,8 @@ public:
         dst << "{ " << std::endl;
         // std::cout<<"scope level: "<<scopelevel<<std::endl;
         scopelevel++;
-        Body->print(dst);
+        if (Body!=NULL)
+            Body->print(dst);
         scopelevel--;
         for (int i = 0; i < scopelevel; i++) {
             dst << "\t";
@@ -449,7 +450,8 @@ public:
     virtual void translate(std::ostream &dst) const override {
         dst << std::endl;
         scopelevel++;
-        Body->translate(dst);
+        if (Body != NULL)
+            Body->translate(dst);
         scopelevel--;
         for (int i = 0; i < scopelevel; i++) {
             dst << "\t";
@@ -461,7 +463,8 @@ public:
         //dst << std::endl;
         // scopelevel++;
         dst<<"#FUNCTION BODY"<<std::endl;
-        Body->compile(dst, contxt, destReg);
+        if (Body != NULL)
+            Body->compile(dst, contxt, destReg);
         // scopelevel--;
         // for (int i = 0; i < scopelevel; i++) {
         //     dst << "\t";
