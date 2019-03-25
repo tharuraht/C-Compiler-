@@ -142,7 +142,7 @@ SCOPE_STATEMENTS:
   ;
 
 STATEMENT:
-    T_RETURN LOGICAL_OP T_SEMICOLON                                                                    {$$ = new ReturnStatement($2);}
+    T_RETURN C_EXPRESSION T_SEMICOLON                                                                    {$$ = new ReturnStatement($2);}
   | T_RETURN T_SEMICOLON                                                                               {$$ = new ReturnStatement(NULL);}
   | T_ENUM T_VARIABLE T_CURLY_LBRACKET ENUM_LIST T_CURLY_RBRACKET T_SEMICOLON                          {$$ = new EnumDeclaration(*$2,$4);}
   | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON                                                        {$$ = new AssignmentStatement(*$1,$3);}
