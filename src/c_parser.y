@@ -158,12 +158,12 @@ STATEMENT:
   | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE                                 {$$ = new IfElseStatement($3, $5, $7);}
   | T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE                                                {$$ = new WhileStatement($3,$5);}
   | T_DO STAT_SCOPE T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET T_SEMICOLON                               {$$ = new DoWhileStatement($5, $2);}
-  | T_FOR T_LBRACKET STATEMENT C_EXPRESSION T_SEMICOLON C_INCREMENT_DECREMENT T_RBRACKET STAT_SCOPE      {$$ = new ForStatement($3, $4, $6, $8);}
+  | T_FOR T_LBRACKET STATEMENT C_EXPRESSION T_SEMICOLON C_EXPRESSION T_RBRACKET STAT_SCOPE      {$$ = new ForStatement($3, $4, $6, $8);}
   | T_SWITCH T_LBRACKET C_EXPRESSION T_RBRACKET T_CURLY_LBRACKET SWITCH_SCOPE T_CURLY_RBRACKET         {$$ = new SwitchStatement($3, $6);}
   | T_BREAK T_SEMICOLON                                                                                {$$ = new BreakStatement();}
   | T_CONTINUE T_SEMICOLON                                                                             {$$ = new ContinueStatement();}
   | DECLARE_VAR  T_SEMICOLON                                                                           {$$ = $1;}
-  | C_EXPRESSION T_SEMICOLON                                                                           {$$ = $1;}
+  | C_EXPRESSION T_SEMICOLON                                                                           {std::cout<<"lone statemenet"<<std::endl;$$ = $1;}
   ;
 
 STAT_SCOPE:
@@ -177,10 +177,6 @@ SWITCH_SCOPE:
   | T_DEFAULT T_COLON SCOPE_STATEMENTS            {$$ = new SwitchBody(*$1,NULL,$3, NULL);}
   ;
 
-FUNCTION_CALL:
-    T_VARIABLE T_LBRACKET PASSED_PARAMS T_RBRACKET  {$$ = new FunctionCall(*$1, $3);}
-  | T_VARIABLE T_LBRACKET T_RBRACKET {$$ = new FunctionCall(*$1, NULL);}
-  ;
 
 PASSED_PARAMS:
     ADDITIVE T_COMMA PASSED_PARAMS {$$ = new PassedParams($1, $3);}
@@ -216,10 +212,10 @@ ENUM_LIST:
   | T_VARIABLE                    {$$ = new LocalEnumElement(*$1,0,NULL, false);}
   ;
 
-C_EXPRESSION:  CONDITIONAL {$$ = $1;};
+C_EXPRESSION:  LOG_OR {$$ = $1;};
 
 CONDITIONAL:
-    C_EXPRESSION T_TERNARY CONDITIONAL LOG_OR {$$ = new IfElseStatement($1, $3, $4);}
+    LOG_OR T_TERNARY CONDITIONAL LOG_OR {$$ = new IfElseStatement($1, $3, $4);}
   | LOG_OR                                    {$$ = $1;}
   ;
 
@@ -288,50 +284,23 @@ C_INCREMENT_DECREMENT:
   | T_DECREMENT T_VARIABLE  {$$ = new PreDecrement(*$2);}
   ;
 
-/*
-COMPARISON_OP: 
-    FACTOR T_LESS_THAN COMPARISON_OP { $$ = new LessThanOperator($1, $3);}
-  | FACTOR T_LESS_EQUAL_THAN COMPARISON_OP { $$ = new LessThanEqualOperator($1, $3);}
-  | FACTOR T_GREATER_THAN COMPARISON_OP { $$ = new GreaterThanOperator($1, $3);}
-  | FACTOR T_GREATER_EQUAL_THAN COMPARISON_OP { $$ = new GreaterThanEqualOperator($1, $3);}
-  | FACTOR T_IS_EQUAL COMPARISON_OP { $$ = new IsEqualOperator($1, $3);}
-  | FACTOR T_IS_NOT_EQUAL COMPARISON_OP { $$ = new IsNotEqualOperator($1, $3);}
-  | FACTOR { $$ = $1;}
-  ;
-
-C_EXPRESSION: 
-  COMPARISON_OP T_LOGICAL_AND C_EXPRESSION { $$ = new LogicalAndOperator($1, $3);}
-  | COMPARISON_OP T_LOGICAL_OR C_EXPRESSION { $$ = new LogicalOrOperator($1, $3);}
-  | COMPARISON_OP               { $$ = $1; }
-  ;
-
-*/
 UNARY:
     T_BITWISE_COMPLEMENT FACTOR         {$$ = new BitwiseComplement(NULL,$2);}
   | T_NOT FACTOR                        {$$ = new NotOperator(NULL,$2);}
+  | T_MINUS T_NUMBER   {$$ = new Number(-$2);}
+  | C_INCREMENT_DECREMENT {$$=$1;}
   | FACTOR                              {$$ = $1;}
   ;
 
 FACTOR: 
     T_VARIABLE         {$$ = new Variable(*$1);}
-  | T_VARIABLE T_SQUARE_LBRACKET T_NUMBER T_SQUARE_RBRACKET {$$ = new ArrayElement(*$1,$3); }
-
   | T_NUMBER           {$$ = new Number( $1 );}
-  | T_MINUS T_NUMBER   {$$ = new Number(-$2);}
-  | FUNCTION_CALL      {$$ = $1;}
-  | C_INCREMENT_DECREMENT {$$ = $1;}
+  | T_VARIABLE T_LBRACKET PASSED_PARAMS T_RBRACKET  {$$ = new FunctionCall(*$1, $3);}
+  | T_VARIABLE T_LBRACKET T_RBRACKET {$$ = new FunctionCall(*$1, NULL);}
+  | T_VARIABLE T_SQUARE_LBRACKET T_NUMBER T_SQUARE_RBRACKET {$$ = new ArrayElement(*$1,$3); }
   | T_LBRACKET C_EXPRESSION T_RBRACKET {$$ = new BracketedExpr($2);}
   ;
 
-
-/*TODO
-
-ADDITIVE
-C_INCREMENT_DECREMENT
-C_ARGS
-DECLARATION
-Factor can also have function call
-*/
 %%
 
 const AST_node *g_root; // Definition of variable (to match declaration earlier)

@@ -8,7 +8,9 @@ int g() {
 }
 
 int main () {
-    return 12/g();
+	int a = 1;
+	int b = a++;
+    return b;
 }
 // int g() {
 //     return 3+f();

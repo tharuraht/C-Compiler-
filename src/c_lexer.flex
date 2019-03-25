@@ -84,7 +84,7 @@ extern "C" int fileno(FILE *stream);
 [&][&]          { return T_LOGICAL_AND; }
 [!]             { return T_NOT; }
 
-[?:]            { return T_TERNARY; }
+["?"][:]        { return T_TERNARY; }
 [&]             { return T_BITWISE_AND; }
 [|]             { return T_BITWISE_OR; }
 ["^"]           { return T_BITWISE_XOR; }
