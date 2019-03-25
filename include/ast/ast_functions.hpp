@@ -50,7 +50,8 @@ class FunctionCall : public Expression
             dst <<"\t#Storing temp register: "<<lockedRegs[i]<< std::endl;
         }
 
-        arg->compile(dst,contxt,destReg);
+        if (arg!=NULL)
+            arg->compile(dst,contxt,destReg);
 
         //function call
         dst<<"\t"<<"jal"<<"\t"<<name<<"\t#Function called"<<std::endl;
