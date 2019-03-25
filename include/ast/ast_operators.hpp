@@ -153,16 +153,6 @@ public:
         : Operator(_left, _right)
     {}
 
-    // virtual double evaluate(
-    //     const std::map<std::string,double> &bindings
-    // ) const override
-    // {
-    //     //throw std::runtime_error("MulOperator::evaluate is not implemented.");
-
-    //     double vl=left->evaluate(bindings);
-    //     double vr=right->evaluate(bindings);
-    //     return vl*vr;
-    // }
     virtual int evaluate () const override
     {
         int vl = left->evaluate();
@@ -509,14 +499,35 @@ public:
     }
 };
 
+class NotOperator : public Operator {
+  protected:
+    virtual const char *getOpcode() const override
+    { return "!"; }
+
+  public:
+    NotOperator(ExpressionPtr _left, ExpressionPtr _right) : Operator(_left, _right)
+    {}
+
+    virtual int evaluate() const override {
+        // double vl=left->evaluate(bindings);
+        int vr=right->evaluate();
+        return (!vr);
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        right->compile(dst, contxt, destReg);
+        dst<<"\t"<<"sltiu"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", 1"<<"\t#! logical operator" << std::endl;
+    }
+};
+
 
 class LogicalAndOperator
     : public Operator
 {
-protected:
+  protected:
     virtual const char *getOpcode() const override
     { return "&&"; }
-public:
+  public:
     LogicalAndOperator(ExpressionPtr _left, ExpressionPtr _right)
         : Operator(_left, _right)
     {}

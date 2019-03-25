@@ -216,7 +216,7 @@ ENUM_LIST:
   | T_VARIABLE                    {$$ = new LocalEnumElement(*$1,0,NULL, false);}
   ;
 
-C_EXPRESSION:  CONDITIONAL {$$ = $1;};
+C_EXPRESSION:  ADDITIVE {$$ = $1;};
 
 CONDITIONAL:
     C_EXPRESSION T_TERNARY CONDITIONAL LOG_OR {$$ = new IfElseStatement($1, $3, $4);}
@@ -269,8 +269,8 @@ SHIFT:
   ;
 
 ADDITIVE:
-    TERM T_PLUS C_EXPRESSION     { $$ = new AddOperator($1, $3);}
-  | TERM T_MINUS C_EXPRESSION    { $$ = new SubOperator($1, $3);}
+    TERM T_PLUS ADDITIVE     { $$ = new AddOperator($1, $3);}
+  | TERM T_MINUS ADDITIVE    { $$ = new SubOperator($1, $3);}
   | TERM                         { $$ = $1; }
   ;
 
