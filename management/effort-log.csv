@@ -33,3 +33,4 @@ Date,Effort,Developers,Milestones
 23.03.19,2,am9717, "Implemented codegen for BREAK function, read up on how to implement MIPS for continue and switch statements"
 24.03.19,5,ta2617,"Implemented parsing and compilation of enum keyword, changed some compiler tests"
 24.03.19,8,am9717, "Fixed incorrectly implemented BREAK, completed CONTINUE and working on SWITCH with ta2617. Completed parser + codegen for operator assignments."
+25.03.19,11,"am9717, ta2617", "Worked together to fix issues with function calls, changed parse tree structure to match operator precedence, added classes for relevant operators and performed functional testing using testbench."
