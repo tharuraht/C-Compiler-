@@ -368,7 +368,7 @@ public:
     }
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
-        std::vector<int> FreeReg = contxt.FindFreeRegs(16, 24);
+        std::vector<int> FreeReg = contxt.FindFreeRegs(8, 15);
         contxt.set_used(FreeReg[0]);
 
         Condition->compile(dst, contxt, FreeReg[0]);
@@ -394,6 +394,7 @@ public:
         }
 
         dst<<"ifelse_end_"<<if_level<<":"<<std::endl;
+        if_level++;
     }
 };
 
@@ -622,7 +623,7 @@ public:
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        dst<<"\t"<<"b"<<"\t"<<"end_loop_"<<loop_count-1<<std::endl;
+        dst<<"\t"<<"b"<<"\t"<<"end_loop_"<<loop_count-1<<"\t #Break called"<<std::endl;
     }
 };
 
