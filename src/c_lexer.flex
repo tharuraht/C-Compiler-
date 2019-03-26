@@ -104,7 +104,7 @@ extern "C" int fileno(FILE *stream);
 
 [0][Xx][0-9a-fA-F]+                   {yylval.number=strtod(yytext, 0); return T_NUMBER; }
 
-[a-zA-Z]+[a-z0-9_]*        { yylval.string=new std::string(yytext); return T_VARIABLE; }
+[a-zA-Z_]+[a-z0-9_]*        { yylval.string=new std::string(yytext); return T_VARIABLE; }
 
 ["][a-z]+[a-z0-9]*["]    { yylval.string=new std::string(yytext); return T_STRING; }
 
@@ -119,4 +119,3 @@ void yyerror (char const *s)
   fprintf (stderr, "Parse Error: %s\n", s); /* s is the text that wasn't matched */
   exit(1);
 }
-

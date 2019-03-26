@@ -18,7 +18,7 @@
   const AST_node* node;
   const Expression* expr;
   /*
-  const constant *const; //added 
+  const constant *const; //added
   const declaration *dec; //added
   const declarator *decr; //added
   const initialiser *init; //added
@@ -48,12 +48,12 @@
 
 %right T_SEMICOLON T_COLON T_COMMA
 
-%right T_NUMBER T_VARIABLE T_RETURN T_STRING 
+%right T_NUMBER T_VARIABLE T_RETURN T_STRING
 
-%token T_SIGNED T_GO_TO T_AUTO T_STRUCT 
+%token T_SIGNED T_GO_TO T_AUTO T_STRUCT
 
 
-%type <expr> STATEMENT ENUM_LIST G_ENUM_LIST 
+%type <expr> STATEMENT ENUM_LIST G_ENUM_LIST
 %type <expr> C_EXPRESSION C_ARGS DECLARE_VAR PASSED_PARAMS G_ADDITIONAL_DECS L_ADDITIONAL_DECS C_INCREMENT_DECREMENT
 %type <expr> CONDITIONAL LOG_OR LOG_AND BIT_OR BIT_XOR BIT_AND EQUALITY RELATIONAL SHIFT ADDITIVE TERM UNARY FACTOR NESTED_SCOPE
 
@@ -61,10 +61,10 @@
 
 %type <node> PROGRAM EX_DECLARATION FUNCTION_DEC_DEF  GLOBAL_DECLARATION
 %type <node> SCOPE  SCOPE_STATEMENTS STAT_SCOPE PARAMETER SWITCH_SCOPE
-%type <node>  T_IF T_ELSE T_WHILE T_FOR T_RETURN T_ENUM 
-//%type <node> BINARY 
+%type <node>  T_IF T_ELSE T_WHILE T_FOR T_RETURN T_ENUM
+//%type <node> BINARY
 
-%type <number> T_NUMBER 
+%type <number> T_NUMBER
 %type <string> T_VARIABLE T_VOID T_INT T_DOUBLE T_FLOAT TYPE_SPECIFY T_CASE T_DEFAULT
 
 //%right "then" T_ELSE solution for dangling if else problem
@@ -86,8 +86,8 @@ ROOT: PROGRAM {g_root = $1;};
 
 PROGRAM:
     EX_DECLARATION PROGRAM {$$ = new Program($1,$2);}
-  | EX_DECLARATION         {$$ = new Program($1, NULL);} 
-  ;   
+  | EX_DECLARATION         {$$ = new Program($1, NULL);}
+  ;
 
 EX_DECLARATION:
     FUNCTION_DEC_DEF   {$$ = $1;}
@@ -113,12 +113,12 @@ G_ADDITIONAL_DECS:
 
 G_ENUM_LIST:
     T_VARIABLE T_COMMA G_ENUM_LIST                  {$$ = new GlobalEnumElement(*$1,NULL,$3);}
-  | T_VARIABLE T_EQUAL C_EXPRESSION T_COMMA G_ENUM_LIST {$$ = new GlobalEnumElement(*$1,$3,$5);} 
+  | T_VARIABLE T_EQUAL C_EXPRESSION T_COMMA G_ENUM_LIST {$$ = new GlobalEnumElement(*$1,$3,$5);}
   | T_VARIABLE T_EQUAL C_EXPRESSION                     {$$ = new GlobalEnumElement(*$1,$3,NULL);}
   | T_VARIABLE                                      {$$ = new GlobalEnumElement(*$1,NULL,NULL);}
   ;
 
-FUNCTION_DEC_DEF: 
+FUNCTION_DEC_DEF:
     TYPE_SPECIFY T_VARIABLE T_LBRACKET T_RBRACKET SCOPE         {$$ = new FunctionDec(*$1,*$2,NULL,$5);}
   | TYPE_SPECIFY T_VARIABLE T_LBRACKET C_ARGS T_RBRACKET SCOPE  {$$ = new FunctionDec(*$1,*$2,$4,$6);}
 
@@ -210,7 +210,7 @@ TYPE_SPECIFY:
 
 ENUM_LIST:
     T_VARIABLE T_COMMA ENUM_LIST  {$$ = new LocalEnumElement(*$1,NULL,$3);}
-  | T_VARIABLE T_EQUAL C_EXPRESSION T_COMMA ENUM_LIST {$$ = new LocalEnumElement(*$1,$3,$5);} 
+  | T_VARIABLE T_EQUAL C_EXPRESSION T_COMMA ENUM_LIST {$$ = new LocalEnumElement(*$1,$3,$5);}
   | T_VARIABLE T_EQUAL C_EXPRESSION                   {$$ = new LocalEnumElement(*$1,$3,NULL);}
   | T_VARIABLE                    {$$ = new LocalEnumElement(*$1,NULL,NULL);}
   ;
@@ -230,21 +230,21 @@ LOG_OR:
   ;
 
 LOG_AND:
-    BIT_OR T_LOGICAL_AND LOG_AND          {$$ = new LogicalAndOperator($1, $3);} 
-  | BIT_OR                                {$$ = $1;}      
-  ; 
+    BIT_OR T_LOGICAL_AND LOG_AND          {$$ = new LogicalAndOperator($1, $3);}
+  | BIT_OR                                {$$ = $1;}
+  ;
 
 BIT_OR:
     BIT_XOR T_BITWISE_OR BIT_OR           {$$ = new BitwiseOrOperator($1,$3);}
-  | BIT_XOR                               {$$ = $1;}  
-  ;                      
+  | BIT_XOR                               {$$ = $1;}
+  ;
 
-BIT_XOR: 
+BIT_XOR:
     BIT_AND T_BITWISE_XOR BIT_XOR         {$$ = new BitwiseXorOperator($1,$3);}
   | BIT_AND                               {$$ = $1;}
   ;
 
-BIT_AND: 
+BIT_AND:
     EQUALITY T_BITWISE_AND BIT_AND        {$$ = new BitwiseAndOperator($1,$3);}
   | EQUALITY                              {$$ = $1;}
   ;
@@ -275,14 +275,14 @@ ADDITIVE:
   | TERM                         { $$ = $1; }
   ;
 
-TERM: 
+TERM:
     UNARY T_TIMES TERM  { $$ = new MulOperator($1, $3);}
   | UNARY T_DIVIDE TERM { $$ = new DivOperator($1, $3);}
   | UNARY T_MODULUS TERM { $$ = new ModOperator($1, $3);}
   | UNARY  { $$ = $1;}
   ;
 
-C_INCREMENT_DECREMENT: 
+C_INCREMENT_DECREMENT:
     T_VARIABLE T_INCREMENT  {$$ = new PostIncrement(*$1);}
   | T_VARIABLE T_DECREMENT  {$$ = new PostDecrement(*$1);}
   | T_INCREMENT T_VARIABLE  {$$ = new PreIncrement(*$2);}
@@ -297,7 +297,7 @@ UNARY:
   | FACTOR                              {$$ = $1;}
   ;
 
-FACTOR: 
+FACTOR:
     T_VARIABLE         {$$ = new Variable(*$1);}
   | T_NUMBER           {$$ = new Number( $1 );}
   | T_VARIABLE T_LBRACKET PASSED_PARAMS T_RBRACKET  {$$ = new FunctionCall(*$1, $3);}
