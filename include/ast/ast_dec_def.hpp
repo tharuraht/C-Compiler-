@@ -172,12 +172,10 @@ public:
 
         
         if(Arguments != NULL){
-            //int stack_end = (var_count*4) +parameter_count+12+50; 
             contxt.clearArgumentregs();
             std::vector<int> freeArgReg = contxt.FindFreeRegs(4, 7);
 
             for(int i =0; i<4; i++){
-                // contxt.set_used(freeArgReg[i]);
                 dst<<"\t"<<"sw"<<"\t"<<"$"<<freeArgReg[i]<<", "<<stack_end+(4*i)<<"($fp)"<<"\t"<<"#storing param argument register"<<std::endl;
             }
 

@@ -108,9 +108,6 @@ class Context {
         return FindFreeRegs(4,7);
     }
 
-    // void DeleteGlobalVar (std::string varname) {
-    //     globalbindings.erase(varname);
-    // }
 
     void NewGlobalVar (std::string varname) {
         globalbindings.emplace(varname,++globalvar_counter);

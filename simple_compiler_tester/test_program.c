@@ -1,17 +1,17 @@
 // multiple functions declared whic call each other
-int f() {
-    return 1;
-}
+// int f() {
+//     return 1;
+// }
 
-int g() {
-    return 2+f();
-}
+// int g() {
+//     return 2+f();
+// }
 
-int main () {
-	int a = 1;
-	int b = a++;
-    return b;
-}
+// int main () {
+// 	int a = 1;
+// 	int b = a++;
+//     return b;
+// }
 // int g() {
 //     return 3+f();
 // }
@@ -105,5 +105,106 @@ int main () {
 //         y = y+x;
 //     }
 //     return y;                                         
-// } 
+// }
 
+// int main () {
+//     int a = 0;
+//     while (a < 11)
+//     {
+//         while (a < 12)
+//         {
+//             if (a > 7)
+//                 break;
+//             a++;
+//         }
+//         if (a > 8)
+//             break;
+//         a++;
+//     }
+//     return a;
+// }
+
+// int main () {
+//     int a;
+//     int b = 0;
+//     for (a = 10; a > 5; a--)
+//     {
+//         if (a == 7)
+//             continue;
+//         b = b + a;
+//     }
+//     for (int i = 0; i < 10; ++i)
+//         if (b == 7)
+//             break;
+//         else
+//             b = b + i;
+
+//     return b;
+// }
+
+// int a[10];
+// int b = 5;
+// int main()
+// {
+//     a[0] = 7;
+//     a[5] = 10;
+//     int a = 0;
+//     b = a;
+//     return a[b];
+// }
+
+// int main () {
+// int a = 5;
+// if (a == 4) return 9;
+// else if (a>4) 
+// return 10;
+// }
+
+// int collatz_recursive(int n)
+// {
+//     if (n == 1)
+//     {
+//         return n;
+//     }
+
+//     if (n % 2 == 0)
+//     {
+//         return n + collatz_recursive(n / 2);
+//     }
+//     else
+//     {
+//         return n + collatz_recursive(n * 3 + 1);
+//     }
+// }
+
+
+    int main()
+    {
+        int a = 1;
+        int b = 2;
+        int c = 3;
+        int d;
+        int e;
+        int f[2];
+        
+        while (a < 10)
+        {
+            int b = 10;
+
+            a++;
+            d = b;
+            f[0] = 3;
+            f[1] = a;
+        }
+        for (c = 0; c < 10; c++)
+        {
+            int a = 15;
+            int f[2];
+
+            e = c;
+            f[0] = 7;
+            f[1] = a;
+        }
+
+        return a + b + c + d + e + f[0] + f[1];
+    }
