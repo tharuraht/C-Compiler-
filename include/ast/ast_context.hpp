@@ -14,6 +14,7 @@ class Context {
     //int is relative location in memory
     std::unordered_map<std::string, unsigned int> globalbindings;
     std::unordered_map<std::string,unsigned int> localbindings;
+    std::unordered_map<std::string, unsigned int> var_vals;
     std::vector<std::string>parameter_list;
 
     bool regavailable[32];
@@ -163,6 +164,24 @@ class Context {
 
     void clear_parameter_list(){
         parameter_list.clear();
+    }
+
+    void store_var_val(std::string var, int val) {
+        var_vals.erase(var);
+        var_vals.emplace(var, val);
+    }
+
+    void clear_var_val(std::string var) {
+        var_vals.erase(var);
+    }
+
+    int find_var_val(std::string var) {
+        if (var_vals.find(var) != var_vals.end())
+        {
+            //variable found
+            return (var_vals.find(var)->second);
+        }
+        return 0;
     }
 
 

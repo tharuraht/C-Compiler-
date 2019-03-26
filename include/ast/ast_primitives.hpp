@@ -26,13 +26,11 @@ class Variable: public Expression {
     }
 
 
-    virtual double evaluate(
-        const std::map<std::string,double> &bindings
-    ) const override
+    virtual int evaluate() const override
     {
-        // TODO-B : Run bin/eval_expr with a variable binding to make sure you understand how this works.
-        // If the binding does not exist, this will throw an error
-        return bindings.at(id);
+        std::cout<<"#variable"<<std::endl;
+        expr_var = id;
+        return 0;
     }
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
@@ -70,16 +68,27 @@ class Variable: public Expression {
 class ArrayElement : public Expression {
     private:
     std::string id;
-    int element_no;
+    ExpressionPtr element;
 
     public:
     ~ArrayElement() {};
-    ArrayElement(std::string _id, int _element_no) : id(_id), element_no(_element_no) {}
+    ArrayElement(std::string _id, ExpressionPtr _element) : id(_id), element(_element) {}
     virtual void print (std::ostream &dst) const override {
-        dst<<id<<"["<<element_no<<"]";
+        dst<<id<<"[";
+        if (element!=NULL)
+            element->print(dst);
+        dst<<"]";
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override{
+        int element_no = element->evaluate();
+        if (expr_var != "") {
+            element_no = contxt.find_var_val(expr_var);
+            expr_var = "";
+        }
+        if (element_no == 0) {
+            element_no = element->evaluate();
+        }
         int var_offset = contxt.LookupVariable(id+std::to_string(element_no), scopelevel);
         // int stack_end = (var_count*4) +parameter_count+12+50;
 

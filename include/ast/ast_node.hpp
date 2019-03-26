@@ -19,6 +19,7 @@ static bool varGlobal;
 static int loop_count;
 static int if_level;
 static bool main_returned;
+static std::string expr_var;
 
 // static int index_no;
 static int enum_list_size;
@@ -53,6 +54,7 @@ public:
     {
         throw std::runtime_error("Compilation not implemented.");
     }
+
 };
 
 

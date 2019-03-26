@@ -119,7 +119,7 @@ public:
     {
         int vl = left->evaluate();
         int vr = right->evaluate();
-        return vl * vr;
+        return vl - vr;
         
     }
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
@@ -268,7 +268,7 @@ public:
         if (varGlobal) {
             int vl = left->evaluate();
             int vr = right->evaluate();
-            dst<<vl / vr;
+            dst<<vl % vr;
         }
         else {
             std::vector<int> freeregs = contxt.FindFreeTempRegs(); //finds available registers
@@ -320,12 +320,10 @@ public:
         : Operator(_left, _right)
     {}
 
-    virtual double evaluate(
-        const std::map<std::string,double> &bindings
-    ) const override
+    virtual int evaluate () const override
     {
-        double vl=left->evaluate(bindings);
-        double vr=right->evaluate(bindings);
+        double vl=left->evaluate();
+        double vr=right->evaluate();
         return (vl<vr);
     }
 
@@ -350,12 +348,10 @@ public:
         : Operator(_left, _right)
     {}
 
-    virtual double evaluate(
-        const std::map<std::string,double> &bindings
-    ) const override
+    virtual int evaluate() const override
     {
-        double vl=left->evaluate(bindings);
-        double vr=right->evaluate(bindings);
+        double vl=left->evaluate();
+        double vr=right->evaluate();
         return (vl<=vr);
     }
 
@@ -382,12 +378,10 @@ public:
         : Operator(_left, _right)
     {}
 
-    virtual double evaluate(
-        const std::map<std::string,double> &bindings
-    ) const override
+    virtual int evaluate() const override
     {
-        double vl=left->evaluate(bindings);
-        double vr=right->evaluate(bindings);
+        double vl=left->evaluate();
+        double vr=right->evaluate();
         return (vl>vr);
     }
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
@@ -411,12 +405,10 @@ public:
         : Operator(_left, _right)
     {}
 
-    virtual double evaluate(
-        const std::map<std::string,double> &bindings
-    ) const override
+    virtual int evaluate() const override
     {
-        double vl=left->evaluate(bindings);
-        double vr=right->evaluate(bindings);
+        double vl=left->evaluate();
+        double vr=right->evaluate();
         return (vl>=vr);
     }
 
@@ -442,12 +434,10 @@ public:
         : Operator(_left, _right)
     {}
 
-    virtual double evaluate(
-        const std::map<std::string,double> &bindings
-    ) const override
+    virtual int evaluate() const override
     {
-        double vl=left->evaluate(bindings);
-        double vr=right->evaluate(bindings);
+        double vl=left->evaluate();
+        double vr=right->evaluate();
         return (vl==vr);
     }
 
@@ -476,12 +466,10 @@ public:
         : Operator(_left, _right)
     {}
 
-    virtual double evaluate(
-        const std::map<std::string,double> &bindings
-    ) const override
+    virtual int evaluate() const override
     {
-        double vl=left->evaluate(bindings);
-        double vr=right->evaluate(bindings);
+        double vl=left->evaluate();
+        double vr=right->evaluate();
         return (vl!=vr);
     }
 
@@ -532,12 +520,10 @@ class LogicalAndOperator
         : Operator(_left, _right)
     {}
 
-    virtual double evaluate(
-        const std::map<std::string,double> &bindings
-    ) const override
+    virtual int evaluate() const override
     {
-        double vl=left->evaluate(bindings);
-        double vr=right->evaluate(bindings);
+        double vl=left->evaluate();
+        double vr=right->evaluate();
         return (vl&&vr);
     }
 
@@ -571,10 +557,10 @@ public:
         : Operator(_left, _right)
     {}
 
-    virtual double evaluate(const std::map<std::string,double> &bindings) const override
+    virtual int evaluate() const override
     {
-        double vl=left->evaluate(bindings);
-        double vr=right->evaluate(bindings);
+        double vl=left->evaluate();
+        double vr=right->evaluate();
         return (vl||vr);
     }
 

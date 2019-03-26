@@ -158,7 +158,7 @@ STATEMENT:
   | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE                                 {$$ = new IfElseStatement($3, $5, $7);}
   | T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE                                                {$$ = new WhileStatement($3,$5);}
   | T_DO STAT_SCOPE T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET T_SEMICOLON                               {$$ = new DoWhileStatement($5, $2);}
-  | T_FOR T_LBRACKET STATEMENT C_EXPRESSION T_SEMICOLON C_EXPRESSION T_RBRACKET STAT_SCOPE      {$$ = new ForStatement($3, $4, $6, $8);}
+  | T_FOR T_LBRACKET STATEMENT STATEMENT C_EXPRESSION T_RBRACKET STAT_SCOPE      {$$ = new ForStatement($3, $4, $5, $7);}
   | T_SWITCH T_LBRACKET C_EXPRESSION T_RBRACKET T_CURLY_LBRACKET SWITCH_SCOPE T_CURLY_RBRACKET         {$$ = new SwitchStatement($3, $6);}
   | T_BREAK T_SEMICOLON                                                                                {$$ = new BreakStatement();}
   | T_CONTINUE T_SEMICOLON                                                                             {$$ = new ContinueStatement();}
@@ -297,7 +297,7 @@ FACTOR:
   | T_NUMBER           {$$ = new Number( $1 );}
   | T_VARIABLE T_LBRACKET PASSED_PARAMS T_RBRACKET  {$$ = new FunctionCall(*$1, $3);}
   | T_VARIABLE T_LBRACKET T_RBRACKET {$$ = new FunctionCall(*$1, NULL);}
-  | T_VARIABLE T_SQUARE_LBRACKET T_NUMBER T_SQUARE_RBRACKET {$$ = new ArrayElement(*$1,$3); }
+  | T_VARIABLE T_SQUARE_LBRACKET C_EXPRESSION T_SQUARE_RBRACKET {$$ = new ArrayElement(*$1,$3); }
   | T_LBRACKET C_EXPRESSION T_RBRACKET {$$ = new BracketedExpr($2);}
   ;
 
