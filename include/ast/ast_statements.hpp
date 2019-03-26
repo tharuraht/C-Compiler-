@@ -37,17 +37,16 @@ public:
         int stack_end = (var_count*4) +parameter_count+12+50;
 
         //find a free register
-        std::vector<int> freeRegs = contxt.FindFreeTempRegs();
-        contxt.set_used(freeRegs[0]);
-        Expression->compile(dst, contxt, freeRegs[0]);
+  
+        Expression->compile(dst, contxt, destReg);
         contxt.store_var_val(VarName, Expression->evaluate());
 
         //store result into variable
         if (contxt.LookupVariable(VarName, scopelevel) != 0)
-            dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#Assign variable "<<VarName<<std::endl;
+            dst<<"\t"<<"sw"<<"\t"<<"$"<<destReg<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#Assign variable "<<VarName<<std::endl;
 
         else if (contxt.find_parameter(VarName) > -1) {
-            dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<(contxt.find_parameter(VarName))*4+stack_end<<"($fp)"<<"\t#Assign passed variable "<<VarName<<std::endl;
+            dst<<"\t"<<"sw"<<"\t"<<"$"<<destReg<<", "<<(contxt.find_parameter(VarName))*4+stack_end<<"($fp)"<<"\t#Assign passed variable "<<VarName<<std::endl;
         }
         // if(varGlobal == false){
         //     dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<stack_end<<"($fp)"<<"\t#Assign function result"<<VarName<<std::endl;
@@ -55,7 +54,7 @@ public:
         // else{
         //     dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#Assign variable "<<VarName<<std::endl;
         // }
-        contxt.set_unused(freeRegs[0]);
+
     }
 };
 
@@ -372,10 +371,10 @@ public:
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
         std::vector<int> FreeReg = contxt.FindFreeRegs(8, 15);
         contxt.set_used(FreeReg[0]);
-
+        int current_if_level = if_level++;
         Condition->compile(dst, contxt, FreeReg[0]);
 
-        dst << "\t"<<"beq"<<"\t" << "$0, $" << FreeReg[0] << ", else_"<<if_level << std::endl; //$else condition yet to be filled
+        dst << "\t"<<"beq"<<"\t" << "$0, $" << FreeReg[0] << ", else_"<<current_if_level << std::endl; //$else condition yet to be filled
 		dst << "\t"<<"nop"<<"\t" << std::endl;
 		contxt.set_unused(FreeReg[0]);
 
@@ -383,16 +382,16 @@ public:
             IBody->compile(dst, contxt, destReg);
         }
 
-        dst<<"\t"<<"b"<<"\t"<<"ifelse_end_"<<if_level<<std::endl;
+        dst<<"\t"<<"b"<<"\t"<<"ifelse_end_"<<current_if_level<<std::endl;
         dst<<"\t"<<"nop"<<std::endl;
 
-        dst<<"else_"<<if_level<<":"<<std::endl;
+        dst<<"else_"<<current_if_level<<":"<<std::endl;
         if(EBody != NULL){
             EBody->compile(dst, contxt, destReg);
         }
 
-        dst<<"ifelse_end_"<<if_level<<":"<<std::endl;
-        if_level++;
+        dst<<"ifelse_end_"<<current_if_level<<":"<<std::endl;
+        
     }
 };
 
@@ -571,6 +570,10 @@ public:
         dst<<"(";
         Expression->translate(dst);
         dst<<")";
+    }
+
+    virtual int evaluate () const override {
+        return Expression->evaluate();
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {

@@ -50,11 +50,10 @@ class GlobalVarDec : public Expression
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
-        //only generate assembly if the variable is assigned
+        dst << "\t"<< ".globl "<<Name << std::endl;
+        dst << "\t"<< ".data" << std::endl;
         if (Expression != NULL)
         {
-            dst << "\t"<< ".globl"<< "\t" << Name <<"\t#New global variable"<< std::endl;
-            dst << "\t"<< ".data"<< "\t" << std::endl;
             // dst << "\t"<< ".align"<< "\t"<< "2" << std::endl;
             //dst<<"\t"<<".type"<<"\t"<<Name<<", @object"<<std::endl;
             //dst<<"\t"<<".size"<<"\t"<<Name<<", 4"<<std::endl;
@@ -65,11 +64,16 @@ class GlobalVarDec : public Expression
             varGlobal = true;
             Expression->compile(dst, contxt, destReg);
             varGlobal = false;
-            dst << std::endl;
+            dst<< "\t#New global variable"<< std::endl;
 
             contxt.store_var_val(Name, Expression->evaluate());
             // dst << "\t"<< ".text" << std::endl;
             // dst << "\t"<< ".align"<< "\t"<< "2" << std::endl;
+        }
+        else {
+            dst<<Name<<":"<<std::endl;
+            dst<<"\t"<<".word"<<"\t"<<"0" << "\t#New global variable"<< std::endl;
+
         }
 
         contxt.NewGlobalVar(Name);
@@ -118,7 +122,7 @@ class LocalVarDec : public Expression
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
-        dst << "#local variable" << std::endl;
+        // dst << "#local variable" << std::endl;
         localvar_counter++;
         contxt.NewLocalVar(Name+std::to_string(scopelevel));
         if (Expression != NULL)

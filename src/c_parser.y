@@ -112,10 +112,10 @@ G_ADDITIONAL_DECS:
   ;
 
 G_ENUM_LIST:
-    T_VARIABLE T_COMMA G_ENUM_LIST                  {$$ = new GlobalEnumElement(*$1,0,$3, false);}
-  | T_VARIABLE T_EQUAL T_NUMBER T_COMMA G_ENUM_LIST {$$ = new GlobalEnumElement(*$1,$3,$5, true);} 
-  | T_VARIABLE T_EQUAL T_NUMBER                     {$$ = new GlobalEnumElement(*$1,$3,NULL, true);}
-  | T_VARIABLE                                      {$$ = new GlobalEnumElement(*$1,0,NULL, false);}
+    T_VARIABLE T_COMMA G_ENUM_LIST                  {$$ = new GlobalEnumElement(*$1,NULL,$3);}
+  | T_VARIABLE T_EQUAL C_EXPRESSION T_COMMA G_ENUM_LIST {$$ = new GlobalEnumElement(*$1,$3,$5);} 
+  | T_VARIABLE T_EQUAL C_EXPRESSION                     {$$ = new GlobalEnumElement(*$1,$3,NULL);}
+  | T_VARIABLE                                      {$$ = new GlobalEnumElement(*$1,NULL,NULL);}
   ;
 
 FUNCTION_DEC_DEF: 
@@ -148,17 +148,16 @@ STATEMENT:
   | T_RETURN T_SEMICOLON                                                                               {$$ = new ReturnStatement(NULL);}
   | T_ENUM T_VARIABLE T_CURLY_LBRACKET ENUM_LIST T_CURLY_RBRACKET T_SEMICOLON                          {$$ = new EnumDeclaration(*$2,$4);}
   | T_ENUM T_CURLY_LBRACKET ENUM_LIST T_CURLY_RBRACKET T_SEMICOLON                                     {$$ = new EnumDeclaration("void",$3);}
-  | T_VARIABLE T_EQUAL C_EXPRESSION T_SEMICOLON                                                        {$$ = new AssignmentStatement(*$1,$3);}
   | T_VARIABLE T_PLUS_EQUAL C_EXPRESSION T_SEMICOLON                                                   {$$ = new AddAssignmentStatement(*$1, $3);}
   | T_VARIABLE T_MINUS_EQUAL C_EXPRESSION T_SEMICOLON                                                  {$$ = new SubAssignmentStatement(*$1, $3);}
   | T_VARIABLE T_TIMES_EQUAL C_EXPRESSION T_SEMICOLON                                                  {$$ = new MulAssignmentStatement(*$1, $3);}
   | T_VARIABLE T_DIVIDE_EQUAL C_EXPRESSION T_SEMICOLON                                                 {$$ = new DivAssignmentStatement(*$1, $3);}
   | T_VARIABLE T_SQUARE_LBRACKET C_EXPRESSION T_SQUARE_RBRACKET T_EQUAL C_EXPRESSION T_SEMICOLON       {$$ = new ArrayAssignment(*$1,$3,$6);}
-  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE                                                   {$$ = new IfElseStatement($3,$5,NULL);}
-  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE                                 {$$ = new IfElseStatement($3, $5, $7);}
-  | T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE                                                {$$ = new WhileStatement($3,$5);}
-  | T_DO STAT_SCOPE T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET T_SEMICOLON                               {$$ = new DoWhileStatement($5, $2);}
-  | T_FOR T_LBRACKET STATEMENT STATEMENT C_EXPRESSION T_RBRACKET STAT_SCOPE      {$$ = new ForStatement($3, $4, $5, $7);}
+  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE                                                 {$$ = new IfElseStatement($3,$5,NULL);}
+  | T_IF T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE T_ELSE STAT_SCOPE                               {$$ = new IfElseStatement($3, $5, $7);}
+  | T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET STAT_SCOPE                                              {$$ = new WhileStatement($3,$5);}
+  | T_DO STAT_SCOPE T_WHILE T_LBRACKET C_EXPRESSION T_RBRACKET T_SEMICOLON                             {$$ = new DoWhileStatement($5, $2);}
+  | T_FOR T_LBRACKET STATEMENT STATEMENT C_EXPRESSION T_RBRACKET STAT_SCOPE                            {$$ = new ForStatement($3, $4, $5, $7);}
   | T_SWITCH T_LBRACKET C_EXPRESSION T_RBRACKET T_CURLY_LBRACKET SWITCH_SCOPE T_CURLY_RBRACKET         {$$ = new SwitchStatement($3, $6);}
   | T_BREAK T_SEMICOLON                                                                                {$$ = new BreakStatement();}
   | T_CONTINUE T_SEMICOLON                                                                             {$$ = new ContinueStatement();}
@@ -206,16 +205,18 @@ TYPE_SPECIFY:
   ;
 
 ENUM_LIST:
-    T_VARIABLE T_COMMA ENUM_LIST  {$$ = new LocalEnumElement(*$1,0,$3, false);}
-  | T_VARIABLE T_EQUAL T_NUMBER T_COMMA ENUM_LIST {$$ = new LocalEnumElement(*$1,$3,$5, true);} 
-  | T_VARIABLE T_EQUAL T_NUMBER                   {$$ = new LocalEnumElement(*$1,$3,NULL, true);}
-  | T_VARIABLE                    {$$ = new LocalEnumElement(*$1,0,NULL, false);}
+    T_VARIABLE T_COMMA ENUM_LIST  {$$ = new LocalEnumElement(*$1,NULL,$3);}
+  | T_VARIABLE T_EQUAL C_EXPRESSION T_COMMA ENUM_LIST {$$ = new LocalEnumElement(*$1,$3,$5);} 
+  | T_VARIABLE T_EQUAL C_EXPRESSION                   {$$ = new LocalEnumElement(*$1,$3,NULL);}
+  | T_VARIABLE                    {$$ = new LocalEnumElement(*$1,NULL,NULL);}
   ;
 
-C_EXPRESSION:  CONDITIONAL {$$ = $1;};
+C_EXPRESSION:  CONDITIONAL {$$ = $1;}
+  | T_VARIABLE T_EQUAL C_EXPRESSION                                                        {$$ = new AssignmentStatement(*$1,$3);}
+  ;
 
 CONDITIONAL:
-    LOG_OR T_TERNARY CONDITIONAL T_COLON CONDITIONAL {$$ = new IfElseStatement($1, $3, $5);}
+    LOG_OR T_TERNARY CONDITIONAL T_COLON CONDITIONAL {$$ = new TernaryOperator($1,$3,$5);}
   | LOG_OR                                    {$$ = $1;}
   ;
 
@@ -287,7 +288,7 @@ C_INCREMENT_DECREMENT:
 UNARY:
     T_BITWISE_COMPLEMENT FACTOR         {$$ = new BitwiseComplement(NULL,$2);}
   | T_NOT FACTOR                        {$$ = new NotOperator(NULL,$2);}
-  | T_MINUS T_NUMBER   {$$ = new Number(-$2);}
+  | T_MINUS FACTOR   {$$ = new NegativeOperator(NULL,$2);}
   | C_INCREMENT_DECREMENT {$$=$1;}
   | FACTOR                              {$$ = $1;}
   ;

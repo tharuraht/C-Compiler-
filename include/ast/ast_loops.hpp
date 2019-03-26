@@ -33,16 +33,15 @@ public:
         if(loop_while == true){
         
         //use a free register for condition check
-        std::vector<int> freeRegs = contxt.FindFreeConstantRegs();
-        contxt.set_used(freeRegs[0]);
+ 
         int current_loop = loop_count++;
 
         dst<<"while_loop_"<<current_loop<<"_begin:"<<"\t#Begin while loop"<<std::endl;
         
         //evalute the condition into the free register
-        Condition->compile(dst, contxt, freeRegs[0]);
+        Condition->compile(dst, contxt, destReg);
         //branch to end if condition evaluates false (0)
-        dst<<"\t"<<"beq"<<"\t"<<"$0, $"<<freeRegs[0]<<", end_loop_"<<current_loop<<std::endl;
+        dst<<"\t"<<"beq"<<"\t"<<"$0, $"<<destReg<<", end_loop_"<<current_loop<<std::endl;
         dst<<"\t"<<"nop"<<std::endl;
 
         std::string current_loop_end = "end_loop_" + std::to_string(current_loop);
@@ -58,7 +57,6 @@ public:
         //end of loop
         dst<<current_loop_end<<":"<<"\t#End while loop"<<std::endl;
         loop_ends.pop_back();
-        contxt.set_unused(freeRegs[0]);
         }
 
         loop_while = false;
@@ -120,23 +118,26 @@ public:
             contxt.set_used(freeRegs[0]);
 
             loop_for = true;
-
-            Init->compile(dst, contxt, freeRegs[0]);
+            if (Init != NULL)
+                Init->compile(dst, contxt, freeRegs[0]);
             dst<<"for_loop_"<<loop_count<<"_begin:"<<"\t#Begin for loop"<<std::endl;
             
             //evalute the condition into the free register
-            Condition->compile(dst, contxt, destReg);
+            if (Condition != NULL)
+                Condition->compile(dst, contxt, destReg);
             //branch to end if condition evaluates false (0)
             dst<<"\t"<<"beq"<<"\t"<<"$0, $"<<destReg<<", end_loop_"<<loop_count<<std::endl;
             dst<<"\t"<<"nop"<<std::endl;
 
             std::string current_loop_end = "end_loop_" + std::to_string(loop_count);
             loop_ends.push_back(current_loop_end);
-            Body->compile(dst, contxt, destReg);
+            if (Body != NULL)
+                Body->compile(dst, contxt, destReg);
             // loop_count--;
 
             dst<<"for_increment_"<<loop_count<<":"<<"\t#Increment stage of for loop"<<std::endl;
-            Increment->compile(dst, contxt, destReg);
+            if (Increment != NULL)
+                Increment->compile(dst, contxt, destReg);
 
             //branch back to top
             dst<<"\t"<<"b"<<"\t"<<"for_loop_"<<loop_count<<"_begin"<<std::endl;

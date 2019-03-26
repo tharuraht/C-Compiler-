@@ -28,7 +28,7 @@ class Variable: public Expression {
 
     virtual int evaluate() const override
     {
-        std::cout<<"#variable"<<std::endl;
+        // std::cout<<"#variable"<<std::endl;
         expr_var = id;
         return 0;
     }
@@ -83,7 +83,10 @@ class ArrayElement : public Expression {
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override{
         int element_no = element->evaluate();
         if (expr_var != "") {
-            element_no = contxt.find_var_val(expr_var);
+            if (element_no == 1)
+                element_no = contxt.find_var_val(expr_var) - 1;
+            else if (element_no == 0)
+                element_no = contxt.find_var_val(expr_var);
             expr_var = "";
         }
         if (element_no == 0) {

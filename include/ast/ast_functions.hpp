@@ -175,6 +175,8 @@ public:
         if (OtherParams != NULL) {
             OtherParams->compile(dst, contxt, destReg);
         }
+
+        contxt.set_unused(freeParamReg[0]);
     } 
 };
 

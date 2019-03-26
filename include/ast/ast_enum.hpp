@@ -31,20 +31,21 @@ class EnumDeclaration : public Expression {
 class LocalEnumElement: public Expression {
   private:
     std::string current_element;
-    int el_value;
+    ExpressionPtr el_value;
     ExpressionPtr next_el;
-    bool value_assigned;
+    // bool value_assigned;
 
   public:
     ~LocalEnumElement() {}
-    LocalEnumElement(std::string _current_element, int _el_value, ExpressionPtr _next_el, bool _value_assigned)
-     : current_element(_current_element), el_value(_el_value), next_el(_next_el), value_assigned(_value_assigned) {}
+    LocalEnumElement(std::string _current_element, ExpressionPtr _el_value, ExpressionPtr _next_el)
+     : current_element(_current_element), el_value(_el_value), next_el(_next_el) {}
 
     virtual void print (std::ostream &dst) const override {
         // enum_list_size++;
         dst<<current_element;
-        if (value_assigned) {
-            dst<<" = "<<el_value;
+        if (el_value!=NULL) {
+            dst<<" = ";
+            el_value->print(dst);
             
         }
         if (next_el != NULL) {
@@ -57,8 +58,8 @@ class LocalEnumElement: public Expression {
         localvar_counter++;
         contxt.NewLocalVar(current_element + std::to_string(scopelevel));
         
-        if (value_assigned) {
-            enum_list_size = el_value;
+        if (el_value!=NULL) {
+            enum_list_size = el_value->evaluate();
         }
         
         dst<<"\t"<<"li"<<"\t"<<"$"<<destReg<<", "<<enum_list_size;
@@ -80,19 +81,20 @@ class LocalEnumElement: public Expression {
 class GlobalEnumElement: public Expression {
   private:
     std::string current_element;
-    int el_value;
+    ExpressionPtr el_value;
     ExpressionPtr next_el;
-    bool value_assigned;
+    // bool value_assigned;
 
   public:
     ~GlobalEnumElement() {}
-    GlobalEnumElement(std::string _current_element, int _el_value, ExpressionPtr _next_el, bool _value_assigned)
-     : current_element(_current_element), el_value(_el_value), next_el(_next_el), value_assigned(_value_assigned) {}
+    GlobalEnumElement(std::string _current_element, ExpressionPtr _el_value, ExpressionPtr _next_el)
+     : current_element(_current_element), el_value(_el_value), next_el(_next_el)  {}
 
     virtual void print (std::ostream &dst) const override {
         dst<<current_element;
-        if (value_assigned) {
-            dst<<" = "<<el_value;
+        if (el_value != NULL) {
+            dst<<" = ";
+            el_value->print(dst);
             
         }
         if (next_el != NULL) {
@@ -109,8 +111,8 @@ class GlobalEnumElement: public Expression {
             dst << current_element << ":" << std::endl;
             
 
-            if (value_assigned) {
-               enum_list_size = el_value;
+            if (el_value != NULL) {
+               enum_list_size = el_value->evaluate();
             }
             
             dst << "\t"<< ".word"<< "\t"<<enum_list_size;

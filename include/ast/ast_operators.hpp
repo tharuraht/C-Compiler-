@@ -240,7 +240,6 @@ public:
             dst << "\t"<<"div"<<"\t"<< "$" << freeregs[0] << ", $" << destReg <<"\t#Division Operator"<< std::endl;
             dst << "\t"<<"mflo"<<"\t"<<"$"<<destReg<<"\t#Store result"<<std::endl;
             contxt.set_unused(freeregs[0]);
-            contxt.set_unused(freeregs[1]);
 
         }
     }
@@ -508,6 +507,30 @@ class NotOperator : public Operator {
     }
 };
 
+class NegativeOperator : public Operator {
+  protected:
+    virtual const char *getOpcode() const override
+    { return "-"; }
+
+  public:
+    NegativeOperator(ExpressionPtr _left, ExpressionPtr _right) : Operator(_left, _right)
+    {}
+
+    virtual int evaluate() const override {
+        int vr=right->evaluate();
+        return (-vr);
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        if (varGlobal) {
+            int vr = right->evaluate();
+            dst << -vr;
+        }
+        right->compile(dst, contxt, destReg);
+        dst<<"\t"<<"sub"<<"\t"<<"$"<<destReg<<", $zero, $"<<destReg<<"\t#- operator" << std::endl;
+    }
+};
+
 
 class LogicalAndOperator
     : public Operator
@@ -742,6 +765,62 @@ class RightShiftOperator : public Operator {
         //or operation ensures that if the result is non zero it becomes 1
         contxt.set_unused(freeReg[0]);
     }   
+};
+
+class TernaryOperator : public Expression {
+  private:
+    ExpressionPtr condition;
+    ExpressionPtr con_true;
+    ExpressionPtr con_false;
+  public:
+    ~TernaryOperator() {}
+    TernaryOperator(ExpressionPtr _condition, ExpressionPtr _con_true, ExpressionPtr _con_false)
+     : condition(_condition), con_true(_con_true), con_false(_con_false) {}
+    
+    virtual void print(std::ostream &dst) const override {
+        condition->print(dst);
+        dst<<" ? ";
+        if (con_true != NULL) 
+            con_true->print(dst);
+        dst<<" : ";
+        con_false->print(dst);
+    }
+
+    virtual int evaluate () const override {
+        int con = condition->evaluate();
+        int evaltrue; 
+        if (con_true != NULL) {
+            evaltrue = con_true->evaluate();
+        }
+        int evalfalse = con_false->evaluate();
+
+        return con ? evaltrue : evalfalse;
+    }
+
+    virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+        int current_if_level = if_level++;
+        condition->compile(dst, contxt, destReg);
+        dst<<"\t"<<"#Ternary operator"<<std::endl;
+        dst << "\t"<<"beq"<<"\t" << "$0, $" << destReg << ", else_"<<current_if_level << std::endl; //$else condition yet to be filled
+		dst << "\t"<<"nop"<<"\t" << std::endl;
+
+        if (con_true != NULL) {
+            con_true->compile(dst, contxt, destReg);
+        }
+        else {
+            //automatically jump to false expr since no true
+            dst<<"\t"<<"b"<<"\t"<<"else_"<<current_if_level;
+            dst<<"\t#No true expression provided"<<std::endl;
+        }
+        dst<<"\t"<<"b"<<"\t"<<"ifelse_end_"<<current_if_level<<std::endl;
+        dst<<"\t"<<"nop"<<std::endl;
+
+        dst<<"else_"<<current_if_level<<":"<<std::endl;
+        con_false->compile(dst, contxt, destReg);
+    
+
+        dst<<"ifelse_end_"<<current_if_level<<":"<<std::endl;
+    }
 };
 
 #endif

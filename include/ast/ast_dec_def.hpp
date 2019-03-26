@@ -246,6 +246,11 @@ public:
         dst<<variable<<"++";
     }
 
+    virtual int evaluate () const override {
+        expr_var = variable;
+        return 0;
+    }
+
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
         std::vector<int> freeReg = contxt.FindFreeTempRegs();
@@ -275,6 +280,11 @@ public:
 
     virtual void print (std::ostream &dst) const override {
         dst<<"++"<<variable;
+    }
+
+    virtual int evaluate () const override {
+        expr_var = variable;
+        return 1;
     }
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
@@ -309,6 +319,11 @@ public:
         dst<<variable<<"--";
     }
 
+    virtual int evaluate () const override {
+        expr_var = variable;
+        return 0;
+    }
+
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
     {
         std::vector<int> freeReg = contxt.FindFreeTempRegs();
@@ -340,6 +355,11 @@ public:
 
     virtual void print (std::ostream &dst) const override {
         dst<<"--"<<variable;
+    }
+
+    virtual int evaluate () const override {
+        expr_var = variable;
+        return 1;
     }
 
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override
