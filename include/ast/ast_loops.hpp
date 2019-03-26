@@ -114,12 +114,12 @@ public:
 
         if(loop_for == true){
             //use a free register for condition check
-            std::vector<int> freeRegs = contxt.FindFreeConstantRegs();
-            contxt.set_used(freeRegs[0]);
+            // std::vector<int> freeRegs = contxt.FindFreeConstantRegs();
+            // contxt.set_used(freeRegs[0]);
 
             loop_for = true;
             if (Init != NULL)
-                Init->compile(dst, contxt, freeRegs[0]);
+                Init->compile(dst, contxt, destReg);
             dst<<"for_loop_"<<loop_count<<"_begin:"<<"\t#Begin for loop"<<std::endl;
             
             //evalute the condition into the free register
@@ -145,7 +145,7 @@ public:
             //end of loop
             dst<<"end_loop_"<<loop_count<<":"<<"\t#End for loop"<<std::endl;
             loop_ends.pop_back();
-            contxt.set_unused(freeRegs[0]);
+            // contxt.set_unused(freeRegs[0]);
             loop_count++;
         }
 

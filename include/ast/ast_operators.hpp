@@ -83,7 +83,7 @@ public:
             {
                 std::vector<int> freeregs = contxt.FindFreeTempRegs(); //finds available registers
                 contxt.set_used(freeregs[0]);                      //locks the registers for use of the function
-                contxt.set_used(freeregs[1]);
+                
                 int current_function_depth = function_call_num;
                 std::cout<<"#function call depth: "<<current_function_depth<<std::endl;
                 left->compile(dst, contxt, freeregs[0]);

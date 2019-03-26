@@ -55,7 +55,7 @@
 
 %type <expr> STATEMENT ENUM_LIST G_ENUM_LIST 
 %type <expr> C_EXPRESSION C_ARGS DECLARE_VAR PASSED_PARAMS G_ADDITIONAL_DECS L_ADDITIONAL_DECS C_INCREMENT_DECREMENT
-%type <expr> CONDITIONAL LOG_OR LOG_AND BIT_OR BIT_XOR BIT_AND EQUALITY RELATIONAL SHIFT ADDITIVE TERM UNARY FACTOR
+%type <expr> CONDITIONAL LOG_OR LOG_AND BIT_OR BIT_XOR BIT_AND EQUALITY RELATIONAL SHIFT ADDITIVE TERM UNARY FACTOR NESTED_SCOPE
 
 //C_INCREMENT_DECREMENT, , EXPR, SCOPE_BODY
 
@@ -163,8 +163,12 @@ STATEMENT:
   | T_CONTINUE T_SEMICOLON                                                                             {$$ = new ContinueStatement();}
   | DECLARE_VAR  T_SEMICOLON                                                                           {$$ = $1;}
   | C_EXPRESSION T_SEMICOLON                                                                           {$$ = $1;}
+  | T_CURLY_LBRACKET NESTED_SCOPE T_CURLY_RBRACKET     {$$ = $2;}
   ;
+NESTED_SCOPE:
 
+   SCOPE_STATEMENTS                                                   {$$ = new ScopeBody($1);}
+  ;
 STAT_SCOPE:
     STATEMENT {$$ = new NoBraces($1);}
   | SCOPE {$$=$1;}

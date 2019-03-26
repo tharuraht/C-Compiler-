@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <iostream>
 
 static unsigned int localvar_counter;
 static unsigned int globalvar_counter;
@@ -43,13 +44,13 @@ class Context {
     }
 
     void set_used(unsigned int regno) {
-        // std::cout<<"#locked: "<<regno<<std::endl;
+        std::cout<<"#locked: "<<regno<<std::endl;
         // std::cout<<"#: "<<regavailable[regno]<<std::endl;
         regavailable[regno] = false;
     }
 
     void set_unused(unsigned int regno) {
-        // std::cout << "#unlocked: " << regno << std::endl;
+        std::cout << "#unlocked: " << regno << std::endl;
         // std::cout << "#: " << regavailable[regno] << std::endl;
         regavailable[regno] = true;
     }

@@ -470,6 +470,22 @@ public:
     }
 };
 
+// class NestedScope : public Expression {
+//   private:
+//     NodePtr Scope;
+//   public:
+//     ~NestedScope() {}
+//     NestedScope (NodePtr _Scope) : Scope(_Scope) {}
+
+//     virtual void print (std::ostream &dst) const override {
+//         Scope->print(dst);
+//     }
+
+//     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
+//         Scope->compile(dst,contxt,destReg);
+//     }
+// };
+
 class NoBraces : public Expression
 {
   private:
