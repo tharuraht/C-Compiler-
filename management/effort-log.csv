@@ -34,4 +34,4 @@ Date,Effort,Developers,Milestones
 24.03.19,5,ta2617,"Implemented parsing and compilation of enum keyword, changed some compiler tests"
 24.03.19,8,am9717, "Fixed incorrectly implemented BREAK, completed CONTINUE and working on SWITCH with ta2617. Completed parser + codegen for operator assignments."
 25.03.19,11,"am9717,ta2617", "Worked together to fix issues with function calls, changed parse tree structure to match operator precedence, added classes for relevant operators and performed functional testing using testbench."
-26.03.19,1,"am9717,ta2617","Added hex end exponential numbers"
+26.03.19,12,"am9717,ta2617","Added hex end exponential numbers and underscore, fixed: corner cases, enum, break/continue, for loops, while loops, ifelse loops, added more tests and tested using testbench."
