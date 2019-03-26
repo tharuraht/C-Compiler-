@@ -67,6 +67,7 @@ class GlobalVarDec : public Expression
             varGlobal = false;
             dst << std::endl;
 
+            contxt.store_var_val(Name, Expression->evaluate());
             // dst << "\t"<< ".text" << std::endl;
             // dst << "\t"<< ".align"<< "\t"<< "2" << std::endl;
         }
@@ -123,6 +124,7 @@ class LocalVarDec : public Expression
         if (Expression != NULL)
         {
             Expression->compile(dst, contxt, destReg);
+            contxt.store_var_val(Name, Expression->evaluate());
         }
         else
         {

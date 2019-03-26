@@ -47,7 +47,7 @@ public:
 
         std::string current_loop_end = "end_loop_" + std::to_string(current_loop);
         loop_ends.push_back(current_loop_end);
-        
+
         Body->compile(dst, contxt, destReg);
         // loop_count--;
 
@@ -130,6 +130,8 @@ public:
             dst<<"\t"<<"beq"<<"\t"<<"$0, $"<<destReg<<", end_loop_"<<loop_count<<std::endl;
             dst<<"\t"<<"nop"<<std::endl;
 
+            std::string current_loop_end = "end_loop_" + std::to_string(loop_count);
+            loop_ends.push_back(current_loop_end);
             Body->compile(dst, contxt, destReg);
             // loop_count--;
 
@@ -141,6 +143,7 @@ public:
             dst<<"\t"<<"nop"<<std::endl;
             //end of loop
             dst<<"end_loop_"<<loop_count<<":"<<"\t#End for loop"<<std::endl;
+            loop_ends.pop_back();
             contxt.set_unused(freeRegs[0]);
             loop_count++;
         }

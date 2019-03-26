@@ -40,6 +40,8 @@ public:
         std::vector<int> freeRegs = contxt.FindFreeTempRegs();
         contxt.set_used(freeRegs[0]);
         Expression->compile(dst, contxt, freeRegs[0]);
+        contxt.store_var_val(VarName, Expression->evaluate());
+
         //store result into variable
         if (contxt.LookupVariable(VarName, scopelevel) != 0)
             dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#Assign variable "<<VarName<<std::endl;
