@@ -37,6 +37,11 @@ class FunctionCall : public Expression
         dst << ")";
     }
 
+    virtual int evaluate () const override {
+        //function call cant really implement
+        return 0;
+    }
+
     virtual void compile(std::ostream &dst, Context &contxt, int destReg) const override {
         function_call_num++;
         function_call_queue.push_back(name);
