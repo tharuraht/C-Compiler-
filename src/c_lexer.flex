@@ -100,7 +100,9 @@ extern "C" int fileno(FILE *stream);
 [+][+]          { return T_INCREMENT; }
 [-][-]          { return T_DECREMENT; }
 
-[0-9]+([.][0-9]*)? { yylval.number=strtod(yytext, 0); return T_NUMBER; }
+[0-9]+([.][0-9]*)?([Ee][-+]?[0-9]+)? { yylval.number=strtod(yytext, 0); return T_NUMBER; }
+
+[0][Xx][0-9a-fA-F]+                   {yylval.number=strtod(yytext, 0); return T_NUMBER; }
 
 [a-zA-Z]+[a-z0-9_]*        { yylval.string=new std::string(yytext); return T_VARIABLE; }
 
