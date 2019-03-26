@@ -29,19 +29,19 @@ public:
     virtual void translate(std::ostream &dst) const override
     {
         dst << VarName << " = ";
-        Expression->translate(dst);         
+        Expression->translate(dst);
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        
+
         int stack_end = (var_count*4) +parameter_count+12+50;
-        
+
         //find a free register
         std::vector<int> freeRegs = contxt.FindFreeTempRegs();
         contxt.set_used(freeRegs[0]);
         Expression->compile(dst, contxt, freeRegs[0]);
         //store result into variable
-        if (contxt.LookupVariable(VarName, scopelevel) != 0) 
+        if (contxt.LookupVariable(VarName, scopelevel) != 0)
             dst<<"\t"<<"sw"<<"\t"<<"$"<<freeRegs[0]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#Assign variable "<<VarName<<std::endl;
 
         else if (contxt.find_parameter(VarName) > -1) {
@@ -77,17 +77,17 @@ public:
     virtual void translate(std::ostream &dst) const override
     {
         dst << VarName << " += ";
-        Expression->translate(dst);         
+        Expression->translate(dst);
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-         
+
         //find a free registers
         std::vector<int> freeRegs = contxt.FindFreeTempRegs();
         contxt.set_used(freeRegs[0]);
         contxt.set_used(freeRegs[1]);
         Expression->compile(dst, contxt, freeRegs[0]);
-        
+
         //load result into free reg 1
         dst<<"\t"<<"lw"<<"\t"<<"$"<<freeRegs[1]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#AddAssign loading variable: "<<VarName<<std::endl;
 
@@ -122,17 +122,17 @@ public:
     virtual void translate(std::ostream &dst) const override
     {
         dst << VarName << " -= ";
-        Expression->translate(dst);         
+        Expression->translate(dst);
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-         
+
         //find a free registers
         std::vector<int> freeRegs = contxt.FindFreeTempRegs();
         contxt.set_used(freeRegs[0]);
         contxt.set_used(freeRegs[1]);
         Expression->compile(dst, contxt, freeRegs[0]);
-        
+
         //load result into free reg 1
         dst<<"\t"<<"lw"<<"\t"<<"$"<<freeRegs[1]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#SubAssign loading variable: "<<VarName<<std::endl;
 
@@ -167,17 +167,17 @@ public:
     virtual void translate(std::ostream &dst) const override
     {
         dst << VarName << " *= ";
-        Expression->translate(dst);         
+        Expression->translate(dst);
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-         
+
         //find a free registers
         std::vector<int> freeRegs = contxt.FindFreeTempRegs();
         contxt.set_used(freeRegs[0]);
         contxt.set_used(freeRegs[1]);
         Expression->compile(dst, contxt, freeRegs[0]);
-        
+
         //load result into free reg 1
         dst<<"\t"<<"lw"<<"\t"<<"$"<<freeRegs[1]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#MulAssign loading variable: "<<VarName<<std::endl;
 
@@ -213,17 +213,17 @@ public:
     virtual void translate(std::ostream &dst) const override
     {
         dst << VarName << " /= ";
-        Expression->translate(dst);         
+        Expression->translate(dst);
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-         
+
         //find a free registers
         std::vector<int> freeRegs = contxt.FindFreeTempRegs();
         contxt.set_used(freeRegs[0]);
         contxt.set_used(freeRegs[1]);
         Expression->compile(dst, contxt, freeRegs[0]);
-        
+
         //load result into free reg 1
         dst<<"\t"<<"lw"<<"\t"<<"$"<<freeRegs[1]<<", "<<contxt.LookupVariable(VarName, scopelevel)<<"($fp)"<<"\t#DivAssign loading variable: "<<VarName<<std::endl;
 
@@ -350,7 +350,7 @@ public:
             dst<<"else";
             EBody->print(dst);
         }
-        
+
     }
 
     virtual void translate(std::ostream &dst) const override {
@@ -378,9 +378,7 @@ public:
 		contxt.set_unused(FreeReg[0]);
 
         if(IBody != NULL){
-            if_level++;
             IBody->compile(dst, contxt, destReg);
-            if_level--;
         }
 
         dst<<"\t"<<"b"<<"\t"<<"ifelse_end_"<<if_level<<std::endl;
@@ -388,9 +386,7 @@ public:
 
         dst<<"else_"<<if_level<<":"<<std::endl;
         if(EBody != NULL){
-            if_level++;
             EBody->compile(dst, contxt, destReg);
-            if_level--;
         }
 
         dst<<"ifelse_end_"<<if_level<<":"<<std::endl;
@@ -407,7 +403,7 @@ class SwitchBody : public AST_node {
 
   public:
     ~SwitchBody() {}
-    SwitchBody(std::string _name, ExpressionPtr _CaseExpression, NodePtr _Statements, NodePtr _Next_case) 
+    SwitchBody(std::string _name, ExpressionPtr _CaseExpression, NodePtr _Statements, NodePtr _Next_case)
      : name(_name), CaseExpression(_CaseExpression), Statements(_Statements), Next_case(_Next_case) {}
 
     virtual void print(std::ostream &dst) const override {
@@ -423,7 +419,7 @@ class SwitchBody : public AST_node {
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        
+
     }
 };
 
@@ -605,11 +601,11 @@ public:
         Condition->compile(dst, contxt, destReg);
         Body->compile(dst, contxt, destReg);
     }
-};  
+};
 
 class BreakStatement : public Expression {
 private:
-    
+
 public:
     ~BreakStatement() {}
     BreakStatement() {}
@@ -629,7 +625,7 @@ public:
 
 class ContinueStatement : public Expression {
 private:
-    
+
 public:
     ~ContinueStatement() {}
     ContinueStatement() {}
