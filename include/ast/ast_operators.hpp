@@ -364,8 +364,8 @@ public:
         contxt.set_used(freeReg[0]);                      //locks the registers for use of the function
         left->compile(dst, contxt, destReg);
         right->compile(dst, contxt, freeReg[0]);
-        dst << "\t"<< "slt"<< "\t"<< "$" << destReg << ", $" << destReg << ", $" <<freeReg[0]<< "\t#<= operator" << std::endl;
-        dst<<"\t"<<"xori"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", 1"<<"\t#>= operator" << std::endl;
+        dst << "\t"<< "slt"<< "\t"<< "$" << destReg << ", $" << freeReg[0] << ", $" <<destReg<< "\t#<= operator" << std::endl;
+        dst<<"\t"<<"xori"<<"\t"<<"$"<<destReg<<", $"<<destReg<<", 1"<<"\t#<= operator" << std::endl;
         contxt.set_unused(freeReg[0]);
     }
 };

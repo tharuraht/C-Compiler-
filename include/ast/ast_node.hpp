@@ -12,12 +12,14 @@ static std::vector<std::string> global_vars;
 static int var_count;
 static int scopelevel;
 static std::vector<std::string> function_call_queue;
+static std::vector<std::string> loop_ends;
 static int parameter_count = 16;
 static int function_call_num;
 static bool varGlobal;
 static int loop_count;
 static int if_level;
 static bool main_returned;
+
 // static int index_no;
 static int enum_list_size;
 static bool loop_while = false;

@@ -35,24 +35,29 @@ public:
         //use a free register for condition check
         std::vector<int> freeRegs = contxt.FindFreeConstantRegs();
         contxt.set_used(freeRegs[0]);
+        int current_loop = loop_count++;
 
-        dst<<"while_loop_"<<loop_count<<"_begin:"<<"\t#Begin while loop"<<std::endl;
+        dst<<"while_loop_"<<current_loop<<"_begin:"<<"\t#Begin while loop"<<std::endl;
         
         //evalute the condition into the free register
         Condition->compile(dst, contxt, freeRegs[0]);
         //branch to end if condition evaluates false (0)
-        dst<<"\t"<<"beq"<<"\t"<<"$0, $"<<freeRegs[0]<<", end_loop_"<<loop_count<<std::endl;
+        dst<<"\t"<<"beq"<<"\t"<<"$0, $"<<freeRegs[0]<<", end_loop_"<<current_loop<<std::endl;
         dst<<"\t"<<"nop"<<std::endl;
 
-        loop_count++;
+        std::string current_loop_end = "end_loop_" + std::to_string(current_loop);
+        loop_ends.push_back(current_loop_end);
+        
         Body->compile(dst, contxt, destReg);
-        loop_count--;
+        // loop_count--;
+
 
         //branch back to top
-        dst<<"\t"<<"b"<<"\t"<<"while_loop_"<<loop_count<<"_begin"<<std::endl;
+        dst<<"\t"<<"b"<<"\t"<<"while_loop_"<<current_loop<<"_begin"<<std::endl;
         dst<<"\t"<<"nop"<<std::endl;
         //end of loop
-        dst<<"end_loop_"<<loop_count<<":"<<"\t#End while loop"<<std::endl;
+        dst<<current_loop_end<<":"<<"\t#End while loop"<<std::endl;
+        loop_ends.pop_back();
         contxt.set_unused(freeRegs[0]);
         }
 
@@ -125,9 +130,8 @@ public:
             dst<<"\t"<<"beq"<<"\t"<<"$0, $"<<destReg<<", end_loop_"<<loop_count<<std::endl;
             dst<<"\t"<<"nop"<<std::endl;
 
-            loop_count++;
             Body->compile(dst, contxt, destReg);
-            loop_count--;
+            // loop_count--;
 
             dst<<"for_increment_"<<loop_count<<":"<<"\t#Increment stage of for loop"<<std::endl;
             Increment->compile(dst, contxt, destReg);
@@ -138,6 +142,7 @@ public:
             //end of loop
             dst<<"end_loop_"<<loop_count<<":"<<"\t#End for loop"<<std::endl;
             contxt.set_unused(freeRegs[0]);
+            loop_count++;
         }
 
         loop_for = false;

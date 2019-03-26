@@ -619,7 +619,7 @@ public:
     }
 
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override {
-        dst<<"\t"<<"b"<<"\t"<<"end_loop_"<<loop_count-1<<"\t #Break called"<<std::endl;
+        dst<<"\t"<<"b"<<"\t"<<loop_ends.back()<<"\t #Break called"<<std::endl;
     }
 };
 
@@ -644,7 +644,7 @@ public:
             dst<<"\t"<<"b"<<"\t"<<"while_loop_"<<loop_count-1<<"_begin"<<"\t #while continue statement"<<std::endl;
         }
         else if(loop_for == true){
-            dst<<"\t"<<"b"<<"\t"<<"for_increment_"<<loop_count-1<<"\t #for continue statement"<<std::endl;
+            dst<<"\t"<<"b"<<"\t"<<"for_increment_"<<loop_count<<"\t #for continue statement"<<std::endl;
             //dst<<"\t"<<"b"<<"\t"<<"ifelse_end_"<<loop_count-1<<"\t #for continue statement"<<std::endl;
         }
     }
