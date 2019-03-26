@@ -80,6 +80,10 @@ class ArrayElement : public Expression {
         dst<<"]";
     }
 
+    virtual int evaluate () const override {
+        return element->evaluate();
+    }
+
     virtual void compile (std::ostream &dst, Context &contxt, int destReg) const override{
         int element_no = element->evaluate();
         if (expr_var != "") {
