@@ -14,7 +14,7 @@ Implement_loops_def, Implement_multifunction_def, 3, am9717, 67693d6cf5f1bb7217d
 Implement_operators,Implement_loops_def,2,am9717,f37e55a00b84bc4e54af4a3a5128fca2fb53bee2, Based on formative test 9 implement operators such as < > and ==
 Test_python_translator,Implement_function_def,4,ta2617,8cc2e5e5ff6c00cb88a4a282e6ef83b240308895, Add tests for conversion between c and python fixing it when it fails/debug if not working
 Complete_python_translator, Test_python_translator, 2, am9717 ta2617, adbac977f9894b1900cf0cc4c1dc8c7cabaf4609, Fix function def/variable def/return/expression/operators for translator based on testing and complete translator
-Add_test_Deliverable_1,Complete_c_compiler, 1, am9717,, Add more tests to formative folder and create a "main" for the c_compiler to perform operations based on input flag
+Add_test_Deliverable_1,Complete_c_compiler, 1, am9717,, Add more tests to formative folder and create a main for the c_compiler to perform operations based on input flag
 Write_c_context,Test_python_translator, 4,am9717 ta2617,be5593f2b4b7a9b7e89e288dc38aa0ba15b59961, Create a context class for compiler that makes use of registers and sets them to used/unused
 Understand_MIPS_directives, Write_c_context, 2, am9717 ta2617, Discussion, Research on MIPS assembly and purpose of derictives for codegen
 Create_Simple_Compile_Function, Understand_MIPS_directives, 4, am9717 ta2617, d51362b51e899920f7fe8fd926d013694f49c7d8, Write MIPS assembly for a simple empty/return 0 main function 
