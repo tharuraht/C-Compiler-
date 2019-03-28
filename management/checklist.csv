@@ -12,8 +12,8 @@ functions that take up to four parameters,yes
 for loops,yes
 arrays declared globally (i.e. outside of any function in your file),yes
 arrays declared locally (i.e. inside a function),yes
-reading and writing elements of an array,no
+reading and writing elements of an array,yes
 recursive function calls,yes
-the enum keyword,no
+the enum keyword,yes
 switch statements,no
-the break and continue keywords,no
+the break and continue keywords,yes
