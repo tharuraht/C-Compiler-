@@ -1,37 +1,39 @@
-Date,Effort,Developers,Milestones
-19.02.19,1,"am9717, ta2617","Read specification, understand tasks required"
-22.02.19,1,"am9717, ta2617","Understood C89 draft spec, allocated initial tasks"
-25.02.19,3,am9717,Worked on a simple lexer
-04.03.19,3,am9717,Worked on a simple parser 
-05.03.19,4,ta2617,Began generating main parse tree
-06.03.19,7,"am9717,ta2617","Built more of parse tree, and began writing AST functions"
-09.03.19,3,ta2617,"Reduced and simplified parser tree in order to test and create functional AST"
-10.03.19,3, am9717, "Completed ten required tests for deliverable 1, wrote (yet to test) bash script to automate testing"
-11.03.19,3,ta2617,"Broadened parser to allow for simple variable syntax e.g. 'a=5+5;'" 
-11.03.19,2, am9717,"Syntax errors in flex file, resolved by simplifying parse tree"
-12.03.19,3,ta2617,"Implemented function definition, main specific translation"
-13.03.19,5,ta2617,"Fixed bugs with multiple statements, resolved some shift-reduce conflicts, implemented global vars"
-13.03.19,5,am9717, "Added translator functionality for: ifelse statements and operators. Implemented c_compiler.cpp for translator testbench testing" 
-14.04.19,3,ta2617, "Fixed bugs with translator, added some tests for translator"
-14.03.19,4,am9717,"Added more comparator and logical operator translator functionality, improved commment support and added more translator tests"
-15.03.19,5,ta2617,"Fixed binary operators || and && in parse tree, added more tests such as nested if, fixed expressions in function calls"
-15.03.19,1,ta2617,"Allowed for non-assigned expressions, added associatiity to ops"
-15.03.19,6,am9717,"Improved translator function for operators, built more parse tree to support returning function calls and debugged errors in translator"
-16.03.19,4,ta2617,"Implemented bracketed expressions for translate, created context class for compiler"
-16.03.19,8,am9717, "Reduced shift/conflict errors in parse tree, implemented do-while and for loops, increments/decrements and empty function calls for translator"
-17.03.19,5,"am9717,ta2617","Discussed codegen structure based on lab 3 and started codegen for global variables"
-18.03.19,2,ta2617,"Implemented type definition and assignment of multiple variables"
-19.03.19,2,ta2617,"Fixed implementation of multiple decs, was understood wrong before"
-19.03.19,6,am9717,"Worked on codegen for scope statements and variable declaration, managed to print asm for simple main function"
-20.03.19,10,ta2617,"Added new parameter for compile function, implemented return, function declaractions, and simple expressions, created simple compiler testers, implementing global variables into functions"
-20.03.19,2,ta2617,"Implemented while function compiliation, and comparison expressions"
-20.03.19,3, am9717, "Discussed and adapted current codegen structure with MIPS ABI calls, nearly completed codegen for IfElse statements"
-21.03.19,2,"am9717,ta2617","Fixed reduce-reduce in parser, and implemented function calls in expressions"
-21.03.19,6, "am9717", "Resolved errors in translator testbench, updated FOR_N test and ran testbench on present compiler. Implemented codegen for FOR loops."
-22.03.19,9,"am9717,ta2617","Implemented parameters, fixed testbench, recursive function call"
-23.03.19,7,ta2617,"Implemented local and global arrays and access via square brackets, defined default return to 0"
-23.03.19,2,am9717, "Implemented codegen for BREAK function, read up on how to implement MIPS for continue and switch statements"
-24.03.19,5,ta2617,"Implemented parsing and compilation of enum keyword, changed some compiler tests"
-24.03.19,8,am9717, "Fixed incorrectly implemented BREAK, completed CONTINUE and working on SWITCH with ta2617. Completed parser + codegen for operator assignments."
-25.03.19,11,"am9717,ta2617", "Worked together to fix issues with function calls, changed parse tree structure to match operator precedence, added classes for relevant operators and performed functional testing using testbench."
-26.03.19,12,"am9717,ta2617","Added hex end exponential numbers and underscore, fixed: corner cases, enum, break/continue, for loops, while loops, ifelse loops, added more tests and tested using testbench."
+Date,Effort,Developers,Description, Milestones (ID)
+18.02.19,1,am9717 ta2617,Read specification; understand tasks required, Define_initial_milestones
+22.02.19,1,am9717 ta2617,Understood C89 draft spec; allocated initial tasks, Define_initial_milestones
+25.02.19,3,am9717,Worked on a simple lexer based on C89 draft manual, Create_simple_lexer
+27.02.19,2,ta2617, Ran tests on lexer based on test_lexer.sh from lexer lab 1, Test_simple_lexer
+01.03.19,1, am9717 ta2617, Discussed findings from lexer testing and approach for the parse tree, Test_simple_lexer
+04.03.19,3,am9717,Worked on simple parser based on C89 default spec and watched parser lecture, Create_simple_parser
+05.03.19,4,ta2617,Began generating main parse tree after realising being short of time for the project, Create_simple_parser
+06.03.19,7,am9717 ta2617,Built more of parse tree and began writing AST functions, Create_simple_parser
+09.03.19,3,ta2617,Reduced and simplified parser tree in order to test and create functional AST, Create_simple_parser
+10.03.19,3, am9717, Completed ten required tests for deliverable 1; wrote (yet to test) bash script to automate testing, Complete_Deliverable_1
+11.03.19,3,ta2617,Broadened parser to allow for simple variable syntax e.g. 'a=5+5;', Develop_simple_parser
+11.03.19,2, am9717,Syntax errors in flex file which were resolved by simplifying parse tree, Test_simple_parser
+12.03.19,3,ta2617,Implemented function definition; main specific translation for the translator deliverable, Implement_function_def
+13.03.19,5,ta2617,Fixed bugs with multiple statements; resolved some shift-reduce conflicts implemented global variables, Implement_multifunction_def
+13.03.19,5,am9717, Added translator functionality for: ifelse statements and operators. Implemented c_compiler.cpp for translator testbench testing, Implement_loops_def
+14.04.19,3,ta2617, Fixed bugs with translator; added some tests for translator, Test_python_translator
+14.03.19,4,am9717,Added more comparator and logical operator translator functionality; improved commment support and added more translator tests, Implement_operators
+15.03.19,5,ta2617,Fixed binary operators || and && in parse tree; added more tests such as nested if; fixed expressions in function calls, Test_python_translator
+15.03.19,1,ta2617,Allowed for non-assigned expressions; added associatiity to ops, Implement_operators
+15.03.19,6,am9717,Improved translator function for operators; built more parse tree to support returning function calls and debugged errors in translator, Complete_python_translator
+16.03.19,4,ta2617,Implemented bracketed expressions for translate; created context class for compiler, Write_c_context
+16.03.19,8,am9717, Reduced shift/conflict errors in parse tree; implemented do-while and for loops; increments/decrements and empty function calls for translator, Complete_python_translator
+17.03.19,5,am9717 ta2617,Discussed codegen structure based on lab 3 and started codegen for global variables, Understand_MIPS_directives
+18.03.19,2,ta2617,Implemented type definition and assignment of multiple variables, Create_Simple_Compile_Function
+19.03.19,2,ta2617,Fixed implementation of multiple decs - was understood wrong before, Create_Simple_Compile_Function
+19.03.19,6,am9717,Worked on codegen for scope statements and variable declaration; managed to print asm for simple main function, Implement_statement_scope
+20.03.19,10,ta2617,Added new parameter for compile function; implemented return; function declaractions and simple expressions; created simple compiler testers; implementing global variables into functions, Implement_global_var/dec
+20.03.19,2,ta2617,Implemented while function compiliation and comparison expressions, Implement_loops
+20.03.19,3, am9717, Discussed and adapted current codegen structure with MIPS ABI calls; nearly completed codegen for IfElse statements, Implement_loops
+21.03.19,2,am9717 ta2617,Fixed reduce-reduce in parser and implemented function calls in expressions, Complete_Basic_Codegen
+21.03.19,6, am9717, Resolved errors in translator testbench; updated FOR_N test and ran testbench on present compiler. Implemented codegen for FOR loops., Test_Basic_Codegen
+22.03.19,9,am9717 ta2617,Implemented parameters; fixed testbench and recursive function call, Implement_param_function_calls
+23.03.19,7,ta2617,Implemented local and global arrays and access via square brackets and defined default return to 0, Implement_local/global_arrays
+23.03.19,2,am9717, Implemented codegen for BREAK function; read up on how to implement MIPS for continue and switch statements, Implement_continue/break
+24.03.19,5,ta2617,Implemented parsing and compilation of enum keyword and changed some compiler tests, Implement_continue/break
+24.03.19,8,am9717, Fixed incorrectly implemented BREAK; completed CONTINUE and working on SWITCH with ta2617. Completed parser + codegen for operator assignments., Implement_operators
+25.03.19,11,am9717 ta2617, Worked together to fix issues with function calls; changed parse tree structure to match operator precedence; added classes for relevant operators and performed functional testing using testbench., Complete_intermediate_codegen
+26.03.19,12,am9717 ta2617,Added hex and exponential numbers and underscore - fixed: corner cases; enum; break/continue; for loops; while loops; ifelse loops; added more tests and tested using testbench., Complete_intermediate_codegen

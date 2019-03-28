@@ -1,19 +1,34 @@
-MilestoneID,             Dependencies, EstimatedEffort, Lead,             Completed, Description
-DefineInitialMilestones,             , 2              ,"am9717, ta2617",           ," Come up with initial milestones for getting started, read and understood specification"
-Create_simple_lexer,,4,am9717,1f639019d6a9f54b9812f3db580b282a9e7fa597,Read the C89 spec and created lexer based on that spec
-Test_simple_lexer,Create_simple_lexer,1,ta2617,,Check the functionality of the lexer by printing output tokens
-Create_simple_parser,Create_simple_lexer,5,am9717,,"Based on lexer, create a parsing file to parse into canonical form"
-Develop_simple_parser,Create_simple_parser,5,ta2617,f3e1f6dd64e3ef570bd285a6f320007b232b6cc2,"Developed parse tree and lexer to be read and print simple mathematical expressions, as in lab 2"
-Test_simple_parser,Create_simple_parser,4,ta2617,,Pass functions into parser and print out ast tree
-Complete_Deliverable_1, , 5,am9717, ,Write test and test drivers for required ten tests. Write a bash script to automate testing.
-Test_Deliverable_1, , 1, am9717, ,Run the automated script and check if own compiler passes written tests.
-Create_var_declaration,Test_simple_parser,2,ta2617,,"Broadened parser to allow for simple variable syntax e.g. 'a=5+5;'" 
-Implement_function_def,Create_var_declaration,3,ta2617,,"Implemented function definition, main specific translation"
-Implement_operators,Test_simple_parser,2,am9717,, Based on formative test 9, implement operators such as <, > and ==.
-Test_python_translator,Implement_function_def,4,ta2617,,"Added tests for conversion between c and python, fixing it when it fails"
-Test_Deliverable_1, , 1, am9717,, Added more tests to formative folder, created c_compiler.cpp and ran the bash script.
-Begin_c_compiler,Test_python_translator,"am9717,ta2617",,"Began writing AST for generating MIPS assembly"
-Understand_MIPS_directives, , 2, "am9717, ta2617", , "Researched on MIPS assembly and purpose of derictives for codegen"
-Create_Simple_Compile_Function, Understand_MIPS_directives, 4, "am9717, ta2617", , "Write MIPS assembly for a simple empty/return 0 main function" 
-Complete_Basic_Codegen, Create_Simple_Compile_Function, 15, "am9717, ta2617", , "Complete all requirements for basic compiler functionality"
-Test_Basic_Codegen, Complete_Basic_Codegen,2,"am9717, ta2617",ebb8753d54e32cf626a39e3f09514f2c25293082,"Tested requirements using set tests"
+MilestoneID,Dependencies,EstimatedEffort,Lead,Completed,Description
+Define_initial_milestones,None,2,am9717 ta2617,Discussion, Come up with initial milestones for getting started; read and understood specification
+Create_simple_lexer,None,4,am9717,1f639019d6a9f54b9812f3db580b282a9e7fa597,Read the C89 spec online; created lexer based on that spec and organised lex file by operator type
+Test_simple_lexer,Create_simple_lexer,1,ta2617,76eb4c95334494e13fb2daefb56a4cfea6dc70a5,Check the functionality of the lexer by printing output tokens
+Create_simple_parser,Test_simple_lexer,5,am9717,b3411d8539e146260d4b6fbad6d3b8939747f950,Based on lexer create a parse tree that places all tokens in right grammar and precedence
+Develop_simple_parser,Create_simple_parser,5,ta2617,4155d3fee32fe877601ba46e3c590f376a9a19f3,Developed parse tree and lexer to be read and print simple mathematical expressions as in lab 2
+Test_simple_parser,Create_simple_parser,4,ta2617,f3e1f6dd64e3ef570bd285a6f320007b232b6cc2,Pass functions into parser and print out ast tree using print canonical file from lab 2
+Complete_Deliverable_1,None, 5,am9717, 1956622d1d30b4ac47f76fd61fa7c006fdf0b89d,Write test and test drivers for required ten tests. Write a bash script to automate testing
+Test_Deliverable_1, Complete_python_translator, 1, am9717,1956622d1d30b4ac47f76fd61fa7c006fdf0b89d ,Run the automated script and check if own compiler passes written tests
+Create_var_declaration,Test_simple_parser,2,ta2617,dea570317ef0779fde43e9d8d98ead233cb45f97,Broaden parser to allow for simple variable syntax e.g. 'a=5+5;' 
+Implement_function_def,Create_var_declaration,3,ta2617,a0bffc5ab391d5569d4189a2c3bcdb7ae6307b6e,Implement function definition; main specific translation as it requires a certain epilogue
+Implement_multifunction_def, Implement_function_def, 3, ta2617, 80dc5a53ba0bf0d875f9cc288118dbc4c3d8f625, Implement multiple function definitions such as many int/void types
+Implement_loops_def, Implement_multifunction_def, 3, am9717, 67693d6cf5f1bb7217d055b457c3fc41668599e7, Implement functionality for if/else/while/for loops parser and translator
+Implement_operators,Implement_loops_def,2,am9717,f37e55a00b84bc4e54af4a3a5128fca2fb53bee2, Based on formative test 9 implement operators such as < > and ==
+Test_python_translator,Implement_function_def,4,ta2617,8cc2e5e5ff6c00cb88a4a282e6ef83b240308895, Add tests for conversion between c and python fixing it when it fails/debug if not working
+Complete_python_translator, Test_python_translator, 2, am9717 ta2617, adbac977f9894b1900cf0cc4c1dc8c7cabaf4609, Fix function def/variable def/return/expression/operators for translator based on testing and complete translator
+Add_test_Deliverable_1,Complete_c_compiler, 1, am9717,, Add more tests to formative folder and create a "main" for the c_compiler to perform operations based on input flag
+Write_c_context,Test_python_translator, 4,am9717 ta2617,be5593f2b4b7a9b7e89e288dc38aa0ba15b59961, Create a context class for compiler that makes use of registers and sets them to used/unused
+Understand_MIPS_directives, Write_c_context, 2, am9717 ta2617, Discussion, Research on MIPS assembly and purpose of derictives for codegen
+Create_Simple_Compile_Function, Understand_MIPS_directives, 4, am9717 ta2617, d51362b51e899920f7fe8fd926d013694f49c7d8, Write MIPS assembly for a simple empty/return 0 main function 
+Test_Simple_Compile_Function, Create_Simple_Compile_Function, 3, ta2617, 7756f2790512d6245c16e887ffe82368a5bf7f0d, Create a simple test that runs the commands required to test codegen with qemu-mips
+Implement_global_var/dec, Test_Simple_Compile_Function, 5, ta2617, cfc201ac602fbeee354479d3a365e95c070db932, Implement global variable and expression declaration that suit all leaves at top of parse tree
+Implement_statement_scope, Test_Simple_Compile_Function, 4, am9717, d51362b51e899920f7fe8fd926d013694f49c7d8, Implement statement scope for declaring many local functions and for multiple declarations
+Implement_loops, Test_Simple_Compile_Function, 4, am9717 ta2617, d62b8cbb83c28da59e1eece86c18156871429bb4, Implement MIPS assembly code for ifelse/while loops
+Implement_operators, Test_Simple_Compile_Function, 5, am9717, ebb8753d54e32cf626a39e3f09514f2c25293082, Implement codegen for arithmetic and logical operators
+Complete_Basic_Codegen, Implement_operators, 15, am9717 ta2617, 3e8d4599fe4745b26f8138c03db1354d8c8d6297 , Complete all requirements for basic compiler functionality
+Test_Basic_Codegen, Complete_Basic_Codegen,2,am9717 ta2617,ebb8753d54e32cf626a39e3f09514f2c25293082,Test requirements using set tests and use some examples from online to test basic functionality
+Implement_FOR_loops, Implement_loops, 2, am9717, 0280ee7fcbd922f29d92068647e8707fb6205789, Add functionality for FOR loops and add increment/decrement codegen
+Implement_param_function_calls, Implement_function_def, 5, am9717 ta2617, 53bab19c04772b29aa2b13c1bee726f34cf71aa2, Add functionality for function calls especially with parameters
+Implement_local/global_arrays, Develop_simple_parser, 5, ta2617, 776eb4aad1b3fda8bfefed31edae939fa8087d13, Add functionality to support local and global arrays in program
+Implement_continue/break, Develop_simple_parser, 3, am9717, 823038cd190950b56f8b0477d79d4827e3280523, Add functionality to support break and Implement_continue
+Implement_enum, Develop_simple_parser, 4, ta2617, ff5ca35d9232b3d933eb6f1bdf779e7bcd613d41, Understand and add functionality for enumerators
+Implement_switch_statements, Implement_continue/break, 5, am9717, a9df83249f147be00dc1ec21d41713fdf94841e8, Add functionality for switch statements
+Complete_intermediate_codegen, Implementations above, 15, ta2617 am9717, c72c1ef3f7c5a980c571cfe479f93de8189236e4, Test and debug all intermediate functionality for codegen 

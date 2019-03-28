@@ -1,9 +1,9 @@
-Week,    DateRange,          PlannedEffort,  ActualEffort,  OtherDeadlines
-4, 29th Jan -  4th Feb,2,1,"Submission for first labcode deliverable, histogram_lexer."
-5,  5th Feb - 11th Feb,4,2,Submission for distributed systems coursework on 8th.
-6, 12th Feb - 18th Feb,3,2,Submission for databases SQL coursework on 15th.
-7, 19th Feb - 25th Feb,6,4,
-8, 26th Feb -  4th March,8,6,Submission for databases ER diagrams coursework on 1st.
-9,  5th Mar - 11th Mar,16,20, Maths coursework deadline meeting, campaigning for committee positions next year. 
-10, 12th Mar - 18th Mar,20,30, Maths coursework deadline on 18th
-11, 19th Mar - 27th Mar,                  ,              ,
+Week,DateRange,PlannedEffort,ActualEffort,OtherDeadlines
+4, 29th Jan -  5th Feb,2,1,Submission for first labcode deliverable and histogram_lexer.
+5,  6th Feb - 13th Feb,4,2,Submission for distributed systems coursework on 8th.
+6, 14th Feb - 21st Feb,3,2,Submission for databases SQL coursework on 15th.
+7, 22nd Feb - 1st March,6,7,Lexer test due 4th March. Sri Lankan society event on 3rd March (Tharusha).
+8, 2nd March -  9th March,12,17,Submission for databases ER diagrams coursework on 1st. Grammar test due 11th March.
+9,  10th Mar - 17th Mar,20,52, Maths coursework deadline meeting - 13th March. Analysis & Optimisation test due 18th March.
+10, 18th Mar - 25th Mar,40,82, Maths coursework deadline on 18th. Hindu Society event on Wednesday 20th March(Agrim)
+11, 26th Mar - 29th Mar,30,15, Compiler submission on 26th and Management submission on 29th March.
